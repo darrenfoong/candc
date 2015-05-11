@@ -1,0 +1,3 @@
+might want to have a model dir which we didn't have in C&C, holding
+all the feature classes etc. Whether we have a separate train class as
+well, or have everything in the model, not sure.

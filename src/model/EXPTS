@@ -1,0 +1,8 @@
+21 July 2014
+
+Procedure followed to get baseline results:
+
+1. run CountFeatures to get working/wsj02-21.feats. The features file
+   has the settings used in CountFeatures manually entered in the
+   preface.
+
