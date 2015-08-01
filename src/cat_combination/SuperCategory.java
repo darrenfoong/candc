@@ -519,7 +519,7 @@ public class SuperCategory implements Comparable<SuperCategory> {
 		cat = leftSuperCat.cat;
 		unfilledDeps = null;
 		filledDeps = null;
-		flags = flags;
+		this.flags = flags;
 		numVars = 2; // ugly?
 		numActiveVars = numVars;
 		vars = new Variable[numVars];
