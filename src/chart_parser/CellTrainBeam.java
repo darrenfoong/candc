@@ -169,7 +169,7 @@ public class CellTrainBeam extends Cell {
 
 			if ( rightChild != null ) {
 				int rightGoldSeen = countGoldDeps(rightChild, sentence, oracleDecoder, oracleSupertags);
-				if ( leftGoldSeen != -1 ) {
+				if ( rightGoldSeen != -1 ) {
 					numGoldSeen += rightGoldSeen;
 				} else {
 					return -1;
