@@ -54,14 +54,14 @@ public class GrammaticalFeature {
 		return feature;
 	}
 
-	/*
-	 * note it's important that the argument to the equals method is an Object,
-	 * and not GrammaticalFeature, since this is the default signature we want
-	 * to override:
-	 */
 	@Override
 	public boolean equals(Object other) {
 		return feature == ((GrammaticalFeature) (other)).feature;
+	}
+
+	@Override
+	public int hashCode() {
+		return feature;
 	}
 
 	/*
