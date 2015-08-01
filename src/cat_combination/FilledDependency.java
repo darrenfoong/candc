@@ -186,6 +186,10 @@ public class FilledDependency implements Comparable<FilledDependency> {
 
 	@Override
 	public boolean equals(Object other) {
+		if ( other == null ) {
+			return false;
+		}
+
 		return relID == ((FilledDependency) (other)).relID
 				&& headIndex == ((FilledDependency) (other)).headIndex
 				&& fillerIndex == ((FilledDependency) (other)).fillerIndex;

@@ -317,6 +317,10 @@ public class Category {
 	// so N[num] != N (updated 10/6/14)
 	@Override
 	public boolean equals(Object other) {
+		if ( other == null ) {
+			return false;
+		}
+
 		return equalIgnoreVars2(this, (Category) (other));
 		// return equalIgnoreVars(this, (Category)(other));
 	}

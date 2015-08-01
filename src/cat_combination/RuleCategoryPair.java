@@ -42,6 +42,10 @@ public class RuleCategoryPair {
 	 */
 	@Override
 	public boolean equals(Object other) {
+		if ( other == null ) {
+			return false;
+		}
+
 		return cat1.equals(((RuleCategoryPair) (other)).cat1)
 				&& cat2.equals(((RuleCategoryPair) (other)).cat2);
 	}

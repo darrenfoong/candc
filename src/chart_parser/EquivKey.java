@@ -21,6 +21,10 @@ public class EquivKey {
 
 	@Override
 	public boolean equals(Object other) {
+		if ( other == null ) {
+			return false;
+		}
+
 		return superCategory.getEhash() == ((EquivKey) (other)).superCategory.getEhash()
 				&& position == ((EquivKey) (other)).position
 				&& span == ((EquivKey) (other)).span

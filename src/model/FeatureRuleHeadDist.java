@@ -145,6 +145,10 @@ public class FeatureRuleHeadDist implements Feature<FeatureRuleHeadDist> {
 
 	@Override
 	public boolean equals(Object other) {
+		if ( other == null ) {
+			return false;
+		}
+
 		return featureType == ((FeatureRuleHeadDist) (other)).featureType && leftCat.equals(((FeatureRuleHeadDist) (other)).leftCat) && rightCat.equals(((FeatureRuleHeadDist) (other)).rightCat) && resultCat.equals(((FeatureRuleHeadDist) (other)).resultCat) && head == ((FeatureRuleHeadDist) (other)).head && distance == ((FeatureRuleHeadDist) (other)).distance;
 	}
 

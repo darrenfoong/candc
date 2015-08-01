@@ -60,6 +60,10 @@ public class FeatureRule implements Feature<FeatureRule> {
 
 	@Override
 	public boolean equals(Object other) {
+		if ( other == null ) {
+			return false;
+		}
+
 		return featureType == ((FeatureRule) (other)).featureType && leftCat.equals(((FeatureRule) (other)).leftCat) && rightCat.equals(((FeatureRule) (other)).rightCat) && resultCat.equals(((FeatureRule) (other)).resultCat);
 	}
 

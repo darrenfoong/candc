@@ -52,6 +52,10 @@ public class FeatureCat implements Feature<FeatureCat> {
 
 	@Override
 	public boolean equals(Object other) {
+		if ( other == null ) {
+			return false;
+		}
+
 		return featureType == ((FeatureCat) (other)).featureType && cat.equals(((FeatureCat) (other)).cat);
 	}
 

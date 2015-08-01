@@ -31,6 +31,10 @@ public class DependencyStringWords implements Comparable<DependencyStringWords> 
 
 	@Override
 	public boolean equals(Object other) {
+		if ( other == null ) {
+			return false;
+		}
+
 		return head.equals(((DependencyStringWords) (other)).head)
 				&& filler.equals(((DependencyStringWords) (other)).filler)
 				&& relID == ((DependencyStringWords) (other)).relID

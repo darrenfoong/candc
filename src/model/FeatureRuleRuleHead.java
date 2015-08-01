@@ -85,6 +85,10 @@ public class FeatureRuleRuleHead implements Feature<FeatureRuleRuleHead> {
 
 	@Override
 	public boolean equals(Object other) {
+		if ( other == null ) {
+			return false;
+		}
+
 		return featureType == ((FeatureRuleRuleHead) (other)).featureType && grandChildCat.equals(((FeatureRuleRuleHead) (other)).grandChildCat) && childCat.equals(((FeatureRuleRuleHead) (other)).childCat) && resultCat.equals(((FeatureRuleRuleHead) (other)).resultCat) && head == ((FeatureRuleRuleHead) (other)).head;
 	}
 

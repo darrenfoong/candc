@@ -24,6 +24,10 @@ public class EquivKeyFscore {
 
 	@Override
 	public boolean equals(Object other) {
+		if ( other == null ) {
+			return false;
+		}
+
 		return superCategory.getEhash() == ((EquivKeyFscore) (other)).superCategory.getEhash()
 				&& position == ((EquivKeyFscore) (other)).position
 				&& span == ((EquivKeyFscore) (other)).span
