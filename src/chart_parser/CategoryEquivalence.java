@@ -21,12 +21,11 @@ public class CategoryEquivalence {
 	 */
 	public boolean add(int position, int span, SuperCategory superCat) {
 		EquivKey equivKey = new EquivKey(position, span, superCat);
-		SuperCategory value = equiv.get(equivKey);
-		equiv.put(equivKey, superCat);
-		// overrides the previous value (if there was one)
-
-		if (value != null) {
-			value.next = superCat;
+		SuperCategory previousValue = equiv.put(equivKey, superCat);
+		// put() returns the previous value, or null if there was no mapping for the key
+		
+		if (previousValue != null) {
+			previousValue.next = superCat;
 			return false;
 		} else {
 			return true;
