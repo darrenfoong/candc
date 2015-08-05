@@ -190,9 +190,9 @@ public abstract class OracleDecoder {
 				}
 
 				String[] tokens = line.split("\\s");
-				short headIndex = (Short.valueOf(tokens[0])).shortValue();
-				short slot = (Short.valueOf(tokens[2])).shortValue();
-				short fillerIndex = (Short.valueOf(tokens[3])).shortValue();
+				short headIndex = Short.parseShort(tokens[0]);
+				short slot = Short.parseShort(tokens[2]);
+				short fillerIndex = Short.parseShort(tokens[3]);
 				short unaryRuleID = (short) (0);
 				short lrange = (short) (0);
 				short relID;

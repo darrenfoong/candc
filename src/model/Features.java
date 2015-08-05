@@ -196,7 +196,7 @@ public class Features {
 
 		while ((featuresLine = featuresIn.readLine()) != null) {
 			weightsLine = weightsIn.readLine();
-			double weight = Double.valueOf(weightsLine);
+			Double weight = Double.valueOf(weightsLine);
 
 			if ( weight == 0.0 ) {
 				continue;
@@ -224,7 +224,7 @@ public class Features {
 
 	private void readFeature(String featuresLine, int ID, Categories categories) {
 		String[] tokens = featuresLine.split("\\s");
-		short featureType = Short.valueOf(tokens[0]);
+		short featureType = Short.parseShort(tokens[0]);
 
 		switch (featureType) {
 			case Features.catRoot: // fall through

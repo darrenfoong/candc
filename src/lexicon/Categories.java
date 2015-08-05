@@ -408,7 +408,7 @@ public class Categories {
 		 * relations for a particular string are added consecutively and that
 		 * the slots are ordered from 1, increasing by 1 each time:
 		 */
-		short slotShort = Short.valueOf(slotString);
+		short slotShort = Short.parseShort(slotString);
 		if (slotShort != prevSlot.value + 1) {
 			throw new Error("slots are not increasing by 1! " + markedupString
 					+ " " + slotShort + " " + prevSlot.value);

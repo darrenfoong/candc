@@ -27,7 +27,7 @@ public class FeatureCatHead implements Feature<FeatureCatHead> {
 
 	public static void readFeature(short featureType, String[] tokens, FeatureIDs<FeatureCatHead> featureIDs, int ID, Categories categories) {
 		Category cat = categories.canonize(tokens[1]);
-		int head = Integer.valueOf(tokens[2]);
+		int head = Integer.parseInt(tokens[2]);
 		FeatureCatHead feature = new FeatureCatHead(featureType, cat, head);
 		featureIDs.addFeature(feature, ID);
 	}

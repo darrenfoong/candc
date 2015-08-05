@@ -26,7 +26,7 @@ class TrainLogLinear {
 		String forestFile = args[0];
 		String weightsFile = args[1];
 		String numItersStr = args[2];
-		int numIterations = Integer.valueOf(numItersStr);
+		int numIterations = Integer.parseInt(numItersStr);
 
 		Feature[] features = null;
 		ArrayList<Forest> forests = new ArrayList<Forest>();
@@ -42,7 +42,7 @@ class TrainLogLinear {
 			out = new PrintWriter(new FileWriter(weightsFile));
 
 			String line = in.readLine();
-			int numFeatures = Integer.valueOf(line);
+			int numFeatures = Integer.parseInt(line);
 			features = new Feature[numFeatures];
 
 			for (int i = 0; i < numFeatures; i++) {
@@ -65,7 +65,7 @@ class TrainLogLinear {
 					break;
 				}
 
-				int numNodes = Integer.valueOf(line);
+				int numNodes = Integer.parseInt(line);
 				Forest forest = new Forest(in, features, numNodes);
 				forests.add(forest);
 			}

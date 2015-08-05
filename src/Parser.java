@@ -49,8 +49,8 @@ class Parser {
 		String fromSent = args[4];
 		String toSent = args[5];
 
-		int fromSentence = Integer.valueOf(fromSent);
-		int toSentence = Integer.valueOf(toSent);
+		int fromSentence = Integer.parseInt(fromSent);
+		int toSentence = Integer.parseInt(toSent);
 
 		Lexicon lexicon = null;
 

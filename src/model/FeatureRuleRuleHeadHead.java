@@ -38,8 +38,8 @@ public class FeatureRuleRuleHeadHead implements Feature<FeatureRuleRuleHeadHead>
 		Category rightGrandChildCat = categories.canonize(tokens[2]);
 		Category childCat = categories.canonize(tokens[3]);
 		Category resultCat = categories.canonize(tokens[4]);
-		int leftHead = Integer.valueOf(tokens[5]);
-		int rightHead = Integer.valueOf(tokens[6]);
+		int leftHead = Integer.parseInt(tokens[5]);
+		int rightHead = Integer.parseInt(tokens[6]);
 		FeatureRuleRuleHeadHead feature = new FeatureRuleRuleHeadHead(featureType, leftGrandChildCat, rightGrandChildCat, childCat, resultCat, leftHead, rightHead);
 		featureIDs.addFeature(feature, ID);
 	}

@@ -35,8 +35,8 @@ public class FeatureRuleHeadHead implements Feature<FeatureRuleHeadHead> {
 		Category leftCat = categories.canonize(tokens[1]);
 		Category rightCat = categories.canonize(tokens[2]);
 		Category resultCat = categories.canonize(tokens[3]);
-		int leftHead = Integer.valueOf(tokens[4]);
-		int rightHead = Integer.valueOf(tokens[5]);
+		int leftHead = Integer.parseInt(tokens[4]);
+		int rightHead = Integer.parseInt(tokens[5]);
 		FeatureRuleHeadHead feature = new FeatureRuleHeadHead(featureType, leftCat, rightCat, resultCat, leftHead, rightHead);
 		featureIDs.addFeature(feature, ID);
 	}

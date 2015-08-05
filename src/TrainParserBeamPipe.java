@@ -54,9 +54,9 @@ public class TrainParserBeamPipe {
 		String fromSent = args[6];
 		String toSent = args[7];
 
-		int fromSentence = Integer.valueOf(fromSent);
-		int toSentence = Integer.valueOf(toSent);
-		int numIterations = Integer.valueOf(numItersStr);
+		int fromSentence = Integer.parseInt(fromSent);
+		int toSentence = Integer.parseInt(toSent);
+		int numIterations = Integer.parseInt(numItersStr);
 
 		Lexicon lexicon = null;
 

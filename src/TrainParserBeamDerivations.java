@@ -66,9 +66,9 @@ public class TrainParserBeamDerivations {
 		String fromSent = args[8];
 		String toSent = args[9];
 
-		int fromSentence = Integer.valueOf(fromSent);
-		int toSentence = Integer.valueOf(toSent);
-		int numIterations = Integer.valueOf(numItersStr);
+		int fromSentence = Integer.parseInt(fromSent);
+		int toSentence = Integer.parseInt(toSent);
+		int numIterations = Integer.parseInt(numItersStr);
 
 		Lexicon lexicon = null;
 

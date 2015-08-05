@@ -33,7 +33,7 @@ public class FeatureRuleRuleHead implements Feature<FeatureRuleRuleHead> {
 		Category grandChildCat = categories.canonize(tokens[1]);
 		Category childCat = categories.canonize(tokens[2]);
 		Category resultCat = categories.canonize(tokens[3]);
-		int head = Integer.valueOf(tokens[4]);
+		int head = Integer.parseInt(tokens[4]);
 		FeatureRuleRuleHead feature = new FeatureRuleRuleHead(featureType, grandChildCat, childCat, resultCat, head);
 		featureIDs.addFeature(feature, ID);
 	}

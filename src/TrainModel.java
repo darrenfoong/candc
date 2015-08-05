@@ -26,7 +26,7 @@ class TrainModel {
 		String forestFile = args[0];
 		String weightsFile = args[1];
 		String numItersStr = args[2];
-		int numIterations = Integer.valueOf(numItersStr);
+		int numIterations = Integer.parseInt(numItersStr);
 
 		Feature[] features = null;
 		ArrayList<Forest> forests = new ArrayList<Forest>();
@@ -44,7 +44,7 @@ class TrainModel {
 			outIter = new PrintWriter(new FileWriter(weightsFile + "." + iteration));
 
 			String line = in.readLine();
-			int numFeatures = Integer.valueOf(line);
+			int numFeatures = Integer.parseInt(line);
 			features = new Feature[numFeatures];
 
 			for (int i = 0; i < numFeatures; i++) {
@@ -67,7 +67,7 @@ class TrainModel {
 					break;
 				}
 
-				int numNodes = Integer.valueOf(line);
+				int numNodes = Integer.parseInt(line);
 				Forest forest = new Forest(in, features, numNodes);
 
 				if (numForest < fromSentence) {

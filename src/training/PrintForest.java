@@ -251,10 +251,10 @@ public class PrintForest {
 					throw new Error("gold deps should always have 4 fields!");
 				}
 
-				short headIndex = (Short.valueOf(tokens[0])).shortValue();
-				short relID = (Short.valueOf(tokens[1])).shortValue();
-				short fillerIndex = (Short.valueOf(tokens[2])).shortValue();
-				short unaryRuleID = (Short.valueOf(tokens[3])).shortValue();
+				short headIndex = Short.parseShort(tokens[0]);
+				short relID = Short.parseShort(tokens[1]);
+				short fillerIndex = Short.parseShort(tokens[2]);
+				short unaryRuleID = Short.parseShort(tokens[3]);
 				short lrange = (short) (0); // assuming lrange is not part of
 				// the data
 

@@ -32,7 +32,7 @@ public class Weights {
 
 		String line = null;
 		while ((line = in.readLine()) != null) {
-			double weight = Double.valueOf(line);
+			double weight = Double.parseDouble(line);
 			weights[ID] = weight;
 			ID++;
 		}

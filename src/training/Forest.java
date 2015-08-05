@@ -23,7 +23,7 @@ public class Forest {
 
 			for (int i = 0; i < numNodes; i++) {
 				line = in.readLine();
-				int nodeID = Integer.valueOf(line);
+				int nodeID = Integer.parseInt(line);
 				if (nodeID != i) {
 					throw new Error(
 							"disj node id does not match expected value! "
@@ -133,7 +133,7 @@ public class Forest {
 	private void readDisjNode(BufferedReader in, int nodeID, Feature[] features) {
 		try {
 			String line = in.readLine();
-			int numConjs = Integer.valueOf(line);
+			int numConjs = Integer.parseInt(line);
 
 			DisjNode disjNode = new DisjNode(numConjs);
 			disjNodes[nodeID] = disjNode;
@@ -156,7 +156,7 @@ public class Forest {
 		try {
 			String line = in.readLine();
 			String[] tokens = line.split("\\s");
-			int nodeType = Integer.valueOf(tokens[0]);
+			int nodeType = Integer.parseInt(tokens[0]);
 			int nextTokenIndex;
 			int leftChildID = -1;
 			int rightChildID = -1;
@@ -165,17 +165,17 @@ public class Forest {
 
 			switch (nodeType) { // reading the children
 			case 0: // leaf node
-				supertagScore = Double.valueOf(tokens[1]);
+				supertagScore = Double.parseDouble(tokens[1]);
 				nextTokenIndex = 2;
 				break;
 			case 1: // unary node
-				leftChildID = Integer.valueOf(tokens[1]);
+				leftChildID = Integer.parseInt(tokens[1]);
 				nextTokenIndex = 2;
 				break;
 			case 2: // binary (non-root) node - fall through
 			case 3: // root node
-				leftChildID = Integer.valueOf(tokens[1]);
-				rightChildID = Integer.valueOf(tokens[2]);
+				leftChildID = Integer.parseInt(tokens[1]);
+				rightChildID = Integer.parseInt(tokens[2]);
 				nextTokenIndex = 3;
 				break;
 			default:
@@ -191,7 +191,7 @@ public class Forest {
 			}
 			nextTokenIndex++;
 
-			int numFeatures = Integer.valueOf(tokens[nextTokenIndex]);
+			int numFeatures = Integer.parseInt(tokens[nextTokenIndex]);
 			nextTokenIndex++;
 
 			// assumes forests are printed bottom up, ie we already have
@@ -206,7 +206,7 @@ public class Forest {
 			disjNode.add(conj, nodeNum);
 
 			for (int i = 0; i < numFeatures; i++) {
-				int featureID = Integer.valueOf(tokens[nextTokenIndex + i]);
+				int featureID = Integer.parseInt(tokens[nextTokenIndex + i]);
 				conj.features[i] = features[featureID];
 			}
 			if (nodeType == 3) {

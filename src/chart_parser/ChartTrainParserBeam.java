@@ -409,17 +409,17 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 					throw new Error("expecting 3 fields");
 				}
 
-				int start = (Integer.valueOf(tokens[0])).intValue();
-				int span = (Integer.valueOf(tokens[1])).intValue();
-				int numDeps = (Integer.valueOf(tokens[2])).intValue();
+				int start = Integer.parseInt(tokens[0]);
+				int span = Integer.parseInt(tokens[1]);
+				int numDeps = Integer.parseInt(tokens[2]);
 
 				for (int i = 0; i < numDeps; i++) {
 					line = goldDepsPerCell.readLine();
 					tokens = line.split("\\s");
 
-					short headIndex = (Short.valueOf(tokens[0])).shortValue();
-					short slot = (Short.valueOf(tokens[2])).shortValue();
-					short fillerIndex = (Short.valueOf(tokens[3])).shortValue();
+					short headIndex = Short.parseShort(tokens[0]);
+					short slot = Short.parseShort(tokens[2]);
+					short fillerIndex = Short.parseShort(tokens[3]);
 					short unaryRuleID = (short) (0);
 					short lrange = (short) (0);
 					short relID;

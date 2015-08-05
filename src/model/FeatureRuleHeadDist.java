@@ -35,8 +35,8 @@ public class FeatureRuleHeadDist implements Feature<FeatureRuleHeadDist> {
 		Category leftCat = categories.canonize(tokens[1]);
 		Category rightCat = categories.canonize(tokens[2]);
 		Category resultCat = categories.canonize(tokens[3]);
-		int head = Integer.valueOf(tokens[4]);
-		short distance = Short.valueOf(tokens[5]);
+		int head = Integer.parseInt(tokens[4]);
+		short distance = Short.parseShort(tokens[5]);
 		FeatureRuleHeadDist feature = new FeatureRuleHeadDist(featureType, leftCat, rightCat, resultCat, head, distance);
 		featureIDs.addFeature(feature, ID);
 	}

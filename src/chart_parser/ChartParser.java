@@ -209,7 +209,7 @@ public class ChartParser {
 				sentence.addWord(tokens[0]);
 				sentence.addPostag(tokens[1]);
 
-				int numSupertags = (Integer.valueOf(tokens[2])).intValue();
+				int numSupertags = Integer.parseInt(tokens[2]);
 				ArrayList<Supertag> supertags = new ArrayList<Supertag>(numSupertags);
 
 				String supertagString = null;
@@ -231,7 +231,7 @@ public class ChartParser {
 
 				for (int i = 0; i < numSupertags; i++) {
 					supertagString = tokens[2 * i + 3];
-					double probability = (Double.valueOf(tokens[2 * i + 4])).doubleValue();
+					double probability = Double.parseDouble(tokens[2 * i + 4]);
 					lowestProb = probability;
 					// assumes supertags are ordered by probability (highest first)
 					// TODO: bad assumption
