@@ -9,12 +9,24 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import model.Lexicon;
+import utils.Benchmark;
 import cat_combination.RuleInstancesParams;
 import chart_parser.ChartParser;
 import chart_parser.ViterbiDecoder;
 
 class Parser {
 	public static void main(String[] args) {
+		int iterations = 1;
+		for ( int i = 1; i <= iterations; i++ ) {
+			System.out.println("## Start program iteration " + i);
+			run(args);
+			System.out.println("## End program iteration " + i);
+		}
+	}
+
+	public static void run(String[] args) {
+		long TS_PROGRAM = Benchmark.getTime();
+
 		int MAX_WORDS = 250;
 		int MAX_SUPERCATS = 300000;
 
@@ -55,7 +67,10 @@ class Parser {
 		Lexicon lexicon = null;
 
 		try {
+			long TS_LEXICON = Benchmark.getTime();
 			lexicon = new Lexicon(lexiconFile);
+			long TE_LEXICON = Benchmark.getTime();
+			Benchmark.printTime("load lexicon", TS_LEXICON, TE_LEXICON);
 		} catch (IOException e) {
 			System.err.println(e);
 			return;
@@ -64,10 +79,13 @@ class Parser {
 		ChartParser parser = null;
 
 		try {
+			long TS_PARSER_INIT = Benchmark.getTime();
 			parser = new ChartParser(grammarDir, altMarkedup,
 					eisnerNormalForm, MAX_WORDS, MAX_SUPERCATS, detailedOutput,
 					oracleFscore, adaptiveSupertagging, ruleInstancesParams,
 					lexicon, featuresFile, weightsFile, newFeatures);
+			long TE_PARSER_INIT = Benchmark.getTime();
+			Benchmark.printTime("init parser", TS_PARSER_INIT, TE_PARSER_INIT);
 		} catch (IOException e) {
 			System.err.println(e);
 			return;
@@ -91,6 +109,7 @@ class Parser {
 			out.println("# mandatory preface");
 			out.println();
 
+			long TS_PARSING = Benchmark.getTime();
 			for (int numSentence = fromSentence; numSentence <= toSentence; numSentence++) {
 				System.out.println("Parsing sentence "+ numSentence);
 				log.println("Parsing sentence "+ numSentence);
@@ -117,6 +136,8 @@ class Parser {
 
 				out.println();
 			}
+			long TE_PARSING = Benchmark.getTime();
+			Benchmark.printTime("parsing", TS_PARSING, TE_PARSING);
 		} catch (FileNotFoundException e) {
 			System.err.println(e);
 		} catch (IOException e) {
@@ -130,5 +151,8 @@ class Parser {
 				System.err.println(e);
 			}
 		}
+
+		long TE_PROGRAM = Benchmark.getTime();
+		Benchmark.printTime("program", TS_PROGRAM, TE_PROGRAM);
 	}
 }
