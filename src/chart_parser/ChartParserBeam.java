@@ -43,21 +43,12 @@ public class ChartParserBeam extends ChartParser {
 					double beta) throws IOException {
 		super(grammarDir, altMarkedup, eisnerNormalForm, MAX_WORDS,
 					MAX_SUPERCATS, output, false, false, ruleInstancesParams,
-					lexicon, null, null, newFeatures);
-
-		if ( compactWeights ) {
-			this.weights = new Weights();
-			this.features = new Features(featuresFile, weightsFile, weights, categories, newFeatures);
-		} else {
-			this.features = (featuresFile != null ? new Features(featuresFile, categories, newFeatures) : null);
-			this.weights = (weightsFile != null ? new Weights(weightsFile, features.numFeatures) : null);
-		}
+					lexicon, featuresFile, weightsFile, newFeatures, compactWeights);
 
 		this.chart = new Chart(MAX_WORDS, output, categories.dependencyRelations, false, false);
 		this.chart.setWeights(this.weights);
 
 		this.cubePruning = cubePruning;
-
 		this.beamSize = beamSize;
 		this.beta = beta;
 	}

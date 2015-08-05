@@ -34,6 +34,7 @@ class Parser {
 		boolean eisnerNormalForm = true;
 		boolean detailedOutput = false;
 		boolean newFeatures = false;
+		boolean compactWeights = true;
 		boolean oracleFscore = false;
 
 		String grammarDir = "data/baseline_expts/grammar";
@@ -83,7 +84,8 @@ class Parser {
 			parser = new ChartParser(grammarDir, altMarkedup,
 					eisnerNormalForm, MAX_WORDS, MAX_SUPERCATS, detailedOutput,
 					oracleFscore, adaptiveSupertagging, ruleInstancesParams,
-					lexicon, featuresFile, weightsFile, newFeatures);
+					lexicon, featuresFile, weightsFile, newFeatures,
+					compactWeights);
 			long TE_PARSER_INIT = Benchmark.getTime();
 			Benchmark.printTime("init parser", TS_PARSER_INIT, TE_PARSER_INIT);
 		} catch (IOException e) {

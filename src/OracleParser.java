@@ -76,7 +76,7 @@ class OracleParser {
 			parser = new ChartParser(grammarDir, altMarkedup,
 					eisnerNormalForm, MAX_WORDS, MAX_SUPERCATS, detailedOutput,
 					oracleFscore, adaptiveSupertagging, ruleInstancesParams, null,
-					null, null, newFeatures);
+					null, null, newFeatures, false);
 		} catch (IOException e) {
 			System.err.println(e);
 			return;

@@ -91,7 +91,7 @@ public class TrainParserBeamDerivations {
 			goldParser = new ChartParser(grammarDir, altMarkedup,
 					eisnerNormalForm, GOLD_MAX_WORDS, GOLD_MAX_SUPERCATS, detailedOutput,
 					oracleFscore, adaptiveSupertagging, ruleInstancesParams,
-					lexicon, featuresFile, weightsFile, newFeatures);
+					lexicon, featuresFile, weightsFile, newFeatures, false);
 		} catch (IOException e) {
 			System.err.println(e);
 			return;

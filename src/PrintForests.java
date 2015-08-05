@@ -71,7 +71,7 @@ class PrintForests {
 			parser = new ChartParser(grammarDir, altMarkedup,
 					eisnerNormalForm, MAX_WORDS, MAX_SUPERCATS, detailedOutput,
 					oracleFscore, adaptiveSupertagging, ruleInstancesParams,
-					lexicon, featuresFile, null, newFeatures);
+					lexicon, featuresFile, null, newFeatures, false);
 		} catch (IOException e) {
 			System.err.println(e);
 			return;

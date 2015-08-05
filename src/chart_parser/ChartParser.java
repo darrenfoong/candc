@@ -54,21 +54,29 @@ public class ChartParser {
 					Lexicon lexicon,
 					String featuresFile,
 					String weightsFile,
-					boolean newFeatures) throws IOException {
+					boolean newFeatures,
+					boolean compactWeights) throws IOException {
 		this.MAX_SUPERCATS = MAX_SUPERCATS;
 		this.printDetailedOutput = output;
 		this.oracleFscore = oracleFscore;
 		this.adaptiveSupertagging = adaptiveSupertagging;
 		this.categories = new Categories(grammarDir, altMarkedup);
 		this.rules = new Rules(eisnerNormalForm, categories, ruleInstancesParams);
-		this.chart = new Chart(MAX_WORDS, output, categories.dependencyRelations, oracleFscore, false);
 		this.lexicon = lexicon;
-		this.features = (featuresFile != null ? new Features(featuresFile, categories, newFeatures) : null);
-		this.weights = (weightsFile != null ? new Weights(weightsFile, features.numFeatures) : null);
+
+		if ( compactWeights ) {
+			this.weights = new Weights();
+			this.features = new Features(featuresFile, weightsFile, weights, categories, newFeatures);
+		} else {
+			this.features = (featuresFile != null ? new Features(featuresFile, categories, newFeatures) : null);
+			this.weights = (weightsFile != null ? new Weights(weightsFile, features.numFeatures) : null);
+		}
+
 		this.sentence = new Sentence(MAX_WORDS);
 		this.results = new ArrayList<SuperCategory>();
 		this.featureIDs = new ArrayList<Integer>();
 
+		this.chart = new Chart(MAX_WORDS, output, categories.dependencyRelations, oracleFscore, false);
 		this.chart.setWeights(this.weights);
 	}
 
