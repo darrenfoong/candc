@@ -1,10 +1,10 @@
 package chart_parser;
 
 public class CellCoords {
-	int pos;
-	int span;
-	int end;
-	double violation;
+	public int pos;
+	public int span;
+	public int end;
+	public double violation;
 
 	public CellCoords(int pos, int span) {
 		this.pos = pos;
