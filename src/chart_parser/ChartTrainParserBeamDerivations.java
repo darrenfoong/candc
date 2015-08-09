@@ -7,8 +7,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
-import utils.Pair;
-
 import model.Lexicon;
 import cat_combination.RuleInstancesParams;
 import cat_combination.SuperCategory;
@@ -98,12 +96,12 @@ public class ChartTrainParserBeamDerivations extends ChartTrainParserBeam {
 		if ( !parallelUpdate ) {
 			if (violation > maxViolation) {
 				maxViolation = violation;
-				maxViolationCell = new Pair<Integer, Integer>(pos, span);
+				maxViolationCell = new CellCoords(pos, span);
 				System.out.println("New maxViolation found at (" + pos + "," + span + "); maxViolation: " + violation);
 			}
 		} else {
 			if ( violation > 0 ) {
-				violationCells.add(new Pair<Pair<Integer, Integer>, Double>(new Pair<Integer, Integer>(pos,span), violation));
+				violationCells.add(new CellCoords(pos, span, violation));
 				System.out.println("Adding (" + pos + "," + span + "); to violationCells; violation: " + violation);
 			}
 		}

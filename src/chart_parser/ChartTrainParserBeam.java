@@ -13,7 +13,6 @@ import java.util.LinkedList;
 import lexicon.Category;
 import model.Lexicon;
 import training.Feature;
-import utils.Pair;
 import cat_combination.FilledDependency;
 import cat_combination.RuleInstancesParams;
 import cat_combination.SuperCategory;
@@ -23,9 +22,9 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 	protected boolean updateLogP;
 	protected double maxViolation;
 
-	protected Pair<Integer, Integer> maxViolationCell;
-	protected ArrayList<Pair<Integer, Integer>> maxViolationCells = new ArrayList<Pair<Integer, Integer>>();
-	protected LinkedList<Pair<Pair<Integer, Integer>, Double>> violationCells = new LinkedList<Pair<Pair<Integer, Integer>, Double>>();
+	protected CellCoords maxViolationCell;
+	protected LinkedList<CellCoords> violationCells = new LinkedList<CellCoords>();
+	protected ArrayList<CellCoords> maxViolationCells = new ArrayList<CellCoords>();
 
 	private Feature[] trainingFeatures;
 	private BufferedReader goldDepsPerCell;
@@ -123,12 +122,12 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 		if ( !parallelUpdate ) {
 			if (violation > maxViolation) {
 				maxViolation = violation;
-				maxViolationCell = new Pair<Integer, Integer>(pos, span);
+				maxViolationCell = new CellCoords(pos, span);
 				System.out.println("New maxViolation found at (" + pos + "," + span + "); maxViolation: " + violation);
 			}
 		} else {
 			if ( violation > 0 ) {
-				violationCells.add(new Pair<Pair<Integer, Integer>, Double>(new Pair<Integer, Integer>(pos,span), violation));
+				violationCells.add(new CellCoords(pos, span, violation));
 				System.out.println("Adding (" + pos + "," + span + "); to violationCells; violation: " + violation);
 			}
 		}
@@ -141,25 +140,25 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 	 * subsentence of a sentence and adds it to maxViolationCells.
 	 */
 	private void findLocalMaxViolations() {
-		Collections.sort(violationCells, new Comparator<Pair<Pair<Integer, Integer>, Double>>(){
+		Collections.sort(violationCells, new Comparator<CellCoords>(){
 			@Override
-			public int compare(Pair<Pair<Integer, Integer>, Double> p1, Pair<Pair<Integer, Integer>, Double> p2){
-				return -Double.compare(p1.y, p2.y);
+			public int compare(CellCoords p1, CellCoords p2){
+				return -Double.compare(p1.violation, p2.violation);
 			}});
 
 		while ( !violationCells.isEmpty() ) {
-			Pair<Pair<Integer, Integer>, Double> top = violationCells.removeFirst();
-			System.out.println("Adding (" + top.x.x + "," + top.x.y + "); violation: " + top.y);
-			maxViolationCells.add(top.x);
+			CellCoords top = violationCells.removeFirst();
+			System.out.println("Adding (" + top.pos + "," + top.span + "); violation: " + top.violation);
+			maxViolationCells.add(top);
 
-			int topLeft = top.x.x;
-			int topRight = top.x.x + top.x.y - 1;
+			int topLeft = top.pos;
+			int topRight = top.end;
 
-			Iterator<Pair<Pair<Integer, Integer>, Double>> it = violationCells.iterator();
+			Iterator<CellCoords> it = violationCells.iterator();
 			while (it.hasNext()) {
-				Pair<Pair<Integer, Integer>, Double> p = it.next();
-				int pLeft = p.x.x;
-				int pRight = p.x.x + p.x.y - 1;
+				CellCoords p = it.next();
+				int pLeft = p.pos;
+				int pRight = p.end;
 
 				if ( !((pRight < topLeft) || (pLeft > topRight)) ) {
 					it.remove();
@@ -210,7 +209,7 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 
 				return null;
 			} else {
-				CellTrainBeam cell = (CellTrainBeam) chart.cell(maxViolationCell.x, maxViolationCell.y);
+				CellTrainBeam cell = (CellTrainBeam) chart.cell(maxViolationCell.pos, maxViolationCell.span);
 
 				System.out.println("maxViolation exists in chart (score: " + cell.maxSuper.score + ", gold score: " + cell.goldSuperCat.score + ", violation: " + maxViolation + "); updating features.");
 				log.println("maxViolation exists in chart (score: " + cell.maxSuper.score + ", gold score: " + cell.goldSuperCat.score + ", violation: " + maxViolation + "); updating features.");
@@ -219,9 +218,9 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 
 				HashSet<Integer> featuresToUpdate = new HashSet<Integer>();
 
-				System.out.println("Updating features for (" + maxViolationCell.x + "," + maxViolationCell.y + ")");
+				System.out.println("Updating features for (" + maxViolationCell.pos + "," + maxViolationCell.span + ")");
 
-				if ( maxViolationCell.x == 0 && maxViolationCell.y == sentence.words.size() ) {
+				if ( maxViolationCell.pos == 0 && maxViolationCell.span == sentence.words.size() ) {
 					atRoot = true;
 					System.out.println("maxViolation found at root");
 				} else {
@@ -254,10 +253,10 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 
 				HashSet<Integer> featuresToUpdate = new HashSet<Integer>();
 
-				for ( Pair<Integer, Integer> pair : maxViolationCells ) {
-					System.out.println("Updating features for (" + pair.x + "," + pair.y + ")");
-					cell = (CellTrainBeam) chart.cell(pair.x, pair.y);
-					if ( pair.x == 0 && pair.y == sentence.words.size() ) {
+				for ( CellCoords pair : maxViolationCells ) {
+					System.out.println("Updating features for (" + pair.pos + "," + pair.span + ")");
+					cell = (CellTrainBeam) chart.cell(pair.pos, pair.span);
+					if ( pair.pos == 0 && pair.span == sentence.words.size() ) {
 						atRoot = true;
 						System.out.println("maxViolation found at root");
 					} else {
