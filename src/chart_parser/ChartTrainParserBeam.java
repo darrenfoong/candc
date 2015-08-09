@@ -167,6 +167,94 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 		}
 	}
 
+	private void findLocalMaxViolationsDP() {
+		/*
+		 * dynamic programming solution to the weighted interval scheduling
+		 * problem
+		 */
+
+		if ( violationCells.isEmpty() ) {
+			return;
+		}
+
+		// sort by end ("finishing time")
+		Collections.sort(violationCells, new Comparator<CellCoords>(){
+			@Override
+			public int compare(CellCoords p1, CellCoords p2){
+				return p1.end - p2.end;
+			}});
+
+		int numViolationCells = violationCells.size();
+
+		int[] rightMostArray = new int[numViolationCells];
+		double[] optArray = new double[numViolationCells];
+
+		boolean[] inclArray = new boolean[numViolationCells];
+		int[] backTrackArray = new int[numViolationCells];
+
+		// calculate rightmost non-overlapping interval for each interval
+		for ( int i = 0; i < numViolationCells; i++ ) {
+			// default: no rightmost non-overlapping interval
+			int rightMost = -1;
+
+			// algorithm checks from right to left
+			// apparently can be optimised with binary search
+			for ( int j = i - 1; j >= 0; j-- ) {
+				if ( violationCells.get(i).pos > violationCells.get(j).end ) {
+					rightMost = j;
+
+					// break upon finding non-overlapping interval
+					// guaranteed to be rightmost due to search direction
+					break;
+				}
+			}
+
+			rightMostArray[i] = rightMost;
+		}
+
+		// base case for one interval
+		optArray[0] = violationCells.get(0).violation;
+		inclArray[0] = true;
+		backTrackArray[0] = -1;
+
+		// iterative bottom-up solution starting from second interval
+		for ( int i = 1; i < numViolationCells; i++ ) {
+			double v1, v2;
+
+			if ( rightMostArray[i] == -1 ) {
+				// if interval does not have rightmost non-overlapping interval
+				// optArray[-1] throws ArrayOutOfBounds exception
+				v1 = violationCells.get(i).violation;
+			} else {
+				v1 = violationCells.get(i).violation + optArray[rightMostArray[i]];
+			}
+
+			v2 = optArray[i-1];
+
+			if ( v1 > v2 ) {
+				optArray[i] = v1;
+				inclArray[i] = true;
+				backTrackArray[i] = rightMostArray[i];
+			} else {
+				optArray[i] = v2;
+				inclArray[i] = false;
+				backTrackArray[i] = i - 1;
+			}
+		}
+
+		int backTrack = numViolationCells - 1;
+
+		while ( backTrack >= 0 ) {
+			if ( inclArray[backTrack] ) {
+				CellCoords top = violationCells.get(backTrack);
+				System.out.println("Adding (" + top.pos + "," + top.span + "); violation: " + top.violation);
+				maxViolationCells.add(top);
+			}
+
+			backTrack = backTrackArray[backTrack];
+		}
+	}
+
 	/**
 	 * Collects all features in tree rooted by superCat in featuresID.
 	 * 
