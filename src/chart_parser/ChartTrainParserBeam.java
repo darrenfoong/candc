@@ -12,12 +12,17 @@ import java.util.LinkedList;
 
 import lexicon.Category;
 import model.Lexicon;
+import statistics.HasUpdateStatistics;
+import statistics.HypothesisSizeStatistics;
 import training.Feature;
 import cat_combination.FilledDependency;
 import cat_combination.RuleInstancesParams;
 import cat_combination.SuperCategory;
 
 public class ChartTrainParserBeam extends ChartParserBeam {
+	public HasUpdateStatistics hasUpdateStatistics = new HasUpdateStatistics();
+	public HypothesisSizeStatistics hypothesisSizeStatistics = new HypothesisSizeStatistics();
+
 	protected boolean parallelUpdate;
 	protected boolean updateLogP;
 	protected double maxViolation;
@@ -295,6 +300,9 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 				System.out.println("No non-zero violation in the chart.");
 				log.println("No non-zero violation in the chart.");
 
+				hasUpdateStatistics.addData(false);
+				hypothesisSizeStatistics.addData(0, sentence.words.size());
+
 				return null;
 			} else {
 				CellTrainBeam cell = (CellTrainBeam) chart.cell(maxViolationCell.pos, maxViolationCell.span);
@@ -321,6 +329,10 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 				updateFeatureParams(cell.maxSuper, false, atRoot, featuresToUpdate);
 
 				updateAllWeights(featuresToUpdate, numTrainInstances);
+
+				hasUpdateStatistics.addData(true);
+				hypothesisSizeStatistics.addData(maxViolationCell.span, sentence.words.size());
+
 				return cell.maxSuper;
 			}
 		} else {
@@ -329,6 +341,9 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 			if (maxViolationCells.isEmpty()) {
 				System.out.println("No non-zero violation in the chart.");
 				log.println("No non-zero violation in the chart.");
+
+				hasUpdateStatistics.addData(false);
+				hypothesisSizeStatistics.addData(0, sentence.words.size());
 
 				return null;
 			} else {
@@ -355,6 +370,16 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 				}
 
 				updateAllWeights(featuresToUpdate, numTrainInstances);
+
+				hasUpdateStatistics.addData(true);
+
+				int totalSpan = 0;
+
+				for ( CellCoords pair : maxViolationCells ) {
+					totalSpan += pair.span;
+				}
+
+				hypothesisSizeStatistics.addData(totalSpan, sentence.words.size());
 
 				return cell.maxSuper;
 			}
