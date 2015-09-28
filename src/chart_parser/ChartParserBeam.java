@@ -12,9 +12,7 @@ import java.util.LinkedList;
 import java.util.PriorityQueue;
 
 import lexicon.Relations;
-import model.Features;
 import model.Lexicon;
-import model.Weights;
 import utils.Pair;
 import cat_combination.FilledDependency;
 import cat_combination.RuleInstancesParams;
