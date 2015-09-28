@@ -148,7 +148,7 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 		Collections.sort(violationCells, new Comparator<CellCoords>(){
 			@Override
 			public int compare(CellCoords p1, CellCoords p2){
-				return -Double.compare(p1.violation, p2.violation);
+				return Double.compare(p2.violation, p1.violation);
 			}});
 
 		while ( !violationCells.isEmpty() ) {
