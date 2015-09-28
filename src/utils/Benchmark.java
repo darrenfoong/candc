@@ -18,7 +18,7 @@ public class Benchmark {
 
 	public static void printMemory(String description, long startMemory, long endMemory) {
 		long usedMemory = endMemory - startMemory;
-		double usedMemoryMega = usedMemory/(1024L * 1024L);
+		double usedMemoryMega = ((double) usedMemory/(double) (1024L * 1024L));
 		System.out.println("# MEMORY # " + description + ": " + usedMemory + " B (" + usedMemoryMega + " MB)");
 	}
 }
