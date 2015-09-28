@@ -244,11 +244,11 @@ public class Categories {
 			throw new Error("unexpected token parsing category in consumeBasic");
 		}
 
-		String atomString = "";
+		StringBuilder atomStringBuilder = new StringBuilder();
 		while (Character.isLetter(currentChar) || currentChar == ','
 				|| currentChar == '.' || currentChar == ';'
 				|| currentChar == ':') {
-			atomString += currentChar;
+			atomStringBuilder.append(currentChar);
 			index.value++;
 			if (index.value < markedupString.length()) {
 				currentChar = markedupString.charAt(index.value);
@@ -256,6 +256,7 @@ public class Categories {
 				break;
 			}
 		}
+		String atomString = atomStringBuilder.toString();
 		Atom atom = new Atom(atomString);
 		GrammaticalFeature feature = new GrammaticalFeature(
 				GrammaticalFeature.NONE);
@@ -342,13 +343,14 @@ public class Categories {
 
 	private GrammaticalFeature consumeFeature(String markedupString,
 			ShortWrapper index) {
-		String featureString = "";
 		char currentChar = markedupString.charAt(index.value);
 
+		StringBuilder featureStringBuilder = new StringBuilder();
 		while (Character.isLetter(currentChar)) {
-			featureString += currentChar;
+			featureStringBuilder.append(currentChar);
 			currentChar = markedupString.charAt(++index.value);
 		}
+		String featureString = featureStringBuilder.toString();
 		if (currentChar != ']') {
 			throw new Error("unexpected character parsing feature");
 		}
@@ -360,13 +362,14 @@ public class Categories {
 
 	private byte consumeVar(String markedupString, ShortWrapper index,
 			ShortWrapper lrange) {
-		String varString = "";
 		char currentChar = markedupString.charAt(index.value);
 
+		StringBuilder varStringBuilder = new StringBuilder();
 		while (Character.isLetter(currentChar) || currentChar == '_') {
-			varString += currentChar;
+			varStringBuilder.append(currentChar);
 			currentChar = markedupString.charAt(++index.value);
 		}
+		String varString = varStringBuilder.toString();
 		if (currentChar == '*') {
 			/*
 			 * from the C&C code: lrange.value = markedup.size(); this assumes
@@ -390,13 +393,14 @@ public class Categories {
 
 	private short consumeSlot(String markedupString, ShortWrapper index,
 			ShortWrapper numJuliaSlots, ShortWrapper prevSlot) {
-		String slotString = "";
 		char currentChar = markedupString.charAt(index.value);
 
+		StringBuilder slotStringBuilder = new StringBuilder();
 		while (Character.isDigit(currentChar)) {
-			slotString += currentChar;
+			slotStringBuilder.append(currentChar);
 			currentChar = markedupString.charAt(++index.value);
 		}
+		String slotString = slotStringBuilder.toString();
 		if (currentChar != '>') {
 			throw new Error("unexpected character parsing dependency");
 		}
