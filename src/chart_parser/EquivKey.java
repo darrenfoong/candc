@@ -21,14 +21,16 @@ public class EquivKey {
 
 	@Override
 	public boolean equals(Object other) {
-		if ( other == null ) {
+		if ( other == null || getClass() != other.getClass() ) {
 			return false;
 		}
 
-		return superCategory.getEhash() == ((EquivKey) (other)).superCategory.getEhash()
-				&& position == ((EquivKey) (other)).position
-				&& span == ((EquivKey) (other)).span
-				&& SuperCategory.equal(superCategory, ((EquivKey) (other)).superCategory);
+		EquivKey cother = (EquivKey) other;
+
+		return superCategory.getEhash() == cother.superCategory.getEhash()
+				&& position == cother.position
+				&& span == cother.span
+				&& SuperCategory.equal(superCategory, cother.superCategory);
 	}
 
 	// same code as used in the equiv class in C&C

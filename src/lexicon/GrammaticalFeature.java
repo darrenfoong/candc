@@ -56,11 +56,13 @@ public class GrammaticalFeature {
 
 	@Override
 	public boolean equals(Object other) {
-		if ( other == null ) {
+		if ( other == null || getClass() != other.getClass() ) {
 			return false;
 		}
 
-		return feature == ((GrammaticalFeature) (other)).feature;
+		GrammaticalFeature cother = (GrammaticalFeature) other;
+
+		return feature == cother.feature;
 	}
 
 	@Override

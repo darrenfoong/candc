@@ -42,11 +42,13 @@ public class RuleCategoryPair {
 	 */
 	@Override
 	public boolean equals(Object other) {
-		if ( other == null ) {
+		if ( other == null || getClass() != other.getClass() ) {
 			return false;
 		}
 
-		return cat1.equals(((RuleCategoryPair) (other)).cat1)
-				&& cat2.equals(((RuleCategoryPair) (other)).cat2);
+		RuleCategoryPair cother = (RuleCategoryPair) other;
+
+		return cat1.equals(cother.cat1)
+				&& cat2.equals(cother.cat2);
 	}
 }

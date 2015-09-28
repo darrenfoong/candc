@@ -24,15 +24,17 @@ public class EquivKeyFscore {
 
 	@Override
 	public boolean equals(Object other) {
-		if ( other == null ) {
+		if ( other == null || getClass() != other.getClass() ) {
 			return false;
 		}
 
-		return superCategory.getEhash() == ((EquivKeyFscore) (other)).superCategory.getEhash()
-				&& position == ((EquivKeyFscore) (other)).position
-				&& span == ((EquivKeyFscore) (other)).span
-				&& SuperCategory.equal(superCategory, ((EquivKeyFscore) (other)).superCategory)
-				&& maxDeps == ((EquivKeyFscore) (other)).maxDeps;
+		EquivKeyFscore cother = (EquivKeyFscore) other;
+
+		return superCategory.getEhash() == cother.superCategory.getEhash()
+				&& position == cother.position
+				&& span == cother.span
+				&& SuperCategory.equal(superCategory, cother.superCategory)
+				&& maxDeps == cother.maxDeps;
 	}
 
 	@Override

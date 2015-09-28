@@ -23,11 +23,13 @@ public class CategoryJSlotPair {
 
 	@Override
 	public boolean equals(Object other) {
-		if ( other == null ) {
+		if ( other == null || getClass() != other.getClass() ) {
 			return false;
 		}
 
-		return catString.equals(((CategoryJSlotPair) (other)).catString)
-				&& slot == ((CategoryJSlotPair) (other)).slot;
+		CategoryJSlotPair cother = (CategoryJSlotPair) other;
+
+		return catString.equals(cother.catString)
+				&& slot == cother.slot;
 	}
 }

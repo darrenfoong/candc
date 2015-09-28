@@ -31,14 +31,16 @@ public class DependencyStringWords implements Comparable<DependencyStringWords> 
 
 	@Override
 	public boolean equals(Object other) {
-		if ( other == null ) {
+		if ( other == null || getClass() != other.getClass() ) {
 			return false;
 		}
 
-		return head.equals(((DependencyStringWords) (other)).head)
-				&& filler.equals(((DependencyStringWords) (other)).filler)
-				&& relID == ((DependencyStringWords) (other)).relID
-				&& unaryRuleID == ((DependencyStringWords) (other)).unaryRuleID;
+		DependencyStringWords cother = (DependencyStringWords) other;
+
+		return head.equals(cother.head)
+				&& filler.equals(cother.filler)
+				&& relID == cother.relID
+				&& unaryRuleID == cother.unaryRuleID;
 	}
 
 	// not sure this is even needed for the HashSet?!

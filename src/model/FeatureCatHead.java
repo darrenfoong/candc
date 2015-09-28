@@ -77,11 +77,12 @@ public class FeatureCatHead implements Feature<FeatureCatHead> {
 
 	@Override
 	public boolean equals(Object other) {
-		if ( other == null ) {
+		if ( other == null || getClass() != other.getClass() ) {
 			return false;
 		}
 
-		return featureType == ((FeatureCatHead) (other)).featureType && cat.equals(((FeatureCatHead) (other)).cat) && head == ((FeatureCatHead) (other)).head;
+		FeatureCatHead cother = (FeatureCatHead) other;
+		return featureType == cother.featureType && cat.equals(cother.cat) && head == cother.head;
 	}
 
 	@Override

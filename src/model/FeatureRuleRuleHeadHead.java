@@ -114,11 +114,12 @@ public class FeatureRuleRuleHeadHead implements Feature<FeatureRuleRuleHeadHead>
 
 	@Override
 	public boolean equals(Object other) {
-		if ( other == null ) {
+		if ( other == null || getClass() != other.getClass() ) {
 			return false;
 		}
 
-		return featureType == ((FeatureRuleRuleHeadHead) (other)).featureType && leftGrandChildCat.equals(((FeatureRuleRuleHeadHead) (other)).leftGrandChildCat) && rightGrandChildCat.equals(((FeatureRuleRuleHeadHead) (other)).rightGrandChildCat) && childCat.equals(((FeatureRuleRuleHeadHead) (other)).childCat) && resultCat.equals(((FeatureRuleRuleHeadHead) (other)).resultCat) && leftHead == ((FeatureRuleRuleHeadHead) (other)).leftHead && rightHead == ((FeatureRuleRuleHeadHead) (other)).rightHead;
+		FeatureRuleRuleHeadHead cother = (FeatureRuleRuleHeadHead) other;
+		return featureType == cother.featureType && leftGrandChildCat.equals(cother.leftGrandChildCat) && rightGrandChildCat.equals(cother.rightGrandChildCat) && childCat.equals(cother.childCat) && resultCat.equals(cother.resultCat) && leftHead == cother.leftHead && rightHead == cother.rightHead;
 	}
 
 	@Override

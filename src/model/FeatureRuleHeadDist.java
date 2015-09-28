@@ -145,11 +145,12 @@ public class FeatureRuleHeadDist implements Feature<FeatureRuleHeadDist> {
 
 	@Override
 	public boolean equals(Object other) {
-		if ( other == null ) {
+		if ( other == null || getClass() != other.getClass() ) {
 			return false;
 		}
 
-		return featureType == ((FeatureRuleHeadDist) (other)).featureType && leftCat.equals(((FeatureRuleHeadDist) (other)).leftCat) && rightCat.equals(((FeatureRuleHeadDist) (other)).rightCat) && resultCat.equals(((FeatureRuleHeadDist) (other)).resultCat) && head == ((FeatureRuleHeadDist) (other)).head && distance == ((FeatureRuleHeadDist) (other)).distance;
+		FeatureRuleHeadDist cother = (FeatureRuleHeadDist) other;
+		return featureType == cother.featureType && leftCat.equals(cother.leftCat) && rightCat.equals(cother.rightCat) && resultCat.equals(cother.resultCat) && head == cother.head && distance == cother.distance;
 	}
 
 	public static short calcDistance(short featureType, int leftIndex, int rightIndex, ArrayList<String> postags) {
