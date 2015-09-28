@@ -7,7 +7,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 public class Weights {
-	double[] weights;
+	private double[] weights;
 
 	public Weights() {
 	}
@@ -21,7 +21,7 @@ public class Weights {
 	}
 
 	public void setWeights(double[] weights) {
-		this.weights = weights;
+		this.weights = (double[]) weights.clone();
 	}
 
 	private void readWeights(String weightsFile) throws IOException {
