@@ -694,6 +694,22 @@ public class SuperCategory implements Comparable<SuperCategory> {
 		}
 	}
 
+	@Override
+	public boolean equals(Object other) {
+		if ( other == null || getClass() != other.getClass() ) {
+			return false;
+		}
+
+		SuperCategory cother = (SuperCategory) other;
+
+		return compareTo(cother) == 0;
+	}
+
+	@Override
+	public int hashCode() {
+		return (int) getEhash();
+	}
+
 	/*
 	 * these are the same flags from C&C (with LEX renamed UNARY_TC)
 	 */

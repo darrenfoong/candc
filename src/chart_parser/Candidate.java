@@ -1,5 +1,8 @@
 package chart_parser;
 
+import utils.Hash;
+
+
 public class Candidate implements Comparable<Candidate> {
 	int k; // choice point
 	int leftIndex; // index into left k-best array
@@ -22,5 +25,25 @@ public class Candidate implements Comparable<Candidate> {
 		} else {
 			return -1;
 		}
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		if ( other == null || getClass() != other.getClass() ) {
+			return false;
+		}
+
+		Candidate cother = (Candidate) other;
+
+		return compareTo(cother) == 0;
+	}
+
+	@Override
+	public int hashCode() {
+		Hash h = new Hash(k);
+		h.plusEqual(leftIndex);
+		h.plusEqual(rightIndex);
+		h.plusEqual(Double.doubleToLongBits(score));
+		return (int) (h.value());
 	}
 }

@@ -1,5 +1,6 @@
 package lexicon;
 
+
 public class VarID implements Comparable<VarID> {
 	/*
 	 * NOT USING VarID objects now (29 Jan 2014), rather using byte values
@@ -169,6 +170,22 @@ public class VarID implements Comparable<VarID> {
 		} else {
 			return 1;
 		}
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		if ( other == null || getClass() != other.getClass() ) {
+			return false;
+		}
+
+		VarID cother = (VarID) other;
+
+		return compareTo(cother) == 0;
+	}
+
+	@Override
+	public int hashCode() {
+		return (int) varID;
 	}
 
 	public void print() {

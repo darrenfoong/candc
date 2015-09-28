@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import lexicon.Category;
+import utils.Hash;
 
 /*
  * this is the class for unfilled dependencies, with a var for the
@@ -249,6 +250,28 @@ public class Dependency implements Comparable<Dependency> {
 		}
 	}
 
+	@Override
+	public boolean equals(Object other) {
+		if ( other == null || getClass() != other.getClass() ) {
+			return false;
+		}
+
+		Dependency cother = (Dependency) other;
+
+		return compareTo(cother) == 0;
+	}
+
+	@Override
+	public int hashCode() {
+		Hash h = new Hash(relID);
+		h.plusEqual(headIndex);
+		h.plusEqual(var);
+		h.plusEqual(unaryRuleID);
+		h.plusEqual(conjFactor);
+		h.plusEqual(lrange);
+		return (int) (h.value());
+	}
+	
 	static public Dependency link(ArrayList<Dependency> deps) {
 		if (deps.isEmpty()) {
 			return null;
