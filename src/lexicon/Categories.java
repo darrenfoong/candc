@@ -190,9 +190,6 @@ public class Categories {
 					break;
 				}
 			}
-			if (line != null) {
-				throw new Error("didn't read the whole markedup file");
-			}
 		} catch (IOException e) {
 			System.err.println(e);
 		}
