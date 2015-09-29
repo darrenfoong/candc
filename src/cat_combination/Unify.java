@@ -124,7 +124,7 @@ public class Unify {
 			 * all features on NP ([nb]) and N (eg [num])
 			 */
 			if (!cat1.isS()) {
-				; // do nothing
+				// do nothing
 			} else if (!cat1.hasFeatureVar()) { // cat1 has constant or no
 				// feature
 				if (!cat2.hasFeatureVar()) { // cat2 has constant or no feature
