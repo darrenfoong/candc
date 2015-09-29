@@ -5,6 +5,7 @@ import io.Sentence;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import lexicon.Relations;
 import utils.NumericalFunctions;
@@ -162,12 +163,13 @@ public class InsideOutside {
 
 	public void printDepScores(PrintWriter out, Relations relations,
 			Sentence sentence) {
-		for (FilledDependency filled : depScores.keySet()) {
+		for ( Map.Entry<FilledDependency, Double> entry : depScores.entrySet() ) {
 			System.out.print("Dependency score for dep: ");
 			PrintWriter writer = new PrintWriter(System.out);
+			FilledDependency filled = entry.getKey();
 			filled.printFull(writer, relations, sentence);
 			writer.flush();
-			System.out.println(" " + depScores.get(filled));
+			System.out.println(" " + entry.getValue());
 		}
 	}
 
