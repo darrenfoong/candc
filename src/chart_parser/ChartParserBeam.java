@@ -138,10 +138,10 @@ public class ChartParserBeam extends ChartParser {
 		jloop:
 		for (int j = 2; j <= numWords; j++) {
 			for (int i = j - 2; i >= 0; i--) {
-				if (Chart.numSuperCategories > MAX_SUPERCATS) {
+				if (Chart.getNumSuperCategories() > MAX_SUPERCATS) {
 					maxSuperCatsExceeded = true;
-					System.out.println("MAX_SUPERCATS exceeded. (" + Chart.numSuperCategories + " > " + MAX_SUPERCATS + ")");
-					log.println("MAX_SUPERCATS exceeded. (" + Chart.numSuperCategories + " > " + MAX_SUPERCATS + ")");
+					System.out.println("MAX_SUPERCATS exceeded. (" + Chart.getNumSuperCategories() + " > " + MAX_SUPERCATS + ")");
+					log.println("MAX_SUPERCATS exceeded. (" + Chart.getNumSuperCategories() + " > " + MAX_SUPERCATS + ")");
 					break jloop;
 				}
 

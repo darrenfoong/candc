@@ -90,13 +90,29 @@ public class SuperCategory implements Comparable<SuperCategory> {
 	 * of dependencies (correct or incorrect, but need to ignore those not taken
 	 * into account in the evaluation)
 	 */
-	static public IgnoreDepsEval ignoreDeps;
+	private static IgnoreDepsEval ignoreDeps;
+
+	public static void setIgnoreDepsEval(IgnoreDepsEval i) {
+		ignoreDeps = i;
+	}
+
+	public static IgnoreDepsEval getIgnoreDepsEval() {
+		return ignoreDeps;
+	}
 
 	/*
 	 * used as a global counter to count the number of categories being produced
 	 * for a sentence
 	 */
-	static public int numSuperCategories;
+	private static int numSuperCategories;
+
+	public static void setNumSuperCategories(int n) {
+		numSuperCategories = n;
+	}
+
+	public static int getNumSuperCategories() {
+		return numSuperCategories;
+	}
 
 	public SuperCategory(short headIndex, Category cat, short flags) {
 		this.cat = cat;

@@ -39,7 +39,15 @@ public class Chart {
 
 	public Weights weights;
 
-	public static int numSuperCategories;
+	private static int numSuperCategories;
+
+	public static void setNumSuperCategories(int n) {
+		numSuperCategories++;
+	}
+
+	public static int getNumSuperCategories() {
+		return numSuperCategories;
+	}
 
 	public Chart(int MAX_WORDS, boolean output, Relations relations, boolean oracleFscore, boolean trainingBeamParser) {
 		this.printDetailedOutput = output;
@@ -204,7 +212,7 @@ public class Chart {
 			equivFscore.clear();
 		}
 
-		SuperCategory.numSuperCategories = 0;
-		Chart.numSuperCategories = 0;
+		SuperCategory.setNumSuperCategories(0);
+		Chart.setNumSuperCategories(0);
 	}
 }

@@ -127,7 +127,15 @@ public class Features {
 
 	public int numFeatures;
 
-	public static boolean newFeatures;
+	private static boolean newFeatures;
+
+	public static void setNewFeatures(boolean n) {
+		newFeatures = n;
+	}
+
+	public static boolean getNewFeatures() {
+		return newFeatures;
+	}
 
 	public Features(String featuresFile, Categories categories, boolean newFeatures) throws IOException {
 		this.featureCatIDs = new FeatureIDs<FeatureCat>();
@@ -141,7 +149,7 @@ public class Features {
 
 		readFeatures(featuresFile, categories);
 
-		Features.newFeatures = newFeatures;
+		Features.setNewFeatures(newFeatures);
 	}
 
 	public Features(String featuresFile, String weightsFile, Weights weights, Categories categories, boolean newFeatures) throws IOException {
@@ -156,7 +164,7 @@ public class Features {
 
 		readFeaturesWeights(featuresFile, weightsFile, weights, categories);
 
-		Features.newFeatures = newFeatures;
+		Features.setNewFeatures(newFeatures);
 	}
 
 	private void readFeatures(String featuresFile, Categories categories) throws IOException {

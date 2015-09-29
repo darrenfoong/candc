@@ -26,7 +26,7 @@ public class OracleFscoreDecoder extends OracleDecoder {
 		 * static variable, since it's only used in conjunction with this
 		 * decoder:
 		 */
-		SuperCategory.ignoreDeps = ignoreDeps;
+		SuperCategory.setIgnoreDepsEval(ignoreDeps);
 	}
 
 	@Override

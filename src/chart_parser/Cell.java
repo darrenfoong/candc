@@ -41,7 +41,7 @@ public class Cell {
 	public void decrementClearCounter() {
 		this.clearCounter--;
 		if ( clearCounter == 0 ) {
-			Chart.numSuperCategories -= superCategories.size();
+			Chart.setNumSuperCategories(Chart.getNumSuperCategories() - superCategories.size());
 			superCategories.clear();
 		}
 	}
@@ -72,7 +72,7 @@ public class Cell {
 				if (finalSize < listSize) {
 					superCategories.subList(finalSize, listSize).clear();
 					superCategories.trimToSize();
-					Chart.numSuperCategories -= (listSize - finalSize);
+					Chart.setNumSuperCategories(Chart.getNumSuperCategories() - (listSize - finalSize));
 				}
 			}
 		}
@@ -187,7 +187,7 @@ public class Cell {
 
 	public void add(SuperCategory superCat) {
 		superCategories.add(superCat);
-		Chart.numSuperCategories++;
+		Chart.setNumSuperCategories(Chart.getNumSuperCategories()+1);
 	}
 
 	public int size() {
