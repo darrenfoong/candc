@@ -114,6 +114,13 @@ public class SuperCategory implements Comparable<SuperCategory> {
 		return numSuperCategories;
 	}
 
+	public static void incrementNumSuperCategories() {
+		numSuperCategories++;
+		if (numSuperCategories % 50000 == 0) {
+			System.out.println("numSuperCategories: " + numSuperCategories);
+		}
+	}
+
 	public SuperCategory(short headIndex, Category cat, short flags) {
 		this.cat = cat;
 		this.unfilledDeps = Dependency.getDependencies(headIndex, cat,
@@ -137,10 +144,7 @@ public class SuperCategory implements Comparable<SuperCategory> {
 		}
 
 		equivalenceHash = equivalenceHash();
-		numSuperCategories++;
-		if (numSuperCategories % 50000 == 0) {
-			System.out.println("numSuperCategories: " + numSuperCategories);
-		}
+		incrementNumSuperCategories();
 
 		outside = 0.0;
 	}
@@ -240,10 +244,7 @@ public class SuperCategory implements Comparable<SuperCategory> {
 		unfilledDeps = Dependency.link(newUnfilledDeps);
 
 		equivalenceHash = equivalenceHash();
-		numSuperCategories++;
-		if (numSuperCategories % 50000 == 0) {
-			System.out.println("numSuperCategories: " + numSuperCategories);
-		}
+		incrementNumSuperCategories();
 		/*
 		 * this gets used by the oracleFscore decoder to split equivalence
 		 * classes by the number of dependencies produced
@@ -319,10 +320,7 @@ public class SuperCategory implements Comparable<SuperCategory> {
 		}
 
 		equivalenceHash = equivalenceHash();
-		numSuperCategories++;
-		if (numSuperCategories % 50000 == 0) {
-			System.out.println("numSuperCategories: " + numSuperCategories);
-		}
+		incrementNumSuperCategories();
 		/*
 		 * this gets used by the oracleFscore decoder to split equivalence
 		 * classes by the number of dependencies produced
@@ -361,10 +359,7 @@ public class SuperCategory implements Comparable<SuperCategory> {
 			throw new Error("numActiveVars > numVars!");
 		}
 
-		numSuperCategories++;
-		if (numSuperCategories % 50000 == 0) {
-			System.out.println("numSuperCategories: " + numSuperCategories);
-		}
+		incrementNumSuperCategories();
 		/*
 		 * this gets used by the oracleFscore decoder to split equivalence
 		 * classes by the number of dependencies produced
@@ -428,10 +423,7 @@ public class SuperCategory implements Comparable<SuperCategory> {
 		}
 
 		equivalenceHash = equivalenceHash();
-		numSuperCategories++;
-		if (numSuperCategories % 50000 == 0) {
-			System.out.println("numSuperCategories: " + numSuperCategories);
-		}
+		incrementNumSuperCategories();
 		/*
 		 * this gets used by the oracleFscore decoder to split equivalence
 		 * classes by the number of dependencies produced
@@ -512,14 +504,7 @@ public class SuperCategory implements Comparable<SuperCategory> {
 		unfilledDeps = Dependency.link(newDeps);
 
 		equivalenceHash = equivalenceHash();
-		numSuperCategories++;
-		if (numSuperCategories % 50000 == 0) {
-			System.out.println("numSuperCategories: " + numSuperCategories);
-			/*
-			 * this gets used by the oracleFscore decoder to split equivalence
-			 * classes by the number of dependencies produced
-			 */
-		}
+		incrementNumSuperCategories();
 	}
 
 	public static SuperCategory TypeRaising(TypeRaisedCategory trCat,
@@ -550,10 +535,7 @@ public class SuperCategory implements Comparable<SuperCategory> {
 		// calling this constructor directly is a little ugly (?)
 		vars[1] = new Variable(leftSuperCat.vars[1], rightSuperCat.vars[1]);
 
-		numSuperCategories++;
-		if (numSuperCategories % 50000 == 0) {
-			System.out.println("numSuperCategories: " + numSuperCategories);
-		}
+		incrementNumSuperCategories();
 		/*
 		 * this gets used by the oracleFscore decoder to split equivalence
 		 * classes by the number of dependencies produced
