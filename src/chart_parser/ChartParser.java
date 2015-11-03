@@ -222,13 +222,20 @@ public class ChartParser {
 
 				String supertagString = null;
 				String goldSupertagString = null;
+				String stagsLine = null;
+				String[] stagTokens;
 
 				boolean seenGold = false;
 				double lowestProb = 1.0;
 
 				if (stagsIn != null) {
-					String stagsLine = stagsIn.readLine();
-					String[] stagTokens = stagsLine.split("\\s");
+					stagsLine = stagsIn.readLine();
+
+					if ( stagsLine != null ) {
+						stagTokens = stagsLine.split("\\s");
+					} else {
+						throw new IllegalArgumentException("Unexpected end of stream");
+					}
 
 					if (stagTokens.length != 3 || !stagTokens[0].equals(tokens[0]) || !stagTokens[1].equals(tokens[1])) {
 						throw new IllegalArgumentException("Mismatch between input and gold supertags: " + tokens[0] + " " + tokens[1] + " " + stagTokens[0] + " " + stagTokens[1]);

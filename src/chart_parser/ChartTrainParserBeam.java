@@ -511,6 +511,10 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 					readStags = true;
 					line = goldDepsPerCell.readLine();
 
+					if ( line == null ) {
+						throw new IllegalArgumentException("Unexpected end of stream");
+					}
+
 					if (line.isEmpty()) {
 						return false;
 					}
@@ -527,7 +531,12 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 
 				for (int i = 0; i < numDeps; i++) {
 					line = goldDepsPerCell.readLine();
-					tokens = line.split("\\s");
+
+					if ( line != null ) {
+						tokens = line.split("\\s");
+					} else {
+						throw new IllegalArgumentException("Unexpected end of stream");
+					}
 
 					short headIndex = Short.parseShort(tokens[0]);
 					short slot = Short.parseShort(tokens[2]);

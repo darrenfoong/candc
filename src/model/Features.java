@@ -199,12 +199,24 @@ public class Features {
 
 		// first line in weights is for logp
 		String weightsLine = weightsIn.readLine();
-		weightsList.add(Double.valueOf(weightsLine));
+
+		if ( weightsLine != null ) {
+			weightsList.add(Double.valueOf(weightsLine));
+		} else {
+			throw new IllegalArgumentException("Unexpected end of stream");
+		}
+
 		int ID = 1;
+		Double weight;
 
 		while ((featuresLine = featuresIn.readLine()) != null) {
 			weightsLine = weightsIn.readLine();
-			Double weight = Double.valueOf(weightsLine);
+
+			if ( weightsLine != null ) {
+				weight = Double.valueOf(weightsLine);
+			} else {
+				throw new IllegalArgumentException("Unexpected end of stream");
+			}
 
 			if ( weight == 0.0 ) {
 				continue;

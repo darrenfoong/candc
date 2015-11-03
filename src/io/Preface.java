@@ -7,7 +7,7 @@ public class Preface {
 	public static void readPreface(BufferedReader in) throws IOException {
 		String line = in.readLine();
 
-		if (line.charAt(0) != '#') {
+		if (line == null || line.charAt(0) != '#') {
 			throw new IllegalArgumentException("File does not start with the mandatory preface.");
 		}
 
