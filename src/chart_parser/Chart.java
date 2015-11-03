@@ -42,7 +42,7 @@ public class Chart {
 	private static int numSuperCategories;
 
 	public static void setNumSuperCategories(int n) {
-		numSuperCategories++;
+		numSuperCategories = n;
 	}
 
 	public static int getNumSuperCategories() {
