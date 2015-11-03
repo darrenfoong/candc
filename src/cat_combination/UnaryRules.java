@@ -129,6 +129,7 @@ public class UnaryRules {
 					// N\N
 					addSuperCat(SfS, superCat, (short) (14), false, results); // 14:
 					// S/S
+					break;
 				default:
 					continue;
 				}
