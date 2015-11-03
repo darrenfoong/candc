@@ -183,20 +183,21 @@ public class ChartTrainParserBeamDerivations extends ChartTrainParserBeam {
 	 * cell where the root supercategory resides in the chart
 	 */
 	private int[] buildTree(SuperCategory parentCat) {
-		int[] leftResult = {0,0};
-		int[] rightResult = {0,0};
+		int[] leftResult;
+		int[] rightResult;
 		int position;
 		int span;
 
 		if ( parentCat.leftChild != null ) {
 				leftResult = buildTree(parentCat.leftChild);
+				position = leftResult[0];
 
 				if ( parentCat.rightChild != null ) {
 					rightResult = buildTree(parentCat.rightChild);
+					span = leftResult[1] + rightResult[1];
+				} else {
+					span = leftResult[1];
 				}
-
-				position = leftResult[0];
-				span = leftResult[1] + rightResult[1];
 		} else {
 			position = buildTreeLeafIndex;
 			span = 1;
