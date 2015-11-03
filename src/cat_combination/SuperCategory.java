@@ -683,13 +683,7 @@ public class SuperCategory implements Comparable<SuperCategory> {
 	// x.score < y.score <=> x > y
 	@Override
 	public int compareTo(SuperCategory other) {
-		if (this.score == other.score) {
-			return 0;
-		} else if (this.score < other.score) {
-			return 1;
-		} else {
-			return -1;
-		}
+		return Double.compare(other.score, this.score);
 	}
 
 	@Override

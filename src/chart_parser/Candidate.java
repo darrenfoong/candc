@@ -18,13 +18,7 @@ public class Candidate implements Comparable<Candidate> {
 
 	@Override
 	public int compareTo(Candidate other) {
-		if (this.score == other.score) {
-			return 0;
-		} else if (this.score < other.score) {
-			return 1;
-		} else {
-			return -1;
-		}
+		return Double.compare(other.score, this.score);
 	}
 
 	@Override
