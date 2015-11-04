@@ -65,6 +65,8 @@ public class ChartTrainParserBeamDerivations extends ChartTrainParserBeam {
 	protected boolean preParse() {
 		maxViolation = 0;
 		maxViolationCell = null;
+		maxViolationCells.clear();
+		violationCells.clear();
 
 		if (!mergeGoldChart(goldChart)) {
 			return false;
@@ -128,7 +130,9 @@ public class ChartTrainParserBeamDerivations extends ChartTrainParserBeam {
 			ArrayList<Supertag> supertags = sentence.multiSupertags.get(position);
 			for ( Supertag supertag : supertags ) {
 				if ( supertag.lexicalCategory.toStringNoOuterBrackets().equals(goldCat.cat.toStringNoOuterBrackets()) ) {
-					goldCat.score = chart.weights.getWeight(0) * Math.log(supertag.probability);
+					double log_prob = chart.weights.getWeight(0) * Math.log(supertag.probability);
+					goldCat.score = log_prob;
+					goldCat.inside = log_prob;
 					break;
 				}
 			}
