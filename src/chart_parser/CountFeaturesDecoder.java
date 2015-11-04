@@ -92,7 +92,7 @@ public class CountFeaturesDecoder {
 											Features.ruleBinaryPosDistVerb};
 					FeatureRuleHeadDist.count(featureRuleHeadDistCounts, sentence, featureTypes3, s.leftChild, s.rightChild, s);
 
-					// TODO start gp feature
+					// start gp feature
 					if ( superCat.leftChild.leftChild != null ) {
 						if ( superCat.leftChild.rightChild != null ) {
 							if ( superCat.rightChild.leftChild != null ) {
@@ -223,7 +223,7 @@ public class CountFeaturesDecoder {
 								FeatureRuleRuleHead.count(featureRuleRuleHeadCounts, sentence, featureTypes8, s.rightChild.leftChild, s.rightChild, s);
 						}
 					}
-					// TODO end gp feature
+					// end gp feature
 
 					countFeaturesRecurse(s.leftChild, sentence);
 					countFeaturesRecurse(s.rightChild, sentence);
@@ -235,7 +235,7 @@ public class CountFeaturesDecoder {
 											Features.ruleUnaryPos};
 					FeatureRuleHead.count(featureRuleHeadCounts, sentence, featureTypes, s.leftChild, s.leftChild, s);
 
-					// TODO start gp feature
+					// start gp feature
 					if ( s.leftChild.leftChild!= null ) {
 						if ( s.leftChild.rightChild != null ) {
 							short[] featureTypes2 = {Features.ruleBinaryWordWord2,
@@ -249,7 +249,7 @@ public class CountFeaturesDecoder {
 							FeatureRuleHead.count(featureRuleHeadCounts, sentence, featureTypes2, s.leftChild.leftChild, s.leftChild.leftChild, s);
 						}
 					}
-					// TODO end gp feature
+					// end gp feature
 
 					countFeaturesRecurse(s.leftChild, sentence);
 				}
