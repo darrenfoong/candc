@@ -173,12 +173,8 @@ public class Chart {
 
 				Category cat = supertag.lexicalCategory;
 				SuperCategory superCat = SuperCategory.Lexical((short) (i + 1), cat, (short) (0));
-				double log_prob = 0.0;
 
-				if (weights.getWeight(0) != 0.0) {
-					log_prob = weights.getWeight(0) * Math.log(supertag.probability);
-				}
-
+				double log_prob = weights.getWeight(0) * Math.log(supertag.probability);
 				superCat.score = log_prob;
 				superCat.inside = log_prob;
 				// used by PrintForest (since the depsSumDecoder already resets score)
