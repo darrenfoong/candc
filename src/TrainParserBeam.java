@@ -174,8 +174,8 @@ public class TrainParserBeam {
 				long TE_PARSING = Benchmark.getTime();
 				Benchmark.printTime("training iteration " + iteration, TS_PARSING, TE_PARSING);
 
-				System.out.println("# Statistics for iteration + " + iteration + ": hasUpdate: " + parser.hasUpdateStatistics.calcHasUpdates() + "/" + parser.hasUpdateStatistics.getSize() + " (" + ((double) parser.hasUpdateStatistics.calcHasUpdates()/(double) parser.hasUpdateStatistics.getSize()) + ")");
-				System.out.println("# Statistics for iteration + " + iteration + ": hypothesisSize: " + parser.hypothesisSizeStatistics.calcAverageProportion() + " (" + parser.hypothesisSizeStatistics.getSize() + ")");
+				System.out.println("# Statistics for iteration " + iteration + ": hasUpdate: " + parser.hasUpdateStatistics.calcHasUpdates() + "/" + parser.hasUpdateStatistics.getSize() + " (" + ((double) parser.hasUpdateStatistics.calcHasUpdates()/(double) parser.hasUpdateStatistics.getSize()) + ")");
+				System.out.println("# Statistics for iteration " + iteration + ": hypothesisSize: " + parser.hypothesisSizeStatistics.calcAverageProportion() + " (" + parser.hypothesisSizeStatistics.getSize() + ")");
 
 				in.close();
 				goldDeps.close();
