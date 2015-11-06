@@ -291,6 +291,10 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 		SuperCategory leftChild = superCat.leftChild;
 		SuperCategory rightChild = superCat.rightChild;
 
+		if ( superCat.marked ) {
+			return;
+		}
+
 		featureIDs.addAll(superCat.featureIDs);
 
 		if (leftChild != null) {
@@ -298,7 +302,36 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 			if (rightChild != null) {
 				collectFeaturesCached(rightChild);
 			}
-		} 
+		}
+	}
+
+	private void markCommonSuperCats(SuperCategory goldCat, SuperCategory foundCat) {
+		HashSet<SuperCategory> goldCats = new HashSet<SuperCategory>();
+		HashSet<SuperCategory> foundCats = new HashSet<SuperCategory>();
+
+		preOrder(goldCat, goldCats);
+		preOrder(foundCat, foundCats);
+
+		goldCats.retainAll(foundCats);
+
+		Iterator<SuperCategory> it = goldCats.iterator();
+		while ( it.hasNext() ) {
+			it.next().marked = true;
+		}
+	}
+
+	private void preOrder(SuperCategory superCat, HashSet<SuperCategory> superCats) {
+		SuperCategory leftChild = superCat.leftChild;
+		SuperCategory rightChild = superCat.rightChild;
+
+		superCats.add(superCat);
+
+		if (leftChild != null) {
+			preOrder(leftChild, superCats);
+			if (rightChild != null) {
+				preOrder(rightChild, superCats);
+			}
+		}
 	}
 
 	/**
@@ -342,6 +375,8 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 					atRoot = false;
 				}
 
+				markCommonSuperCats(cell.goldSuperCat, cell.maxSuper);
+
 				System.out.println("Incrementing gold tree features");
 				updateFeatureParams(cell.goldSuperCat, true, atRoot, featuresToUpdate);
 				System.out.println("Decrementing found tree features");
@@ -384,6 +419,9 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 					} else {
 						atRoot = false;
 					}
+
+					markCommonSuperCats(cell.goldSuperCat, cell.maxSuper);
+
 					updateFeatureParams(cell.goldSuperCat, true, atRoot, featuresToUpdate);
 					updateFeatureParams(cell.maxSuper, false, atRoot, featuresToUpdate);
 				}

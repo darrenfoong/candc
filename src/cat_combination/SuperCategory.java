@@ -85,6 +85,7 @@ public class SuperCategory implements Comparable<SuperCategory> {
 	public int goldMarker = 0;
 
 	public ArrayList<Integer> featureIDs = new ArrayList<Integer>();
+	public boolean marked = false;
 
 	/*
 	 * perhaps not great design having this here, but need it for the oracle
