@@ -84,6 +84,8 @@ public class SuperCategory implements Comparable<SuperCategory> {
 	public int marker = 0; // used to mark active nodes
 	public int goldMarker = 0;
 
+	public ArrayList<Integer> featureIDs = null;
+
 	/*
 	 * perhaps not great design having this here, but need it for the oracle
 	 * F-score decoder when filling the outside field which records the number

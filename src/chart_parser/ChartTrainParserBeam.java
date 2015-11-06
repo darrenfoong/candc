@@ -283,6 +283,25 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 	}
 
 	/**
+	 * Collects all cached features in tree rooted by superCat in featuresID.
+	 * 
+	 * @param superCat root supercategory of tree
+	 */
+	private void collectFeaturesCached(SuperCategory superCat) {
+		SuperCategory leftChild = superCat.leftChild;
+		SuperCategory rightChild = superCat.rightChild;
+
+		featureIDs.addAll(superCat.featureIDs);
+
+		if (leftChild != null) {
+			collectFeaturesCached(leftChild);
+			if (rightChild != null) {
+				collectFeaturesCached(rightChild);
+			}
+		} 
+	}
+
+	/**
 	 * Single node max violation update: updates weights.
 	 * 
 	 * Parallel max violation update: computes set of frontiers for entire
@@ -400,7 +419,7 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 			features.collectRootFeatures(superCat, sentence, featureIDs);
 		}
 
-		collectFeatures(superCat);
+		collectFeaturesCached(superCat);
 
 		Iterator<Integer> it = featureIDs.iterator();
 		while ( it.hasNext() ) {
