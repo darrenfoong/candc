@@ -483,7 +483,9 @@ public class ChartParserBeam extends ChartParser {
 
 		Iterator<Integer> it = featureIDs.iterator();
 		while ( it.hasNext() ) {
-			superCat.score += weights.getWeight(it.next());
+			int id = it.next();
+			superCat.score += weights.getWeight(id);
+			superCat.featureIDs.add(id);
 		}
 	}
 
@@ -502,7 +504,9 @@ public class ChartParserBeam extends ChartParser {
 
 		Iterator<Integer> it = featureIDs.iterator();
 		while ( it.hasNext() ) {
-			superCat.score += weights.getWeight(it.next());
+			int id = it.next();
+			superCat.score += weights.getWeight(id);
+			superCat.featureIDs.add(id);
 		}
 	}
 
@@ -521,7 +525,9 @@ public class ChartParserBeam extends ChartParser {
 
 		Iterator<Integer> it = featureIDs.iterator();
 		while ( it.hasNext() ) {
-			superCat.score += weights.getWeight(it.next());
+			int id = it.next();
+			superCat.score += weights.getWeight(id);
+			superCat.featureIDs.add(id);
 		}
 	}
 
@@ -543,7 +549,9 @@ public class ChartParserBeam extends ChartParser {
 
 		Iterator<Integer> it = featureIDs.iterator();
 		while ( it.hasNext() ) {
-			superCat.score += weights.getWeight(it.next());
+			int id = it.next();
+			superCat.score += weights.getWeight(id);
+			superCat.featureIDs.add(id);
 		}
 	}
 
