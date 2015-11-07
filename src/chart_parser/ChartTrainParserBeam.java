@@ -305,22 +305,24 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 		}
 	}
 
-	private void markCommonSuperCats(SuperCategory goldCat, SuperCategory foundCat) {
-		HashSet<SuperCategory> goldCats = new HashSet<SuperCategory>();
-		HashSet<SuperCategory> foundCats = new HashSet<SuperCategory>();
+	private void markCommonSuperCats(SuperCategory goldRootSuperCat, SuperCategory foundRootSuperCat) {
+		ArrayList<SuperCategory> goldSuperCats = new ArrayList<SuperCategory>();
+		ArrayList<SuperCategory> foundSuperCats = new ArrayList<SuperCategory>();
 
-		preOrder(goldCat, goldCats);
-		preOrder(foundCat, foundCats);
+		preOrder(goldRootSuperCat, goldSuperCats);
+		preOrder(foundRootSuperCat, foundSuperCats);
 
-		goldCats.retainAll(foundCats);
-
-		Iterator<SuperCategory> it = goldCats.iterator();
-		while ( it.hasNext() ) {
-			it.next().marked = true;
+		for ( SuperCategory goldCat : goldSuperCats ) {
+			for ( SuperCategory foundCat : foundSuperCats ) {
+				if ( goldCat == foundCat ) {
+					foundCat.marked = true;
+					break;
+				}
+			}
 		}
 	}
 
-	private void preOrder(SuperCategory superCat, HashSet<SuperCategory> superCats) {
+	private void preOrder(SuperCategory superCat, ArrayList<SuperCategory> superCats) {
 		SuperCategory leftChild = superCat.leftChild;
 		SuperCategory rightChild = superCat.rightChild;
 
