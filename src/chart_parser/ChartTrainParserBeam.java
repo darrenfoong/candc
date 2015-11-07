@@ -453,9 +453,9 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 	private void updateFeatureParams(SuperCategory superCat, boolean positiveUpdate, boolean atRoot, HashSet<Integer> featuresToUpdate) {
 		featureIDs.clear();
 
-		if (atRoot) {
-			features.collectRootFeatures(superCat, sentence, featureIDs);
-		}
+		//if (atRoot) {
+		//	features.collectRootFeatures(superCat, sentence, featureIDs);
+		//}
 
 		collectFeaturesCached(superCat);
 
