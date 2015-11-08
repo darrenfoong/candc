@@ -269,6 +269,10 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 		SuperCategory leftChild = superCat.leftChild;
 		SuperCategory rightChild = superCat.rightChild;
 
+		if ( superCat.marked ) {
+			return;
+		}
+
 		if (leftChild != null) {
 			collectFeatures(leftChild);
 			if (rightChild != null) {
@@ -279,29 +283,6 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 			}
 		} else {
 			features.collectLeafFeatures(superCat, sentence, featureIDs);
-		}
-	}
-
-	/**
-	 * Collects all cached features in tree rooted by superCat in featuresID.
-	 * 
-	 * @param superCat root supercategory of tree
-	 */
-	private void collectFeaturesCached(SuperCategory superCat) {
-		SuperCategory leftChild = superCat.leftChild;
-		SuperCategory rightChild = superCat.rightChild;
-
-		if ( superCat.marked ) {
-			return;
-		}
-
-		featureIDs.addAll(superCat.featureIDs);
-
-		if (leftChild != null) {
-			collectFeaturesCached(leftChild);
-			if (rightChild != null) {
-				collectFeaturesCached(rightChild);
-			}
 		}
 	}
 
@@ -455,11 +436,11 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 	private void updateFeatureParams(SuperCategory superCat, boolean positiveUpdate, boolean atRoot, HashSet<Integer> featuresToUpdate) {
 		featureIDs.clear();
 
-		//if (atRoot) {
-		//	features.collectRootFeatures(superCat, sentence, featureIDs);
-		//}
+		if (atRoot) {
+			features.collectRootFeatures(superCat, sentence, featureIDs);
+		}
 
-		collectFeaturesCached(superCat);
+		collectFeatures(superCat);
 
 		Iterator<Integer> it = featureIDs.iterator();
 		while ( it.hasNext() ) {

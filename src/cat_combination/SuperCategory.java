@@ -84,7 +84,6 @@ public class SuperCategory implements Comparable<SuperCategory> {
 	public int marker = 0; // used to mark active nodes
 	public int goldMarker = 0;
 
-	public ArrayList<Integer> featureIDs = new ArrayList<Integer>();
 	public boolean marked = false;
 
 	/*

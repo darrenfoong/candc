@@ -485,7 +485,6 @@ public class ChartParserBeam extends ChartParser {
 		while ( it.hasNext() ) {
 			int id = it.next();
 			superCat.score += weights.getWeight(id);
-			superCat.featureIDs.add(id);
 		}
 	}
 
@@ -506,7 +505,6 @@ public class ChartParserBeam extends ChartParser {
 		while ( it.hasNext() ) {
 			int id = it.next();
 			superCat.score += weights.getWeight(id);
-			superCat.featureIDs.add(id);
 		}
 	}
 
@@ -527,7 +525,6 @@ public class ChartParserBeam extends ChartParser {
 		while ( it.hasNext() ) {
 			int id = it.next();
 			superCat.score += weights.getWeight(id);
-			superCat.featureIDs.add(id);
 		}
 	}
 
@@ -551,7 +548,6 @@ public class ChartParserBeam extends ChartParser {
 		while ( it.hasNext() ) {
 			int id = it.next();
 			superCat.score += weights.getWeight(id);
-			superCat.featureIDs.add(id);
 		}
 	}
 
