@@ -336,7 +336,6 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 				log.println("No non-zero violation in the chart.");
 
 				hasUpdateStatistics.addData(false);
-				// hypothesisSizeStatistics.addData(0, sentence.words.size());
 
 				return null;
 			} else {
@@ -380,7 +379,6 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 				log.println("No non-zero violation in the chart.");
 
 				hasUpdateStatistics.addData(false);
-				// hypothesisSizeStatistics.addData(0, sentence.words.size());
 
 				return null;
 			} else {
