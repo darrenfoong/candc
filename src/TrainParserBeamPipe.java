@@ -140,6 +140,9 @@ public class TrainParserBeamPipe {
 
 					if (numSentence % 5000 == 0) {
 						outIterPart = new PrintWriter(new BufferedWriter(new FileWriter(outputWeightsFile + "." + iteration + "." + numSentence)));
+						outIterPart.println("# mandatory preface");
+						outIterPart.println("# mandatory preface");
+						outIterPart.println();
 						parser.printWeights(outIterPart, numTrainInstances);
 						outIterPart.close();
 					}
