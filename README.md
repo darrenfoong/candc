@@ -1,4 +1,4 @@
-# C&C Parser
+# Java C&C Parser
 
 The Java C&C parser is a port of the [C&C parser](http://svn.ask.it.usyd.edu.au/trac/candc) originally written in C++ by James Curran and Stephen Clark.
 
