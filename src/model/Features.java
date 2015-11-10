@@ -564,6 +564,7 @@ public class Features {
 	}
 
 	public void printWeights(Weights weights, PrintWriter out) {
+		out.println(weights.getWeight(0));
 		featureCatIDs.printWeights(weights, out);
 		featureCatHeadIDs.printWeights(weights, out);
 		featureRuleIDs.printWeights(weights, out);
