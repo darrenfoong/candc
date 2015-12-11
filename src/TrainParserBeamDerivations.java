@@ -195,6 +195,9 @@ public class TrainParserBeamDerivations {
 				roots.close();
 
 				outIter = new PrintWriter(new BufferedWriter(new FileWriter(outputWeightsFile + "." + iteration)));
+				outIter.println("# mandatory preface");
+				outIter.println("# mandatory preface");
+				outIter.println();
 				parser.printWeights(outIter, numTrainInstances);
 				outIter.close();
 				pipe.close();
