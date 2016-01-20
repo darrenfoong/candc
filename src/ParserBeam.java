@@ -35,6 +35,8 @@ public class ParserBeam {
 		boolean compactWeights = true;
 		boolean cubePruning = false;
 
+		boolean printIncorrectDeps = false;
+
 		String grammarDir = "data/baseline_expts/grammar";
 		String lexiconFile = "data/baseline_expts/working/lexicon/wsj02-21.wordsPos";
 		String featuresFile = "data/baseline_expts/working/lexicon/wsj02-21.feats.1-22";
@@ -94,6 +96,7 @@ public class ParserBeam {
 		BufferedReader in = null;
 		PrintWriter out = null;
 		PrintWriter log = null;
+		PrintWriter outIncorrect = null;
 
 		try {
 			in = new BufferedReader(new FileReader(inputFile));
@@ -102,6 +105,14 @@ public class ParserBeam {
 
 			out = new PrintWriter(new BufferedWriter(new FileWriter(outputFile)));
 			log = new PrintWriter(new BufferedWriter(new FileWriter(logFile)));
+
+			if ( printIncorrectDeps ) {
+				outIncorrect = new PrintWriter(new BufferedWriter(new FileWriter(outputFile + ".incorrect")));
+
+				outIncorrect.println("# mandatory preface");
+				outIncorrect.println("# mandatory preface");
+				outIncorrect.println();
+			}
 
 			out.println("# mandatory preface");
 			out.println("# mandatory preface");
@@ -122,7 +133,7 @@ public class ParserBeam {
 					boolean success = parser.root();
 
 					if (success) {
-						parser.printDeps(out, parser.categories.dependencyRelations, parser.sentence);
+						parser.printDeps(out, parser.categories.dependencyRelations, parser.sentence, true);
 						parser.sentence.printC_line(out);
 					} else {
 						System.out.println("No root category.");
@@ -131,6 +142,11 @@ public class ParserBeam {
 				}
 
 				out.println();
+
+				if ( printIncorrectDeps ) {
+					parser.printIncorrectDeps(outIncorrect, parser.categories.dependencyRelations, parser.sentence);
+					outIncorrect.println();
+				}
 			}
 			long TE_PARSING = Benchmark.getTime();
 			Benchmark.printTime("parsing", TS_PARSING, TE_PARSING);
@@ -138,6 +154,7 @@ public class ParserBeam {
 			System.err.println(e);
 		} finally {
 			try {
+				if ( outIncorrect != null ) { outIncorrect.close(); }
 				if ( log != null ) { log.close(); }
 				if ( out != null ) { out.close(); }
 				if ( in != null ) { in.close(); }

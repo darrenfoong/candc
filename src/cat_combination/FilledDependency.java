@@ -30,6 +30,8 @@ public class FilledDependency implements Comparable<FilledDependency> {
 	final short lrange; // if dependency has been created thro' the head-passing
 	// mechanism
 
+	public boolean correct = false;
+
 	public FilledDependency next; // the linked list
 
 	public FilledDependency(short relID, short headIndex, short fillerIndex,

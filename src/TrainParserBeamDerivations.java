@@ -159,7 +159,7 @@ public class TrainParserBeamDerivations {
 
 						if (best != null) {
 							System.out.println("best category deps: ");
-							parser.printDeps(writer, parser.categories.dependencyRelations, parser.sentence, best);
+							parser.printDeps(writer, parser.categories.dependencyRelations, parser.sentence, best, true);
 							writer.flush();
 							System.out.println();
 						} else {

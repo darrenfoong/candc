@@ -551,7 +551,7 @@ public class ChartParserBeam extends ChartParser {
 		}
 	}
 
-	public void printDeps(PrintWriter out, Relations relations, Sentence sentence) {
+	public void printDeps(PrintWriter out, Relations relations, Sentence sentence, boolean correct) {
 		double maxScore = Double.NEGATIVE_INFINITY;
 		SuperCategory maxRoot = null;
 
@@ -566,23 +566,38 @@ public class ChartParserBeam extends ChartParser {
 		}
 
 		if (maxRoot != null) {
-			printDeps(out, relations, sentence, maxRoot);
+			printDeps(out, relations, sentence, maxRoot, correct);
 		}
 	}
 
-	public void printDeps(PrintWriter out, Relations relations, Sentence sentence, SuperCategory superCat) {
+	public void printDeps(PrintWriter out, Relations relations, Sentence sentence, SuperCategory superCat, boolean correct) {
 		for (FilledDependency filled = superCat.filledDeps; filled != null; filled = filled.next) {
 			filled.printFullJslot(out, relations, sentence);
+			if ( correct ) {
+				filled.correct = true;
+			}
 		}
 
 		if (superCat.leftChild != null) {
-			printDeps(out, relations, sentence, superCat.leftChild);
+			printDeps(out, relations, sentence, superCat.leftChild, correct);
 
 			if (superCat.rightChild != null) {
-				printDeps(out, relations, sentence, superCat.rightChild);
+				printDeps(out, relations, sentence, superCat.rightChild, correct);
 			}
 		} else {
 			sentence.addOutputSupertag(superCat.cat);
+		}
+	}
+
+	public void printIncorrectDeps(PrintWriter outIncorrect, Relations relations, Sentence sentence) {
+		for ( Cell cell : chart.chart ) {
+			for ( SuperCategory superCat : cell.getSuperCategories() ) {
+				for (FilledDependency filled = superCat.filledDeps; filled != null; filled = filled.next) {
+					if ( !filled.correct ) {
+						filled.printFullJslot(outIncorrect, relations, sentence);
+					}
+				}
+			}
 		}
 	}
 }
