@@ -413,7 +413,7 @@ public class ChartParser {
 		features.collectBinaryFeatures(superCat, sentence, featureIDs);
 		Iterator<Integer> it = featureIDs.iterator();
 		while ( it.hasNext() ) {
-			score += weights.getWeight(it.next());;
+			score += weights.getWeight(it.next());
 		}
 		superCat.score = score;
 	}
