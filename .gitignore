@@ -15,6 +15,7 @@ countfeatures
 evaluate
 evaluatebeam
 hashcodedist
+incorrectdeps
 init
 Makefile
 parse
