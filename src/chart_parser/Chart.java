@@ -124,14 +124,12 @@ public class Chart {
 		}
 	}
 
-	public void addNoDP(int position, int span, ArrayList<SuperCategory> superCategories) {
-		for (SuperCategory superCat : superCategories) {
-			addNoDP(position, span, superCat);
-		}
-	}
-
 	public void addNoDP(int position, int span, SuperCategory superCat) {
 		cell(position, span).add(superCat);
+	}
+
+	public void addNoDP(int position, int span, ArrayList<SuperCategory> superCategories) {
+		cell(position, span).add(superCategories);
 	}
 
 	public void setWeights(Weights weights) {

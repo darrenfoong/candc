@@ -190,6 +190,10 @@ public class Cell {
 		Chart.setNumSuperCategories(Chart.getNumSuperCategories()+1);
 	}
 
+	public void add(ArrayList<SuperCategory> superCats) {
+		superCategories.addAll(superCats);
+	}
+
 	public int size() {
 		return superCategories.size();
 	}
