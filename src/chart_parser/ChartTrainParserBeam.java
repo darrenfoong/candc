@@ -440,10 +440,7 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 
 		collectFeatures(superCat);
 
-		Iterator<Integer> it = featureIDs.iterator();
-		while ( it.hasNext() ) {
-			int ID = it.next();
-
+		for ( int ID : featureIDs ) {
 			System.out.println(" Updating feature " + ID);
 
 			if (positiveUpdate) {
@@ -475,10 +472,7 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 	 * @param numTrainInstances for the fast averaged perceptron
 	 */
 	private void updateAllWeights(HashSet<Integer> featuresToUpdate, int numTrainInstances) {
-		Iterator<Integer> it = featuresToUpdate.iterator();
-		while ( it.hasNext() ) {
-			Integer ID = it.next();
-
+		for ( Integer ID : featuresToUpdate ) {
 			if ( ID != null ) {
 				if ( trainingFeatures[ID].getLambdaUpdate() != 0.0 ) {
 					trainingFeatures[ID].perceptronUpdateFast(numTrainInstances);

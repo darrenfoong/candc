@@ -355,9 +355,8 @@ public class ChartParser {
 
 			features.collectRootFeatures(equiv, sentence, featureIDs);
 
-			Iterator<Integer> it = featureIDs.iterator();
-			while ( it.hasNext() ) {
-				equiv.score += weights.getWeight(it.next());
+			for ( int featureID : featureIDs ) {
+				equiv.score += weights.getWeight(featureID);
 			}
 		}
 	}
