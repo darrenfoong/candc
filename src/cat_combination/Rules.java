@@ -118,8 +118,7 @@ public class Rules {
 			 * atomic left, complex backslash right:
 			 */
 			case NONE * NFLAGS + BACKWARD:
-				return combinators.backwardApplication(leftSuperCat, rightSuperCat,
-						results, sentence);
+				return combinators.backwardApplication(leftSuperCat, rightSuperCat, results, sentence);
 			/*
 			 * atomic or complex left, punct (not comma) right:
 			 */
@@ -139,29 +138,24 @@ public class Rules {
 			case NONE * NFLAGS + COMMA: // fall through
 			case FORWARD * NFLAGS + COMMA: // |
 			case BACKWARD * NFLAGS + COMMA: // |
-				boolean typeChangeResult = punctRules.rightCommaTypeChange(
-						leftSuperCat, rightSuperCat, results);
-			boolean punctResult = punctRules.rightPunct(leftSuperCat,
-					rightSuperCat, results);
-			return typeChangeResult || punctResult;
+				boolean typeChangeResult = punctRules.rightCommaTypeChange(leftSuperCat, rightSuperCat, results);
+				boolean punctResult = punctRules.rightPunct(leftSuperCat, rightSuperCat, results);
+				return typeChangeResult || punctResult;
 			/*
 			 * complex forward slash left, atomic right conj case is for
 			 * conj/conj conj
 			 */
 			case FORWARD * NFLAGS + NONE: // fall through
 			case FORWARD * NFLAGS + CONJ: // |
-				return combinators.forwardApplication(leftSuperCat, rightSuperCat,
-						results, sentence);
+				return combinators.forwardApplication(leftSuperCat, rightSuperCat, results, sentence);
 			/*
 			 * complex left and right, both forward slash:
 			 */
 			case FORWARD * NFLAGS + FORWARD:
-				if (combinators.forwardComposition(leftSuperCat, rightSuperCat,
-						results, sentence)) {
+				if (combinators.forwardComposition(leftSuperCat, rightSuperCat, results, sentence)) {
 					return true;
 				} else {
-					return combinators.forwardApplication(leftSuperCat,
-							rightSuperCat, results, sentence);
+					return combinators.forwardApplication(leftSuperCat, rightSuperCat, results, sentence);
 				}
 			/*
 			 * complex left and right, forward slash left, backslash right:
@@ -218,7 +212,7 @@ public class Rules {
 			case PERIOD * NFLAGS + BACKWARD: // |
 				punctResult = punctRules.leftPunct(leftSuperCat, rightSuperCat, results);
 				conjResult = punctRules.leftPunctConj(leftSuperCat, rightSuperCat, results);
-			return punctResult || conjResult;
+				return punctResult || conjResult;
 			/*
 			 * comma left, atomic or complex right
 			 */
@@ -228,7 +222,7 @@ public class Rules {
 				typeChangeResult = punctRules.leftCommaTypeChange(leftSuperCat, rightSuperCat, results);
 				punctResult = punctRules.leftPunct(leftSuperCat, rightSuperCat, results);
 				conjResult = punctRules.leftPunctConj(leftSuperCat, rightSuperCat, results);
-			return typeChangeResult || punctResult || conjResult;
+				return typeChangeResult || punctResult || conjResult;
 			default:
 				return false;
 		}
