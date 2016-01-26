@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
 
@@ -481,10 +480,8 @@ public class ChartParserBeam extends ChartParser {
 
 		features.collectRootFeatures(superCat, sentence, featureIDs);
 
-		Iterator<Integer> it = featureIDs.iterator();
-		while ( it.hasNext() ) {
-			int id = it.next();
-			superCat.score += weights.getWeight(id);
+		for ( int featureID : featureIDs ) {
+			superCat.score += weights.getWeight(featureID);
 		}
 	}
 
@@ -501,10 +498,8 @@ public class ChartParserBeam extends ChartParser {
 
 		features.collectUnaryFeatures(superCat, sentence, featureIDs);
 
-		Iterator<Integer> it = featureIDs.iterator();
-		while ( it.hasNext() ) {
-			int id = it.next();
-			superCat.score += weights.getWeight(id);
+		for ( int featureID : featureIDs ) {
+			superCat.score += weights.getWeight(featureID);
 		}
 	}
 
@@ -521,10 +516,8 @@ public class ChartParserBeam extends ChartParser {
 
 		features.collectBinaryFeatures(superCat, sentence, featureIDs);
 
-		Iterator<Integer> it = featureIDs.iterator();
-		while ( it.hasNext() ) {
-			int id = it.next();
-			superCat.score += weights.getWeight(id);
+		for ( int featureID : featureIDs ) {
+			superCat.score += weights.getWeight(featureID);
 		}
 	}
 
@@ -544,10 +537,8 @@ public class ChartParserBeam extends ChartParser {
 
 		features.collectLeafFeatures(superCat, sentence, featureIDs);
 
-		Iterator<Integer> it = featureIDs.iterator();
-		while ( it.hasNext() ) {
-			int id = it.next();
-			superCat.score += weights.getWeight(id);
+		for ( int featureID : featureIDs ) {
+			superCat.score += weights.getWeight(featureID);
 		}
 	}
 

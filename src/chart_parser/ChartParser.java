@@ -399,10 +399,11 @@ public class ChartParser {
 		featureIDs.clear();
 
 		features.collectUnaryFeatures(superCat, sentence, featureIDs);
-		Iterator<Integer> it = featureIDs.iterator();
-		while ( it.hasNext() ) {
-			score += weights.getWeight(it.next());
+
+		for ( int featureID : featureIDs ) {
+			score += weights.getWeight(featureID);
 		}
+
 		superCat.score = score;
 	}
 
@@ -411,10 +412,11 @@ public class ChartParser {
 		featureIDs.clear();
 
 		features.collectBinaryFeatures(superCat, sentence, featureIDs);
-		Iterator<Integer> it = featureIDs.iterator();
-		while ( it.hasNext() ) {
-			score += weights.getWeight(it.next());
+
+		for ( int featureID : featureIDs ) {
+			score += weights.getWeight(featureID);
 		}
+
 		superCat.score = score;
 	}
 
@@ -425,9 +427,8 @@ public class ChartParser {
 
 		features.collectLeafFeatures(superCat, sentence, featureIDs);
 
-		Iterator<Integer> it = featureIDs.iterator();
-		while ( it.hasNext() ) {
-			score += weights.getWeight(it.next());
+		for ( int featureID : featureIDs ) {
+			score += weights.getWeight(featureID);
 		}
 
 		superCat.score = score;
