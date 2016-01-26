@@ -5,6 +5,7 @@ gc
 lib
 output
 scripts
+.settings
 src/.git
 src/.gitignore
 .classpath
