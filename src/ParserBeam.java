@@ -107,7 +107,7 @@ public class ParserBeam {
 			log = new PrintWriter(new BufferedWriter(new FileWriter(logFile)));
 
 			if ( printChartDeps ) {
-				outChartDeps = new PrintWriter(new BufferedWriter(new FileWriter(outputFile + ".incorrect")));
+				outChartDeps = new PrintWriter(new BufferedWriter(new FileWriter(outputFile + ".chartdeps")));
 
 				outChartDeps.println("# mandatory preface");
 				outChartDeps.println("# mandatory preface");
