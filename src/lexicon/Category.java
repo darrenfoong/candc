@@ -47,9 +47,6 @@ public class Category {
 		this.unificationHash = uHashBasic();
 		this.equivalenceHash = eHashBasic();
 		this.numArgs = 0;
-		/*
-		 * print(); System.out.println(" Num args: " + numArgs);
-		 */
 	}
 
 	// constructor for complex categories:
@@ -65,9 +62,6 @@ public class Category {
 		this.unificationHash = uHashComplex();
 		this.equivalenceHash = eHashComplex();
 		this.numArgs = countArgs();
-		/*
-		 * print(); System.out.println(" Num args: " + numArgs);
-		 */
 	}
 
 	/*
@@ -85,12 +79,8 @@ public class Category {
 		this.argument = ((other.argument != null) ? new Category(other.argument, transTable, feat) : null);
 		this.unificationHash = new Hash(other.unificationHash);
 		this.equivalenceHash = ((result == null) ? eHashBasic() : eHashComplex());
-		// need to call eHash method again since the feature may have changed
-		// from other
+		// need to call eHash method again since the feature may have changed from other
 		this.numArgs = other.numArgs;
-		/*
-		 * print(); System.out.println(" Num args: " + numArgs);
-		 */
 	}
 
 	/*
@@ -137,16 +127,14 @@ public class Category {
 	 */
 	public void reorderVariables(byte[] transTable, byte[] seenVariables, ByteWrapper order) {
 		if (isAtomic()) {
-			if (var != VarID.NONE
-					&& seenVariables[transTable[var]] == VarID.NONE) {
+			if (var != VarID.NONE && seenVariables[transTable[var]] == VarID.NONE) {
 				seenVariables[transTable[var]] = ++order.value;
 			}
 		} else {
 			result.reorderVariables(transTable, seenVariables, order);
 			argument.reorderVariables(transTable, seenVariables, order);
 
-			if (var != VarID.NONE
-					&& seenVariables[transTable[var]] == VarID.NONE) {
+			if (var != VarID.NONE && seenVariables[transTable[var]] == VarID.NONE) {
 				seenVariables[transTable[var]] = ++order.value;
 			}
 		}
@@ -419,8 +407,7 @@ public class Category {
 	public void printNoOuterBrackets(PrintWriter out, boolean outer) {
 		if (isAtomic()) {
 			atom.print(out);
-			if (feature.value() != GrammaticalFeature.NONE
-					&& feature.value() != GrammaticalFeature.X) {
+			if (feature.value() != GrammaticalFeature.NONE && feature.value() != GrammaticalFeature.X) {
 				out.print("[");
 				feature.print(out);
 				out.print("]");
