@@ -537,7 +537,7 @@ public class ChartParserBeam extends ChartParser {
 	}
 
 	public void printDeps(PrintWriter out, Relations relations, Sentence sentence, SuperCategory superCat) {
-		for (FilledDependency filled = superCat.filledDeps; filled != null; filled = filled.next) {
+		for ( FilledDependency filled : superCat.filledDeps ) {
 			filled.printFullJslot(out, relations, sentence);
 		}
 
@@ -555,7 +555,7 @@ public class ChartParserBeam extends ChartParser {
 	public void printChartDeps(PrintWriter outChartDeps, Relations relations, Sentence sentence) {
 		for ( Cell cell : chart.chart ) {
 			for ( SuperCategory superCat : cell.getSuperCategories() ) {
-				for (FilledDependency filled = superCat.filledDeps; filled != null; filled = filled.next) {
+				for ( FilledDependency filled : superCat.filledDeps ) {
 					filled.printFullJslot(outChartDeps, relations, sentence);
 				}
 			}

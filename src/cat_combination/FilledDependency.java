@@ -3,6 +3,7 @@ package cat_combination;
 import io.Sentence;
 
 import java.io.PrintWriter;
+import java.util.ArrayList;
 
 import lexicon.Categories;
 import lexicon.Relation;
@@ -15,8 +16,6 @@ import utils.Hash;
  *
  * also has the linked list through the next field
  *
- * A nice OOP implementation would have a parent class which the two
- * dependency classes inherit from
  */
 
 public class FilledDependency implements Comparable<FilledDependency> {
@@ -27,8 +26,6 @@ public class FilledDependency implements Comparable<FilledDependency> {
 	protected final short lrange; // if dependency has been created thro' the head-passing mechanism
 
 	public final short conjFactor; // average divisor for multiple slot fillers in max-recall decoder
-
-	public FilledDependency next; // the linked list
 
 	public FilledDependency(short relID,
 			short headIndex,
@@ -41,7 +38,6 @@ public class FilledDependency implements Comparable<FilledDependency> {
 		this.unaryRuleID = unaryRuleID;
 		this.conjFactor = 1;
 		this.lrange = lrange;
-		this.next = null;
 
 		if ( fillerIndex == 0 ) {
 			throw new Error("expecting a non-zero filler index when constructing the filled dependency!");
@@ -53,15 +49,13 @@ public class FilledDependency implements Comparable<FilledDependency> {
 			short fillerIndex,
 			short unaryRuleID,
 			short lrange,
-			short conjFactor,
-			FilledDependency next) {
+			short conjFactor) {
 		this.relID = relID;
 		this.headIndex = headIndex;
 		this.fillerIndex = fillerIndex;
 		this.unaryRuleID = unaryRuleID;
 		this.conjFactor = conjFactor;
 		this.lrange = lrange;
-		this.next = next;
 
 		if ( fillerIndex == 0 ) {
 			throw new Error("expecting a non-zero filler index when constructing the filled dependency!");
@@ -71,33 +65,27 @@ public class FilledDependency implements Comparable<FilledDependency> {
 	public FilledDependency(Dependency dep,
 			short fillerIndex,
 			short conjFactor,
-			short lrange,
-			FilledDependency next) {
+			short lrange) {
 		this.relID = dep.relID;
 		this.headIndex = dep.headIndex;
 		this.fillerIndex = fillerIndex;
 		this.unaryRuleID = dep.unaryRuleID;
 		this.conjFactor = conjFactor;
 		this.lrange = (lrange != 0) ? lrange : dep.lrange;
-		this.next = next;
 
 		if ( fillerIndex == 0 ) {
 			throw new Error("expecting a non-zero filler index when constructing the filled dependency!");
 		}
 	}
 
-	/*
-	 * creates a linked list of FilledDependencies from an unfilled dependency
-	 * and a variable (which may have a number of fillers)
-	 */
-	public static FilledDependency fromUnfilled(Dependency dep, Variable var, short lrange, FilledDependency next) {
+	public static ArrayList<FilledDependency> fromUnfilled(Dependency dep, Variable var, short lrange, ArrayList<FilledDependency> deps) {
 		short conjFactor = var.countFillers();
 
 		for ( int i = 0; i < var.fillers.length && var.fillers[i] != Variable.SENTINEL; i++ ) {
-			next = new FilledDependency(dep, var.fillers[i], conjFactor, lrange, next);
+			deps.add(new FilledDependency(dep, var.fillers[i], conjFactor, lrange));
 		}
 
-		return next;
+		return deps;
 	}
 
 	@Override
@@ -137,10 +125,6 @@ public class FilledDependency implements Comparable<FilledDependency> {
 		out.println(headIndex + " " + plainCatString + " " + jslot + " " + fillerIndex);
 	}
 
-	/*
-	 * needed to implement the Comparable interface, which gets used to order
-	 * the dependencies:
-	 */
 	@Override
 	public int compareTo(FilledDependency other) {
 		if ( this.relID == other.relID ) {

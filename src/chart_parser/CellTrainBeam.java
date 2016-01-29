@@ -146,7 +146,7 @@ public class CellTrainBeam extends Cell {
 	private int countGoldDeps(SuperCategory superCat, Sentence sentence, OracleDecoder oracleDecoder, ArrayList<Category> oracleSupertags) {
 		int numGoldSeen = 0;
 
-		for ( FilledDependency filledDep = superCat.filledDeps; filledDep != null; filledDep = filledDep.next ) {
+		for ( FilledDependency filledDep : superCat.filledDeps ) {
 			if ( !oracleDecoder.ignoreDeps.ignoreDependency(filledDep, sentence) ) {
 				if ( goldDeps.contains(filledDep) ) {
 					numGoldSeen++;

@@ -139,7 +139,7 @@ public abstract class OracleDecoder {
 			sentence.addOutputSupertag(superCat.cat);
 		}
 
-		for (FilledDependency filled = superCat.filledDeps; filled != null; filled = filled.next) {
+		for ( FilledDependency filled : superCat.filledDeps ) {
 			if (!ignoreDepsFlag || !ignoreDeps.ignoreDependency(filled, sentence)) {
 				parserDeps.add(filled);
 			}

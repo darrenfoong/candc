@@ -71,7 +71,7 @@ public abstract class Decoder {
 			sentence.addOutputSupertag(superCat.cat);
 		}
 
-		for (FilledDependency filled = superCat.filledDeps; filled != null; filled = filled.next) {
+		for ( FilledDependency filled : superCat.filledDeps ) {
 			parserDeps.add(filled);
 		}
 	}

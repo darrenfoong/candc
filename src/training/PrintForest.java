@@ -209,7 +209,7 @@ public class PrintForest {
 
 	private int countGoldDeps(SuperCategory superCat) {
 		int score = 0;
-		for (FilledDependency filled = superCat.filledDeps; filled != null; filled = filled.next) {
+		for ( FilledDependency filled : superCat.filledDeps ) {
 			if (goldDeps.contains(filled)) {
 				score++;
 			}

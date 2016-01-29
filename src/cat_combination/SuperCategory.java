@@ -3,6 +3,7 @@ package cat_combination;
 import io.Sentence;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import lexicon.Category;
 import lexicon.Relations;
@@ -26,10 +27,10 @@ public class SuperCategory implements Comparable<SuperCategory> {
 	public final Category cat;
 
 	// linked list of dependencies waiting to be filled
-	public Dependency unfilledDeps = null;
+	public ArrayList<Dependency> unfilledDeps = null;
 
 	// linked list of deps that were filled when children combined
-	public FilledDependency filledDeps = null;
+	public ArrayList<FilledDependency> filledDeps = null;
 
 	/*
 	 * used to record how the category was built (eg coordination) which then
@@ -114,6 +115,7 @@ public class SuperCategory implements Comparable<SuperCategory> {
 	public SuperCategory(short headIndex, Category cat, short flags) {
 		this.cat = cat;
 		this.unfilledDeps = Dependency.getDependencies(headIndex, cat, (short) (0)); // last argument is ruleID
+		this.filledDeps = new ArrayList<FilledDependency>();
 		this.flags = flags;
 		this.numVars = cat.getNumVars();
 		this.numActiveVars = this.numVars; // same as numVars since lexical category
@@ -182,9 +184,10 @@ public class SuperCategory implements Comparable<SuperCategory> {
 			vars[i] = new Variable(leftChild.vars[unification.old1[i]], rightChild.vars[unification.old2[i]]);
 		}
 
-		ArrayList<Dependency> newUnfilledDeps = new ArrayList<Dependency>();
+		unfilledDeps = new ArrayList<Dependency>();
+		filledDeps = new ArrayList<FilledDependency>();
 
-		for (Dependency dep = leftChild.unfilledDeps; dep != null; dep = dep.next) {
+		for ( Dependency dep : leftChild.unfilledDeps ) {
 			byte var = unification.trans1[dep.var];
 
 			if (var == VarID.NONE) {
@@ -202,11 +205,12 @@ public class SuperCategory implements Comparable<SuperCategory> {
 				 * otherwise would have same signature
 				 */
 				Dependency newDep = new Dependency(dep, var, lrange, true);
-				newUnfilledDeps.add(newDep);
+				// newUnfilledDeps.add(newDep);
+				unfilledDeps.add(newDep);
 			}
 		}
 
-		for (Dependency dep = rightChild.unfilledDeps; dep != null; dep = dep.next) {
+		for ( Dependency dep : rightChild.unfilledDeps ) {
 			byte var = unification.trans2[dep.var];
 			if (var == VarID.NONE) {
 				continue;
@@ -223,11 +227,12 @@ public class SuperCategory implements Comparable<SuperCategory> {
 				 * otherwise would have same signature
 				 */
 				Dependency newDep = new Dependency(dep, var, lrange, true);
-				newUnfilledDeps.add(newDep);
+				// newUnfilledDeps.add(newDep);
+				unfilledDeps.add(newDep);
 			}
 		}
 
-		unfilledDeps = Dependency.link(newUnfilledDeps);
+		// unfilledDeps = newUnfilledDeps;
 
 		equivalenceHash = equivalenceHash();
 		incrementNumSuperCategories();
@@ -253,7 +258,7 @@ public class SuperCategory implements Comparable<SuperCategory> {
 	public SuperCategory(Category cat, short flags, SuperCategory leftChild, SuperCategory rightChild) {
 		this.cat = cat;
 		this.unfilledDeps = rightChild.unfilledDeps;
-		this.filledDeps = null;
+		this.filledDeps = new ArrayList<FilledDependency>();
 		this.flags = flags;
 		this.numVars = rightChild.numVars;
 		this.numActiveVars = rightChild.numActiveVars;
@@ -290,8 +295,8 @@ public class SuperCategory implements Comparable<SuperCategory> {
 		Variable var = rightChild.vars[rightChild.cat.var];
 		if (var.isFilled()) { // shouldn't this always be the case?
 			// this is the "head" on the conj cat, eg "and"
-			short head = leftChild.vars[1].getFiller(); 
-			unfilledDeps = new Dependency(Relations.conj1, head, cat.argument.var, (short) (0), unfilledDeps);
+			short head = leftChild.vars[1].getFiller();
+			unfilledDeps.add(new Dependency(Relations.conj1, head, cat.argument.var, (short) (0)));
 			// unfilledDeps is already set to those from rightChild; these become the next field
 		}
 
@@ -317,7 +322,7 @@ public class SuperCategory implements Comparable<SuperCategory> {
 	public SuperCategory(Category cat, short flags, SuperCategory leftSuperCat, SuperCategory rightSuperCat, SuperCategory variablesSuperCat) {
 		this.cat = cat;
 		unfilledDeps = variablesSuperCat.unfilledDeps;
-		filledDeps = null;
+		filledDeps = new ArrayList<FilledDependency>();
 		this.flags = flags;
 		numVars = variablesSuperCat.numVars;
 		numActiveVars = variablesSuperCat.numActiveVars;
@@ -346,8 +351,8 @@ public class SuperCategory implements Comparable<SuperCategory> {
 
 	public SuperCategory(Category cat, short flags, SuperCategory leftSuperCat, SuperCategory rightSuperCat, SuperCategory headSuperCat, boolean replace, short ruleID) {
 		this.cat = cat;
-		unfilledDeps = null;
-		filledDeps = null;
+		unfilledDeps = new ArrayList<Dependency>();
+		filledDeps = new ArrayList<FilledDependency>();
 		this.flags = flags;
 		numVars = cat.getNumVars();
 		numActiveVars = numVars;
@@ -410,8 +415,8 @@ public class SuperCategory implements Comparable<SuperCategory> {
 
 	public SuperCategory(TypeRaisedCategory trCat, short flags, SuperCategory leftSuperCat) {
 		cat = trCat.cat;
-		unfilledDeps = null;
-		filledDeps = null;
+		unfilledDeps = new ArrayList<Dependency>();
+		filledDeps = new ArrayList<FilledDependency>();
 		this.flags = flags;
 		numVars = cat.getNumVars();
 		numActiveVars = numVars;
@@ -445,18 +450,21 @@ public class SuperCategory implements Comparable<SuperCategory> {
 			// TODO: did we forget to increment numSuperCategories++ here?
 		}
 
-		ArrayList<Dependency> newDeps = new ArrayList<Dependency>();
+		// ArrayList<Dependency> newDeps = new ArrayList<Dependency>();
+		unfilledDeps.clear();
+
 		/*
 		 * essentially copying dependencies over from the original
 		 * non-type-raised category (could be more than one if eg two APs have
 		 * been coordinated), and replacing the var with trCat.depVar
 		 */
-		for (Dependency dep = leftSuperCat.unfilledDeps; dep != null; dep = dep.next) {
+		for ( Dependency dep : leftSuperCat.unfilledDeps ) {
 			// boolean argument distinguishes the constructor from another with same signature
 			Dependency newDep = new Dependency(dep, trCat.depVar, dep.lrange, true);
-			newDeps.add(newDep);
+			unfilledDeps.add(newDep);
 		}
-		unfilledDeps = Dependency.link(newDeps);
+
+		// unfilledDeps = Dependency.link(newDeps);
 
 		equivalenceHash = equivalenceHash();
 		incrementNumSuperCategories();
@@ -471,8 +479,8 @@ public class SuperCategory implements Comparable<SuperCategory> {
 	 */
 	public SuperCategory(short flags, SuperCategory leftSuperCat, SuperCategory rightSuperCat) {
 		cat = leftSuperCat.cat;
-		unfilledDeps = null;
-		filledDeps = null;
+		unfilledDeps = new ArrayList<Dependency>();
+		filledDeps = new ArrayList<FilledDependency>();
 		this.flags = flags;
 		numVars = 2; // ugly?
 		numActiveVars = numVars;
@@ -506,7 +514,7 @@ public class SuperCategory implements Comparable<SuperCategory> {
 		}
 
 		int numDeps = 0;
-		for (FilledDependency dep = filledDeps; dep != null; dep = dep.next) {
+		for ( FilledDependency dep : filledDeps ) {
 			if (!ignoreDeps.ignoreDependency(dep, sentence)) {
 				numDeps++;
 			}
@@ -521,7 +529,7 @@ public class SuperCategory implements Comparable<SuperCategory> {
 	 */
 	private Hash equivalenceHash() {
 		Hash h = new Hash(cat.getEhash());
-		for (Dependency dep = unfilledDeps; dep != null; dep = dep.next) {
+		for ( Dependency dep : unfilledDeps ) {
 			h.plusEqual(dep.relID);
 		}
 		for (int i = 1; i < numActiveVars; i++) {
@@ -562,18 +570,16 @@ public class SuperCategory implements Comparable<SuperCategory> {
 			return false;
 		}
 
-		Dependency dep1 = superCategory1.unfilledDeps;
-		Dependency dep2 = superCategory2.unfilledDeps;
-		while (dep1 != null && dep2 != null) {
-			if (!Dependency.equal(dep1, dep2)) {
-				return false;
-			}
-
-			dep1 = dep1.next;
-			dep2 = dep2.next;
-		}
-		if (dep1 != null || dep2 != null) {
+		if ( superCategory1.unfilledDeps.size() != superCategory2.unfilledDeps.size() ) {
 			return false;
+		} else {
+			Collections.sort(superCategory1.unfilledDeps);
+			Collections.sort(superCategory2.unfilledDeps);
+			for ( int i = 0; i < superCategory1.unfilledDeps.size(); i++ ) {
+				if ( !Dependency.equal(superCategory1.unfilledDeps.get(i), superCategory2.unfilledDeps.get(i)) ) {
+					return false;
+				}
+			}
 		}
 
 		return true;
@@ -621,7 +627,7 @@ public class SuperCategory implements Comparable<SuperCategory> {
 
 	public void printFilledDeps(Relations relations) {
 		System.out.println("printing deps:");
-		for (FilledDependency dep = filledDeps; dep != null; dep = dep.next) {
+		for ( FilledDependency dep : filledDeps ){
 			System.out.println(dep);
 		}
 	}

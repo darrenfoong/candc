@@ -45,7 +45,7 @@ public class OracleFscoreDecoder extends OracleDecoder {
 		 * that match the first 4 elements of the tuple but would get ignored by
 		 * the evaluate script - although the gold doesn't have these anyway?)
 		 */
-		for (FilledDependency filled = superCat.filledDeps; filled != null; filled = filled.next) {
+		for ( FilledDependency filled : superCat.filledDeps ) {
 			if (goldDeps.contains(filled)
 					&& !ignoreDeps.ignoreDependency(filled, sentence)) {
 				score++;

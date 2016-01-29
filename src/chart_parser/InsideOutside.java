@@ -149,7 +149,7 @@ public class InsideOutside {
 		}
 		double prob = Math.exp(outside + conj.inside + invZ);
 
-		for (FilledDependency filled = conj.filledDeps; filled != null; filled = filled.next) {
+		for ( FilledDependency filled : conj.filledDeps ) {
 			double score = prob;
 
 			Double currentScore = depScores.get(filled);

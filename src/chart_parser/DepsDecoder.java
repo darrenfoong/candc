@@ -76,7 +76,7 @@ public class DepsDecoder extends Decoder {
 			}
 		}
 
-		for (FilledDependency filled = superCat.filledDeps; filled != null; filled = filled.next) {
+		for ( FilledDependency filled : superCat.filledDeps ) {
 			score += insideOutside.depScores.get(filled) / filled.conjFactor;
 		}
 

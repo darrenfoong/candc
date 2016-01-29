@@ -438,7 +438,7 @@ public class ChartParser {
 			}
 		}
 
-		for (FilledDependency filled = superCat.filledDeps; filled != null; filled = filled.next) {
+		for ( FilledDependency filled : superCat.filledDeps ) {
 			if (!ignoreDepsFlag || !oracle.ignoreDeps.ignoreDependency(filled, sentence)) {
 				deps.add(filled);
 			}
