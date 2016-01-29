@@ -302,11 +302,7 @@ public class ChartParser {
 				boolean success = rules.combine(leftSuperCat, rightSuperCat, results, printDetailedOutput, sentence);
 				if (printDetailedOutput) {
 					if (success) {
-						System.out.print("success!: ");
-						PrintWriter systemOut = new PrintWriter(System.out, true);
-						results.get(results.size() - 1).cat.print(systemOut);
-						systemOut.close();
-						System.out.println();
+						System.out.println("success!: " + results.get(results.size() - 1).cat);
 					} else {
 						System.out.println("failed to combine");
 					}

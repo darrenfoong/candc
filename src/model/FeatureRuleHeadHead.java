@@ -2,7 +2,6 @@ package model;
 
 import io.Sentence;
 
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -127,19 +126,7 @@ public class FeatureRuleHeadHead implements Feature<FeatureRuleHeadHead> {
 	}
 
 	@Override
-	public void print(PrintWriter out) {
-		out.print(featureType + " ");
-		leftCat.print(out);
-		out.print(" ");
-		rightCat.print(out);
-		out.print(" ");
-		resultCat.print(out);
-		out.print(" " + leftHead);
-		out.print(" " + rightHead);
-	}
-
-	@Override
 	public String toString() {
-		return featureType + " " + leftCat.toStringNoOuterBrackets() + " " + rightCat.toStringNoOuterBrackets() + " " + resultCat.toStringNoOuterBrackets() + " " + leftHead + " " + rightHead;
+		return featureType + " " + leftCat + " " + rightCat + " " + resultCat + " " + leftHead + " " + rightHead;
 	}
 }

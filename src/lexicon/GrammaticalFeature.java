@@ -1,7 +1,5 @@
 package lexicon;
 
-import java.io.PrintWriter;
-
 public class GrammaticalFeature {
 	/*
 	 * essentially just a wrapper class around an integer byte value
@@ -260,14 +258,6 @@ public class GrammaticalFeature {
 		}
 
 		return featureString;
-	}
-
-	public void print(PrintWriter out) {
-		out.print(this.toString());
-	}
-
-	public void printToErr() {
-		System.err.print(this.toString());
 	}
 
 	public boolean isNone() {

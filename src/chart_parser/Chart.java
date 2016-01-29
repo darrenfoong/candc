@@ -3,7 +3,6 @@ package chart_parser;
 import io.Sentence;
 import io.Supertag;
 
-import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import lexicon.Category;
@@ -102,9 +101,7 @@ public class Chart {
 
 	public void add(int position, int span, SuperCategory superCat) {
 		if (printDetailedOutput) {
-			System.out.println("adding to chart: ");
-			superCat.cat.print(new PrintWriter(System.out, true));
-			System.out.println();
+			System.out.println("adding to chart: " + superCat.cat);
 			superCat.printFilledDeps(relations);
 		}
 

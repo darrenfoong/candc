@@ -2,7 +2,6 @@ package cat_combination;
 
 import io.Sentence;
 
-import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import lexicon.Atom;
@@ -66,14 +65,9 @@ public class Rules {
 
 	public boolean combine(SuperCategory leftSuperCat, SuperCategory rightSuperCat, ArrayList<SuperCategory> results, boolean printDetailedOutput, Sentence sentence) {
 		if (printDetailedOutput) {
-			PrintWriter systemOut = new PrintWriter(System.out, true);
 			System.out.println("trying to combine two cats: ");
-			leftSuperCat.cat.print(systemOut);
-			systemOut.flush();
-			System.out.println();
-			rightSuperCat.cat.print(systemOut);
-			systemOut.flush();
-			System.out.println();
+			System.out.println(leftSuperCat.cat);
+			System.out.println(rightSuperCat.cat);
 		}
 
 		if (allRuleInstances != null && !allRuleInstances.contains(leftSuperCat.cat, rightSuperCat.cat)) {

@@ -25,17 +25,14 @@ public class FeatureCounts<T extends Feature<T>> {
 		if (count != null) {
 			featureCounts.put(feature, count+1);
 		} else {
-			feature = (T) feature.canonize(categories);
+			feature = feature.canonize(categories);
 			featureCounts.put(feature, 1);
 		}
 	}
 
 	public void print(PrintWriter out) {
 		for (Map.Entry<T, Integer> entry : featureCounts.entrySet()) {
-			entry.getKey().print(out);
-			out.print(" ");
-			out.print(entry.getValue());
-			out.println();
+			out.println(entry.getKey() + " " + entry.getValue());
 		}
 	}
 }

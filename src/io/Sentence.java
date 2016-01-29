@@ -66,7 +66,7 @@ public class Sentence {
 
 		for (int i = 0; i < words.size(); i++) {
 			out.print(" " + words.get(i) + "|" + postags.get(i) + "|");
-			outputSupertags.get(i).printNoOuterBrackets(out, true);
+			out.print(outputSupertags.get(i).toStringNoOuterBrackets(true));
 		}
 
 		out.println();
@@ -78,7 +78,7 @@ public class Sentence {
 				out.print(" ");
 			}
 
-			outputSupertags.get(i).printNoOuterBrackets(out, true);
+			out.print(outputSupertags.get(i).toStringNoOuterBrackets(true));
 		}
 
 		out.println();

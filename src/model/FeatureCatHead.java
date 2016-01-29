@@ -2,7 +2,6 @@ package model;
 
 import io.Sentence;
 
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -92,14 +91,7 @@ public class FeatureCatHead implements Feature<FeatureCatHead> {
 	}
 
 	@Override
-	public void print(PrintWriter out) {
-		out.print(featureType + " ");
-		cat.print(out);
-		out.print(" " + head);
-	}
-
-	@Override
 	public String toString() {
-		return featureType + " " + cat.toStringNoOuterBrackets() + " " + head;
+		return featureType + " " + cat + " " + head;
 	}
 }

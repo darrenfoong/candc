@@ -21,10 +21,7 @@ public class FeatureIDs<T extends Feature<T>> {
 
 	public void print(PrintWriter out) {
 		for (Map.Entry<T, Integer> entry : featureIDs.entrySet()) {
-			entry.getKey().print(out);
-			out.print(" ");
-			out.print(entry.getValue());
-			out.println();
+			out.println(entry.getKey() + " " + entry.getValue());
 		}
 	}
 

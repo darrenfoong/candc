@@ -230,13 +230,11 @@ public abstract class OracleDecoder {
 	public void printDeps(PrintWriter out, Relations relations, Sentence sentence, Boolean relIDonly) {
 		if (relIDonly) {
 			if (newRootCat != null) {
-				newRootCat.print(out);
+				out.print(newRootCat);
 			} else {
-				rootCat.print(out);
+				out.print(rootCat);
 			}
-			out.print(" ");
-			rootCat.print(out);
-			out.println();
+			out.println(" " + rootCat);
 		}
 
 		Iterator<FilledDependency> iterator = parserDeps.iterator();

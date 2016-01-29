@@ -1,7 +1,5 @@
 package lexicon;
 
-import java.io.PrintWriter;
-
 public class Atom {
 	/*
 	 * essentially just a wrapper class around an integer byte value
@@ -152,14 +150,6 @@ public class Atom {
 		}
 
 		return atomString;
-	}
-
-	public void print(PrintWriter out) {
-		out.print(this.toString());
-	}
-
-	public void printToErr() {
-		System.err.print(this.toString());
 	}
 
 	public boolean isN() {

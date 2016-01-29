@@ -18,10 +18,7 @@ public class RuleCategoryPair {
 	}
 
 	public void print(PrintWriter out) {
-		cat1.print(out);
-		out.print(" ");
-		cat2.print(out);
-		out.println();
+		out.println(cat1 + " " + cat2);
 	}
 
 	/*

@@ -1,6 +1,5 @@
 package model;
 
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -65,12 +64,6 @@ public class FeatureCat implements Feature<FeatureCat> {
 	public FeatureCat canonize(Categories categories) {
 		Category canonicalCat = categories.canonize(cat);
 		return new FeatureCat(featureType, canonicalCat);
-	}
-
-	@Override
-	public void print(PrintWriter out) {
-		out.print(featureType + " ");
-		cat.print(out);
 	}
 
 	@Override

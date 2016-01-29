@@ -1,7 +1,5 @@
 package lexicon;
 
-import java.io.PrintWriter;
-
 import utils.ByteWrapper;
 import utils.Hash;
 
@@ -86,14 +84,14 @@ public class Category {
 	/*
 	 * uses the constructor above; upper-case first letter since this is
 	 * effectively a constructor; called TransVariable because it copies the
-	 * other Category whilst translating its variables unsing the transTable
+	 * other Category whilst translating its variables using the transTable
 	 */
 	public static Category TransVariable(Category other, byte[] transTable, GrammaticalFeature feat) {
 		return new Category(other, transTable, feat);
 	}
 
 	private byte countArgs() {
-		if (result != null) {
+		if ( result != null ) {
 			return (byte) (result.countArgs() + 1);
 		} else {
 			return (byte) (0);
@@ -169,13 +167,10 @@ public class Category {
 		}
 	}
 
-	// easy for atomic categories: just use the atom value since these
-	// are distinct for all basic categories
 	private Hash uHashBasic() {
 		return new Hash(atom.value());
 	}
 
-	// spread the complex cat hash values out beyond the basic values
 	private Hash uHashComplex() {
 		Hash h = new Hash(result.unificationHash.value());
 		h.timesEqual(2);
@@ -184,13 +179,10 @@ public class Category {
 		return h;
 	}
 
-	/*
-	 * ignore all features except on the S atom where we also ignore NONE and
-	 * the variable X
-	 */
+	// ignore all features except on the S atom where we also ignore NONE and the variable X
 	private Hash eHashBasic() {
 		Hash h = uHashBasic();
-		if ((isS() || isN() || isNP()) && !feature.isFree()) {
+		if (isS() && !feature.isFree()) {
 			h.plusEqual(feature.value());
 		}
 		return h;
@@ -198,9 +190,9 @@ public class Category {
 
 	private Hash eHashComplex() {
 		Hash h = new Hash(result.equivalenceHash.value());
-		h.plusEqual(argument.equivalenceHash.value());
 		h.timesEqual(2);
 		h.barEqual(slash);
+		h.plusEqual(argument.equivalenceHash.value());
 		return h;
 	}
 
@@ -249,8 +241,7 @@ public class Category {
 					return true;
 				}
 
-				return unequal(cat1.result, cat2.result)
-						|| unequal(cat1.argument, cat2.argument);
+				return unequal(cat1.result, cat2.result) || unequal(cat1.argument, cat2.argument);
 			}
 		}
 	}
@@ -289,13 +280,11 @@ public class Category {
 					return true;
 				}
 
-				return unequalIgnoreVars2(cat1.result, cat2.result)
-						|| unequalIgnoreVars2(cat1.argument, cat2.argument);
+				return unequalIgnoreVars2(cat1.result, cat2.result) || unequalIgnoreVars2(cat1.argument, cat2.argument);
 			}
 		}
 	}
 
-	// hashCode and equals used by the canonicalCats hashSet in Categories
 	@Override
 	public int hashCode() {
 		return (int) (equivalenceHash.value());
@@ -317,122 +306,61 @@ public class Category {
 
 	@Override
 	public String toString() {
-		String output = "";
-		if (isAtomic()) {
-			output += atom.toString();
-			if (feature.value() != GrammaticalFeature.NONE) {
-				output += "[";
-				output += feature.toString();
-				output += "]";
-			}
+		if ( isAtomic() ) {
+			return toStringNoOuterBrackets();
 		} else {
-			output += "(";
-			output += result.toString();
-			if (isFwd()) {
-				output += "/";
-			} else {
-				output += "\\";
-			}
-			output += argument.toString();
-			output += ")";
+			return "(" + toStringNoOuterBrackets() + ")";
 		}
-
-		return output;
 	}
 
 	public String toStringNoOuterBrackets() {
 		String output = "";
-		if (isAtomic()) {
-			output += atom.toString();
-			if (feature.value() != GrammaticalFeature.NONE) {
-				output += "[";
-				output += feature.toString();
-				output += "]";
+
+		if ( isAtomic() ) {
+			output += atom;
+			if ( feature.value() != GrammaticalFeature.NONE ) {
+				output += "[" + feature + "]";
 			}
 		} else {
-			output += result.toString();
-			if (isFwd()) {
+			output += result;
+			if ( isFwd() ) {
 				output += "/";
 			} else {
 				output += "\\";
 			}
-			output += argument.toString();
+			output += argument;
 		}
 
 		return output;
 	}
 
-	public void print(PrintWriter out) {
-		if (isAtomic()) {
-			atom.print(out);
-			if (feature.value() != GrammaticalFeature.NONE) {
-				out.print("[");
-				feature.print(out);
-				out.print("]");
+	public String toStringNoOuterBrackets(boolean outer) {
+		String output = "";
+
+		if ( isAtomic() ) {
+			output += atom;
+			if ( feature.value() != GrammaticalFeature.NONE && feature.value() != GrammaticalFeature.X ) {
+				output += "[" + feature + "]";
 			}
 		} else {
-			out.print("(");
-			result.print(out);
-			if (isFwd()) {
-				out.print("/");
+			if ( !outer ) {
+				output += "(";
+			}
+			output += result.toStringNoOuterBrackets(false);
+			if ( isFwd() ) {
+				output += "/";
 			} else {
-				out.print("\\");
+				output += "\\";
 			}
-			argument.print(out);
-			out.print(")");
-		}
-	}
-
-	public void printToErr() {
-		if (isAtomic()) {
-			atom.printToErr();
-			if (feature.value() != GrammaticalFeature.NONE) {
-				System.err.print("[");
-				feature.printToErr();
-				System.err.print("]");
-			}
-		} else {
-			System.err.print("(");
-			result.printToErr();
-			if (isFwd()) {
-				System.err.print("/");
-			} else {
-				System.err.print("\\");
-			}
-			argument.printToErr();
-			System.err.print(")");
-		}
-	}
-
-	public void printNoOuterBrackets(PrintWriter out, boolean outer) {
-		if (isAtomic()) {
-			atom.print(out);
-			if (feature.value() != GrammaticalFeature.NONE && feature.value() != GrammaticalFeature.X) {
-				out.print("[");
-				feature.print(out);
-				out.print("]");
-			}
-		} else {
-			if (!outer) {
-				out.print("(");
-			}
-			result.printNoOuterBrackets(out, false);
-			if (isFwd()) {
-				out.print("/");
-			} else {
-				out.print("\\");
-			}
-			argument.printNoOuterBrackets(out, false);
-			if (!outer) {
-				out.print(")");
+			output += argument.toStringNoOuterBrackets(false);
+			if ( !outer ) {
+				output += ")";
 			}
 		}
+
+		return output;
 	}
 
-	/*
-	 * remaining methods are a large set of observers checking for various
-	 * properties and types
-	 */
 	public boolean isAtomic() {
 		return atom.value() != Atom.NONE;
 	}
