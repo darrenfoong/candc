@@ -14,8 +14,6 @@ public class Cell {
 	private ArrayList<SuperCategory> superCategories;
 	private ArrayList<LinkedList<SuperCategory>> preSuperCategories;
 
-	private int clearCounter;
-
 	public Cell() {
 		this.superCategories = new ArrayList<SuperCategory>();
 		this.preSuperCategories = new ArrayList<LinkedList<SuperCategory>>();
@@ -27,23 +25,6 @@ public class Cell {
 
 	public ArrayList<LinkedList<SuperCategory>> getPreSuperCategories() {
 		return preSuperCategories;
-	}
-
-	public void setClearCounter(int clearCounter) {
-		this.clearCounter = clearCounter;
-	}
-
-	/**
-	 * Decrements clearCounter for combine operations. When clearCounter reaches
-	 * zero, superCategories will no longer be needed and can be cleared i.e.
-	 * garbage collected.
-	 */
-	public void decrementClearCounter() {
-		this.clearCounter--;
-		if ( clearCounter == 0 ) {
-			Chart.setNumSuperCategories(Chart.getNumSuperCategories() - superCategories.size());
-			superCategories.clear();
-		}
 	}
 
 	/**
@@ -205,6 +186,5 @@ public class Cell {
 	public void clear() {
 		superCategories.clear();
 		preSuperCategories.clear();
-		clearCounter = 0;
 	}
 }

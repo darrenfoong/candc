@@ -98,8 +98,6 @@ public class ChartParserBeam extends ChartParser {
 		chart.clear();
 		chart.load(sentence, betas[0], false, true);
 
-		setClearCounters(chart);
-
 		if (!preParse()) {
 			return true;
 		}
@@ -201,23 +199,6 @@ public class ChartParserBeam extends ChartParser {
 	}
 
 	/**
-	 * Initialises clearCounters for all cells. The value of a cell (pos, span)
-	 * is numWords - span.
-	 * 
-	 * @param chart chart
-	 */
-	private void setClearCounters(Chart chart) {
-		int numWords = chart.numWords;
-
-		for (int span = 1; span <= numWords; span++) {
-			int clearCounter = numWords - span;
-			for (int pos = 0; pos <= numWords - span; pos++) {
-				chart.cell(pos, span).setClearCounter(clearCounter);
-			}
-		}
-	}
-
-	/**
 	 * Initialises initial cell capacity.
 	 * 
 	 * The initial (expected cell capacity) is the number of combine operations
@@ -246,9 +227,6 @@ public class ChartParserBeam extends ChartParser {
 		for (SuperCategory superCat : results) {
 			calcScore(superCat, atRoot);
 		}
-
-		leftCell.decrementClearCounter();
-		rightCell.decrementClearCounter();
 	}
 
 	public void combineBetter(Cell leftCell, Cell rightCell, int position, int span, boolean atRoot) {
@@ -343,9 +321,6 @@ public class ChartParserBeam extends ChartParser {
 			Collections.sort(kbest);
 			chart.cell(position, span).getPreSuperCategories().add(kbest);
 		}
-
-		leftCell.decrementClearCounter();
-		rightCell.decrementClearCounter();
 	}
 
 	@Override
