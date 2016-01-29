@@ -43,7 +43,6 @@ public class Atom {
 		return atom;
 	}
 
-	// returns byte representation of String atomic category
 	private static byte convert(String stringAtom) {
 		if ( stringAtom.isEmpty() ) {
 			throw new IllegalArgumentException("Cannot convert an empty string atom.");
