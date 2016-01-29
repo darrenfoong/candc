@@ -1,6 +1,5 @@
 package lexicon;
 
-
 /*
  * some categories to be type-raised already have a dependency, eg the
  * AP case:
@@ -13,6 +12,7 @@ package lexicon;
  * is needed by the relevant SuperCategory constructor since it needs
  * to get the Variable associated with the lexical item
  */
+
 public class TypeRaisedCategory {
 	public Category cat;
 	public byte lexVar; // variable associated with lexical item
