@@ -242,7 +242,7 @@ public abstract class OracleDecoder {
 		while (iterator.hasNext()) {
 			FilledDependency parserDep = iterator.next();
 			if (relIDonly) {
-				parserDep.print(out);
+				out.println(parserDep);
 			} else {
 				parserDep.printFullJslot(out, relations, sentence);
 			}

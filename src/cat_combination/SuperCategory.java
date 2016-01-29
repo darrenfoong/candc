@@ -2,7 +2,6 @@ package cat_combination;
 
 import io.Sentence;
 
-import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import lexicon.Category;
@@ -623,7 +622,7 @@ public class SuperCategory implements Comparable<SuperCategory> {
 	public void printFilledDeps(Relations relations) {
 		System.out.println("printing deps:");
 		for (FilledDependency dep = filledDeps; dep != null; dep = dep.next) {
-			dep.print(new PrintWriter(System.out));
+			System.out.println(dep);
 		}
 	}
 

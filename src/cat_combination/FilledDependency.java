@@ -20,20 +20,21 @@ import utils.Hash;
  */
 
 public class FilledDependency implements Comparable<FilledDependency> {
-	final short relID;
-	final short headIndex; // position of the "head" word in the sentence
-	final short fillerIndex; // position of the filler word in the sentence
-	final short unaryRuleID; // if dependency has been created thro' a unary
-	// rule
-	public final short conjFactor; // average divisor for multiple slot fillers
-	// in max-recall decoder
-	final short lrange; // if dependency has been created thro' the head-passing
-	// mechanism
+	protected final short relID;
+	protected final short headIndex; // position of the "head" word in the sentence
+	protected final short fillerIndex; // position of the filler word in the sentence
+	protected final short unaryRuleID; // if dependency has been created thro' a unary rule
+	protected final short lrange; // if dependency has been created thro' the head-passing mechanism
+
+	public final short conjFactor; // average divisor for multiple slot fillers in max-recall decoder
 
 	public FilledDependency next; // the linked list
 
-	public FilledDependency(short relID, short headIndex, short fillerIndex,
-			short unaryRuleID, short lrange) {
+	public FilledDependency(short relID,
+			short headIndex,
+			short fillerIndex,
+			short unaryRuleID,
+			short lrange) {
 		this.relID = relID;
 		this.headIndex = headIndex;
 		this.fillerIndex = fillerIndex;
@@ -42,14 +43,17 @@ public class FilledDependency implements Comparable<FilledDependency> {
 		this.lrange = lrange;
 		this.next = null;
 
-		if (fillerIndex == 0) {
-			throw new Error(
-					"expecting a non-zero filler index when constructing the filled dependency!");
+		if ( fillerIndex == 0 ) {
+			throw new Error("expecting a non-zero filler index when constructing the filled dependency!");
 		}
 	}
 
-	public FilledDependency(short relID, short headIndex, short fillerIndex,
-			short unaryRuleID, short lrange, short conjFactor,
+	public FilledDependency(short relID,
+			short headIndex,
+			short fillerIndex,
+			short unaryRuleID,
+			short lrange,
+			short conjFactor,
 			FilledDependency next) {
 		this.relID = relID;
 		this.headIndex = headIndex;
@@ -59,25 +63,26 @@ public class FilledDependency implements Comparable<FilledDependency> {
 		this.lrange = lrange;
 		this.next = next;
 
-		if (fillerIndex == 0) {
-			throw new Error(
-					"expecting a non-zero filler index when constructing the filled dependency!");
+		if ( fillerIndex == 0 ) {
+			throw new Error("expecting a non-zero filler index when constructing the filled dependency!");
 		}
 	}
 
-	public FilledDependency(Dependency dep, short fillerIndex,
-			short conjFactor, short lrange, FilledDependency next) {
+	public FilledDependency(Dependency dep,
+			short fillerIndex,
+			short conjFactor,
+			short lrange,
+			FilledDependency next) {
 		this.relID = dep.relID;
 		this.headIndex = dep.headIndex;
 		this.fillerIndex = fillerIndex;
 		this.unaryRuleID = dep.unaryRuleID;
 		this.conjFactor = conjFactor;
-		this.lrange = (lrange != 0 ? lrange : dep.lrange);
+		this.lrange = (lrange != 0) ? lrange : dep.lrange;
 		this.next = next;
 
-		if (fillerIndex == 0) {
-			throw new Error(
-					"expecting a non-zero filler index when constructing the filled dependency!");
+		if ( fillerIndex == 0 ) {
+			throw new Error("expecting a non-zero filler index when constructing the filled dependency!");
 		}
 	}
 
@@ -85,62 +90,51 @@ public class FilledDependency implements Comparable<FilledDependency> {
 	 * creates a linked list of FilledDependencies from an unfilled dependency
 	 * and a variable (which may have a number of fillers)
 	 */
-	public static FilledDependency fromUnfilled(Dependency dep, Variable var,
-			short lrange, FilledDependency next) {
+	public static FilledDependency fromUnfilled(Dependency dep, Variable var, short lrange, FilledDependency next) {
 		short conjFactor = var.countFillers();
 
-		for (int i = 0; i < var.fillers.length
-				&& var.fillers[i] != Variable.SENTINEL; i++) {
-			next = new FilledDependency(dep, var.fillers[i], conjFactor,
-					lrange, next);
+		for ( int i = 0; i < var.fillers.length && var.fillers[i] != Variable.SENTINEL; i++ ) {
+			next = new FilledDependency(dep, var.fillers[i], conjFactor, lrange, next);
 		}
 
 		return next;
 	}
 
-	public void print(PrintWriter out) {
-		out.println(headIndex + " " + relID + " " + fillerIndex + " "
-				+ unaryRuleID);
+	@Override
+	public String toString() {
+		return headIndex + " " + relID + " " + fillerIndex + " " + unaryRuleID;
 	}
 
-	public void printFull(PrintWriter out, Relations relations,
-			Sentence sentence) {
+	public void printFull(PrintWriter out, Relations relations, Sentence sentence) {
 		String head = sentence.words.get(headIndex - 1);
 		String filler = sentence.words.get(fillerIndex - 1);
 		Relation relation = relations.getRelation(relID);
 		String stringCat = relation.category;
 		short slot = relation.slot;
-		out.println(head + "_" + headIndex + " " + stringCat + " " + slot + " "
-				+ filler + "_" + fillerIndex + " " + unaryRuleID);
+		out.println(head + "_" + headIndex + " " + stringCat + " " + slot + " " + filler + "_" + fillerIndex + " " + unaryRuleID);
 	}
 
-	public void printFullJslot(PrintWriter out, Relations relations,
-			Sentence sentence) {
+	public void printFullJslot(PrintWriter out, Relations relations, Sentence sentence) {
 		String head = sentence.words.get(headIndex - 1);
 		String filler = sentence.words.get(fillerIndex - 1);
 		Relation relation = relations.getRelation(relID);
 		String stringCat = relation.category;
 		short jslot = relation.jslot;
-		out.println(head + "_" + headIndex + " " + stringCat + " " + jslot
-				+ " " + filler + "_" + fillerIndex + " " + unaryRuleID);
+		out.println(head + "_" + headIndex + " " + stringCat + " " + jslot + " " + filler + "_" + fillerIndex + " " + unaryRuleID);
 	}
 
-	public void printForTraining(PrintWriter out, Categories categories,
-			Sentence sentence) {
+	public void printForTraining(PrintWriter out, Categories categories, Sentence sentence) {
 		Relations relations = categories.dependencyRelations;
 		Relation relation = relations.getRelation(relID);
 		String stringCat = relation.category;
 		short jslot = relation.jslot;
 
 		String plainCatString = categories.getPlainString(stringCat);
-		if (plainCatString == null) {
-			throw new Error(
-					"should have plain category string for all lexical categories! "
-							+ stringCat);
+		if ( plainCatString == null ) {
+			throw new Error("should have plain category string for all lexical categories! " + stringCat);
 		}
 
-		out.println(headIndex + " " + plainCatString + " " + jslot + " "
-				+ fillerIndex);
+		out.println(headIndex + " " + plainCatString + " " + jslot + " " + fillerIndex);
 	}
 
 	/*
@@ -149,24 +143,14 @@ public class FilledDependency implements Comparable<FilledDependency> {
 	 */
 	@Override
 	public int compareTo(FilledDependency other) {
-		if (this.relID == other.relID) {
-			if (this.headIndex == other.headIndex) {
-				if (this.fillerIndex == other.fillerIndex) {
-					return 0;
-				} else if (this.fillerIndex < other.fillerIndex) {
-					return -1;
-				} else {
-					return 1;
-				}
-			} else if (this.headIndex < other.headIndex) {
-				return -1;
+		if ( this.relID == other.relID ) {
+			if ( this.headIndex == other.headIndex ) {
+				return Short.compare(this.fillerIndex, other.fillerIndex);
 			} else {
-				return 1;
+				return Short.compare(this.headIndex, other.headIndex);
 			}
-		} else if (this.relID < other.relID) {
-			return -1;
 		} else {
-			return 1;
+			return Short.compare(this.relID, other.relID);
 		}
 	}
 
@@ -192,8 +176,6 @@ public class FilledDependency implements Comparable<FilledDependency> {
 
 		FilledDependency cother = (FilledDependency) other;
 
-		return relID == cother.relID
-				&& headIndex == cother.headIndex
-				&& fillerIndex == cother.fillerIndex;
+		return relID == cother.relID && headIndex == cother.headIndex && fillerIndex == cother.fillerIndex;
 	}
 }
