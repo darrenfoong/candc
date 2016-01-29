@@ -29,7 +29,6 @@ public class CategoryJSlotPair {
 
 		CategoryJSlotPair cother = (CategoryJSlotPair) other;
 
-		return catString.equals(cother.catString)
-				&& slot == cother.slot;
+		return catString.equals(cother.catString) && slot == cother.slot;
 	}
 }
