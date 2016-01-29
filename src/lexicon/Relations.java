@@ -51,11 +51,10 @@ public class Relations {
 	 */
 	public short getRelID_II(String category, short slot) {
 		CategoryJSlotPair pair = new CategoryJSlotPair(category, slot);
-		if (relIDsII.containsKey(pair)) {
+		if ( relIDsII.containsKey(pair) ) {
 		// if (relIDsII.get(pair) != null) {
 			return relIDsII.get(pair);
-		}
-		else {
+		} else {
 			return (short) (0); // not a relation in markedup
 		}
 	}
@@ -65,7 +64,7 @@ public class Relations {
 		short relID = (short) (relations.size());
 		relations.add(relation);
 
-		if (slot == 1) {
+		if ( slot == 1 ) {
 			relIDs.put(categoryString, relID);
 			// relID gets converted to an object thro' autoboxing
 		}
