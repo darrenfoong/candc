@@ -7,7 +7,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashSet;
-import java.util.Iterator;
 
 import lexicon.Categories;
 import lexicon.Category;
@@ -32,17 +31,16 @@ public class RuleInstances {
 	}
 
 	public void print(PrintWriter out) {
-		Iterator<RuleCategoryPair> iterator = ruleInstances.iterator();
-		while (iterator.hasNext()) {
-			((RuleCategoryPair) (iterator.next())).print(out);
+		for ( RuleCategoryPair ruleInstance : ruleInstances ) {
+			out.println(ruleInstance);
 		}
 	}
 
-	private void readRuleInstances(String ruleInstancesFile,
-			Categories categories) {
+	private void readRuleInstances(String ruleInstancesFile, Categories categories) {
+		BufferedReader in = null;
+
 		try {
-			BufferedReader in = new BufferedReader(new FileReader(
-					ruleInstancesFile));
+			in = new BufferedReader(new FileReader( ruleInstancesFile));
 			Preface.readPreface(in);
 
 			String line;
@@ -58,6 +56,12 @@ public class RuleInstances {
 			}
 		} catch (IOException e) {
 			System.err.println(e);
+		} finally {
+			try {
+				if ( in != null ) { in.close(); }
+			} catch ( IOException e ) {
+				e.printStackTrace();
+			}
 		}
 	}
 }

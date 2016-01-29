@@ -1,7 +1,5 @@
 package cat_combination;
 
-import java.io.PrintWriter;
-
 import lexicon.Category;
 import utils.Hash;
 
@@ -17,8 +15,9 @@ public class RuleCategoryPair {
 		this.cat2 = cat2;
 	}
 
-	public void print(PrintWriter out) {
-		out.println(cat1 + " " + cat2);
+	@Override
+	public String toString() {
+		return cat1 + " " + cat2;
 	}
 
 	/*
@@ -45,7 +44,6 @@ public class RuleCategoryPair {
 
 		RuleCategoryPair cother = (RuleCategoryPair) other;
 
-		return cat1.equals(cother.cat1)
-				&& cat2.equals(cother.cat2);
+		return cat1.equals(cother.cat1) && cat2.equals(cother.cat2);
 	}
 }
