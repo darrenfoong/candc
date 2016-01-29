@@ -24,10 +24,10 @@ public class Relation {
 	}
 
 	public void printSlot(boolean juliaSlots) {
-		if (juliaSlots) {
-			System.out.print(category + " " + Short.toString(jslot));
+		if ( juliaSlots ) {
+			System.out.print(category + " " + jslot);
 		} else {
-			System.out.print(category + " " + Short.toString(slot));
+			System.out.print(category + " " + slot);
 		}
 	}
 }
