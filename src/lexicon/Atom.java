@@ -43,17 +43,15 @@ public class Atom {
 		return atom;
 	}
 
-	/*
-	 * returns byte representation of String atomic category
-	 */
+	// returns byte representation of String atomic category
 	private static byte convert(String stringAtom) {
-		byte byteAtom = NONE;
-
-		if (stringAtom.isEmpty()) {
+		if ( stringAtom.isEmpty() ) {
 			throw new IllegalArgumentException("Cannot convert an empty string atom.");
 		}
 
-		switch (stringAtom.charAt(0)) {
+		byte byteAtom = NONE;
+
+		switch ( stringAtom.charAt(0) ) {
 			case ':':
 				byteAtom = COLON;
 				break;
@@ -64,14 +62,14 @@ public class Atom {
 				byteAtom = CONJ;
 				break;
 			case 'L':
-				if (stringAtom.charAt(1) == 'R') {
+				if ( stringAtom.charAt(1) == 'R' ) {
 					byteAtom = LRB;
 				} else {
 					byteAtom = LQU;
 				}
 				break;
 			case 'N':
-				if (stringAtom.length() == 1) {
+				if ( stringAtom.length() == 1 ) {
 					byteAtom = N;
 				} else {
 					byteAtom = NP;
@@ -84,7 +82,7 @@ public class Atom {
 				byteAtom = PP;
 				break;
 			case 'R':
-				if (stringAtom.charAt(1) == 'R') {
+				if ( stringAtom.charAt(1) == 'R' ) {
 					byteAtom = RRB;
 				} else {
 					byteAtom = RQU;
@@ -97,7 +95,7 @@ public class Atom {
 				byteAtom = SEMICOLON;
 				break;
 			default:
-				throw new IllegalArgumentException("Run out of atom types to check.");
+				throw new IllegalArgumentException("Invalid string atom.");
 		}
 
 		return byteAtom;
@@ -108,50 +106,50 @@ public class Atom {
 		String atomString = "";
 
 		switch (atom) {
-		case NONE:
-			atomString = "";
-			break;
-		case N:
-			atomString = "N";
-			break;
-		case NP:
-			atomString = "NP";
-			break;
-		case S:
-			atomString = "S";
-			break;
-		case PP:
-			atomString = "PP";
-			break;
-		case CONJ:
-			atomString = "conj";
-			break;
-		case PERIOD:
-			atomString = ".";
-			break;
-		case COLON:
-			atomString = ":";
-			break;
-		case SEMICOLON:
-			atomString = ";";
-			break;
-		case COMMA:
-			atomString = ",";
-			break;
-		case LQU:
-			atomString = "LQU";
-			break;
-		case RQU:
-			atomString = "RQU";
-			break;
-		case LRB:
-			atomString = "LRB";
-			break;
-		case RRB:
-			atomString = "RRB";
-			break;
-		default:
-			throw new Error("run out of atoms to convert?!");
+			case NONE:
+				atomString = "";
+				break;
+			case N:
+				atomString = "N";
+				break;
+			case NP:
+				atomString = "NP";
+				break;
+			case S:
+				atomString = "S";
+				break;
+			case PP:
+				atomString = "PP";
+				break;
+			case CONJ:
+				atomString = "conj";
+				break;
+			case PERIOD:
+				atomString = ".";
+				break;
+			case COLON:
+				atomString = ":";
+				break;
+			case SEMICOLON:
+				atomString = ";";
+				break;
+			case COMMA:
+				atomString = ",";
+				break;
+			case LQU:
+				atomString = "LQU";
+				break;
+			case RQU:
+				atomString = "RQU";
+				break;
+			case LRB:
+				atomString = "LRB";
+				break;
+			case RRB:
+				atomString = "RRB";
+				break;
+			default:
+				throw new Error("Invalid atom.");
 		}
 
 		return atomString;
@@ -165,16 +163,12 @@ public class Atom {
 		System.err.print(this.toString());
 	}
 
-	/*
-	 * remaining methods are observers which detect whether this atom is of a
-	 * certain type
-	 */
-	public boolean isNP() {
-		return atom == NP;
-	}
-
 	public boolean isN() {
 		return atom == N;
+	}
+
+	public boolean isNP() {
+		return atom == NP;
 	}
 
 	public boolean isNorNP() {
@@ -197,20 +191,20 @@ public class Atom {
 		return atom == COMMA;
 	}
 
-	public boolean isCommaOrPeriod() {
-		return atom == COMMA || atom == PERIOD;
-	}
-
 	public boolean isPeriod() {
 		return atom == PERIOD;
 	}
 
-	public boolean isColon() {
-		return atom == COLON;
+	public boolean isCommaOrPeriod() {
+		return atom == COMMA || atom == PERIOD;
 	}
 
 	public boolean isSemicolon() {
 		return atom == SEMICOLON;
+	}
+
+	public boolean isColon() {
+		return atom == COLON;
 	}
 
 	public boolean isSemiOrColon() {
