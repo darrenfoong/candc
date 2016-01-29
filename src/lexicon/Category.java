@@ -322,7 +322,7 @@ public class Category {
 			output += atom.toString();
 			if (feature.value() != GrammaticalFeature.NONE) {
 				output += "[";
-				output += feature.convert();
+				output += feature.toString();
 				output += "]";
 			}
 		} else {
@@ -346,7 +346,7 @@ public class Category {
 			output += atom.toString();
 			if (feature.value() != GrammaticalFeature.NONE) {
 				output += "[";
-				output += feature.convert();
+				output += feature.toString();
 				output += "]";
 			}
 		} else {
