@@ -257,7 +257,7 @@ public class SuperCategory implements Comparable<SuperCategory> {
 
 	public SuperCategory(Category cat, short flags, SuperCategory leftChild, SuperCategory rightChild) {
 		this.cat = cat;
-		this.unfilledDeps = rightChild.unfilledDeps;
+		this.unfilledDeps = new ArrayList<Dependency>(rightChild.unfilledDeps);
 		this.filledDeps = new ArrayList<FilledDependency>();
 		this.flags = flags;
 		this.numVars = rightChild.numVars;
