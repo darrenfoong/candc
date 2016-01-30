@@ -216,7 +216,7 @@ public class TrainParserBeamDerivations {
 				if ( out != null ) { out.close(); }
 				if ( roots != null ) { roots.close(); }
 				if ( goldDeps != null ) { goldDeps.close(); }
-				if ( in2 != null ) { in.close(); }
+				if ( in2 != null ) { in2.close(); }
 				if ( in != null ) { in.close(); }
 			} catch (IOException e) {
 				System.err.println(e);
