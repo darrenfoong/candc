@@ -53,15 +53,6 @@ public class Dependency implements Comparable<Dependency> {
 		}
 	}
 
-	public Dependency(Dependency other) {
-		this.relID = other.relID;
-		this.headIndex = other.headIndex;
-		this.var = other.var;
-		this.unaryRuleID = other.unaryRuleID;
-		this.conjFactor = other.conjFactor;
-		this.lrange = other.lrange;
-	}
-
 	/*
 	 * this constructor is used in the clone method which is used in the
 	 * UnaryRule SuperCategory constructor
