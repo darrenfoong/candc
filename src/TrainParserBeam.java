@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import model.Lexicon;
-import utils.Benchmark;
 import cat_combination.RuleInstancesParams;
 import cat_combination.SuperCategory;
 import chart_parser.ChartTrainParserBeam;
@@ -18,8 +17,6 @@ import chart_parser.OracleDepsSumDecoder;
 
 public class TrainParserBeam {
 	public static void main(String[] args) {
-		long TS_PROGRAM = Benchmark.getTime();
-
 		int MAX_WORDS = 150;
 		int MAX_SUPERCATS = 500000;
 
@@ -67,10 +64,7 @@ public class TrainParserBeam {
 		Lexicon lexicon = null;
 
 		try {
-			long TS_LEXICON = Benchmark.getTime();
 			lexicon = new Lexicon(lexiconFile);
-			long TE_LEXICON = Benchmark.getTime();
-			Benchmark.printTime("load lexicon", TS_LEXICON, TE_LEXICON);
 		} catch (IOException e) {
 			System.err.println(e);
 			return;
@@ -79,14 +73,11 @@ public class TrainParserBeam {
 		ChartTrainParserBeam parser = null;
 
 		try {
-			long TS_PARSER_INIT = Benchmark.getTime();
 			parser = new ChartTrainParserBeam(grammarDir, altMarkedup,
 					eisnerNormalForm, MAX_WORDS, MAX_SUPERCATS, detailedOutput,
 					ruleInstancesParams, lexicon, featuresFile, weightsFile,
 					newFeatures, cubePruning, beamSize, beta, parallelUpdate,
 					updateLogP);
-			long TE_PARSER_INIT = Benchmark.getTime();
-			Benchmark.printTime("init parser", TS_PARSER_INIT, TE_PARSER_INIT);
 		} catch (IOException e) {
 			System.err.println(e);
 			return;
@@ -102,7 +93,6 @@ public class TrainParserBeam {
 
 			Preface.printPreface(out);
 
-			long TS_PARSING_TOTAL = Benchmark.getTime();
 			for (int iteration = 1; iteration <= numIterations; iteration++) {
 				try ( BufferedReader in = new BufferedReader(new FileReader(inputFile));
 					  BufferedReader goldDeps = new BufferedReader(new FileReader(goldDepsFile));
@@ -121,7 +111,6 @@ public class TrainParserBeam {
 					Sentences sentences = new Sentences(in, null, parser.categories, MAX_WORDS);
 					sentences.skip(fromSentence - 1);
 
-					long TS_PARSING = Benchmark.getTime();
 					for (int numSentence = fromSentence; numSentence <= toSentence && sentences.hasNext(); numSentence++) {
 						System.out.println("Parsing sentence " + iteration + "/"+ numSentence);
 						log.println("Parsing sentence " + iteration + "/"+ numSentence);
@@ -160,8 +149,6 @@ public class TrainParserBeam {
 							}
 						}
 					}
-					long TE_PARSING = Benchmark.getTime();
-					Benchmark.printTime("training iteration " + iteration, TS_PARSING, TE_PARSING);
 
 					System.out.println("# Statistics for iteration " + iteration + ": hasUpdate: " + parser.hasUpdateStatistics.calcHasUpdates() + "/" + parser.hasUpdateStatistics.getSize() + " (" + ((double) parser.hasUpdateStatistics.calcHasUpdates()/(double) parser.hasUpdateStatistics.getSize()) + ")");
 					System.out.println("# Statistics for iteration " + iteration + ": hypothesisSize: " + parser.hypothesisSizeStatistics.calcAverageProportion() + " (" + parser.hypothesisSizeStatistics.getSize() + ")");
@@ -170,15 +157,10 @@ public class TrainParserBeam {
 					parser.printWeights(outIter, numTrainInstances);
 				}
 			}
-			long TE_PARSING_TOTAL = Benchmark.getTime();
-			Benchmark.printTime("training total", TS_PARSING_TOTAL, TE_PARSING_TOTAL);
 
 			parser.printWeights(out, numTrainInstances);
 		} catch (IOException e) {
 			System.err.println(e);
 		}
-
-		long TE_PROGRAM = Benchmark.getTime();
-		Benchmark.printTime("program", TS_PROGRAM, TE_PROGRAM);
 	}
 }
