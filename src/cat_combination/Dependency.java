@@ -36,23 +36,6 @@ public class Dependency implements Comparable<Dependency> {
 		}
 	}
 
-	public Dependency(short relID,
-			short headIndex,
-			byte var,
-			short unaryRuleID,
-			short lrange) {
-		this.relID = relID;
-		this.headIndex = headIndex;
-		this.var = var;
-		this.unaryRuleID = unaryRuleID;
-		this.conjFactor = 1;
-		this.lrange = lrange;
-
-		if ( headIndex == 0 ) {
-			throw new Error("expecting a non-zero head index when constructing the dependency!");
-		}
-	}
-
 	/*
 	 * this constructor is used in the clone method which is used in the
 	 * UnaryRule SuperCategory constructor
@@ -89,7 +72,7 @@ public class Dependency implements Comparable<Dependency> {
 	 * this constructor multiplies two conjFactors together to get a new
 	 * conjFactor
 	 */
-	Dependency(Dependency other, byte var, short lrange, short conjFactor) {
+	public Dependency(Dependency other, byte var, short lrange, short conjFactor) {
 		this.relID = other.relID;
 		this.headIndex = other.headIndex;
 		this.var = var;
