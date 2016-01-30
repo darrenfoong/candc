@@ -18,7 +18,10 @@ public class Sentences implements Iterator<Sentence> {
 
 	private boolean sentenceRead = false;
 
-	public Sentences(BufferedReader in, BufferedReader stagsIn, Categories categories, int MAX_WORDS) {
+	public Sentences(BufferedReader in,
+			BufferedReader stagsIn,
+			Categories categories,
+			int MAX_WORDS) {
 		this.MAX_WORDS = MAX_WORDS;
 		this.in = in;
 		this.stagsIn = stagsIn;
@@ -88,13 +91,13 @@ public class Sentences implements Iterator<Sentence> {
 					// further more lowestProb gets assigned prob at every iteration
 					// if assumption holds, can optimise by assuming lowestProb = probability after loop
 
-					if (supertagString.equals(goldSupertagString)) {
+					if ( supertagString.equals(goldSupertagString) ) {
 						seenGold = true;
 					}
 
 					Category lexicalCategory = categories.getCategory(supertagString);
 
-					if (lexicalCategory == null) {
+					if ( lexicalCategory == null ) {
 						throw new IllegalArgumentException("No such supertag: " + supertagString);
 					}
 
@@ -102,10 +105,10 @@ public class Sentences implements Iterator<Sentence> {
 					supertags.add(supertag);
 				}
 
-				if (stagsIn != null && seenGold == false) {
+				if ( stagsIn != null && seenGold == false ) {
 					Category goldLexicalCategory = categories.getCategory(goldSupertagString);
 
-					if (goldLexicalCategory == null) {
+					if ( goldLexicalCategory == null ) {
 						throw new IllegalArgumentException("No such gold supertag: " + goldSupertagString);
 					}
 
@@ -116,7 +119,7 @@ public class Sentences implements Iterator<Sentence> {
 
 				sentence.addSupertags(supertags);
 			}
-		} catch (IOException e) {
+		} catch ( IOException e ) {
 			System.err.println(e);
 			next = null;
 		}
