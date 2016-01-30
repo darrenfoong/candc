@@ -168,78 +168,92 @@ public class Features {
 	}
 
 	private void readFeatures(String featuresFile, Categories categories) throws IOException {
-		BufferedReader featuresIn = new BufferedReader(new FileReader(featuresFile));
+		BufferedReader featuresIn = null;
 
-		Preface.readPreface(featuresIn);
+		try {
+			featuresIn = new BufferedReader(new FileReader(featuresFile));
 
-		String featuresLine = null;
-		int ID = 1;
+			Preface.readPreface(featuresIn);
 
-		while ((featuresLine = featuresIn.readLine()) != null) {
-			readFeature(featuresLine, ID, categories);
-			ID++;
+			String featuresLine = null;
+			int ID = 1;
+
+			while ((featuresLine = featuresIn.readLine()) != null) {
+				readFeature(featuresLine, ID, categories);
+				ID++;
+			}
+
+			numFeatures = ID;
+			// ID starts at 1 (because of logp)
+			// and gets incremented after each feature has been read
+			System.out.println("Total number of features read in: " + numFeatures);
+		} finally {
+			if ( featuresIn != null ) { featuresIn.close(); }
 		}
-
-		numFeatures = ID;
-		// ID starts at 1 (because of logp)
-		// and gets incremented after each feature has been read
-		System.out.println("Total number of features read in: " + numFeatures);
 	}
 
 	private void readFeaturesWeights(String featuresFile, String weightsFile, Weights weights, Categories categories) throws IOException {
 		ArrayList<Double> weightsList = new ArrayList<Double>();
 
-		BufferedReader featuresIn = new BufferedReader(new FileReader(featuresFile));
-		BufferedReader weightsIn = new BufferedReader(new FileReader(weightsFile));
+		BufferedReader featuresIn = null;
+		BufferedReader weightsIn = null;
 
-		Preface.readPreface(featuresIn);
-		Preface.readPreface(weightsIn);
+		try {
+			featuresIn = new BufferedReader(new FileReader(featuresFile));
+			weightsIn = new BufferedReader(new FileReader(weightsFile));
 
-		String featuresLine = null;
+			Preface.readPreface(featuresIn);
+			Preface.readPreface(weightsIn);
 
-		// first line in weights is for logp
-		String weightsLine = weightsIn.readLine();
+			String featuresLine = null;
 
-		if ( weightsLine != null ) {
-			weightsList.add(Double.valueOf(weightsLine));
-		} else {
-			throw new IllegalArgumentException("Unexpected end of stream");
-		}
-
-		int ID = 1;
-		Double weight;
-
-		while ((featuresLine = featuresIn.readLine()) != null) {
-			weightsLine = weightsIn.readLine();
+			// first line in weights is for logp
+			String weightsLine = weightsIn.readLine();
 
 			if ( weightsLine != null ) {
-				weight = Double.valueOf(weightsLine);
+				weightsList.add(Double.valueOf(weightsLine));
 			} else {
 				throw new IllegalArgumentException("Unexpected end of stream");
 			}
 
-			if ( weight == 0.0 ) {
-				continue;
-			} else {
-				weightsList.add(weight);
+			int ID = 1;
+			Double weight;
+
+			while ((featuresLine = featuresIn.readLine()) != null) {
+				weightsLine = weightsIn.readLine();
+
+				if ( weightsLine != null ) {
+					weight = Double.valueOf(weightsLine);
+				} else {
+					throw new IllegalArgumentException("Unexpected end of stream");
+				}
+
+				if ( weight == 0.0 ) {
+					continue;
+				} else {
+					weightsList.add(weight);
+				}
+
+				readFeature(featuresLine, ID, categories);
+				ID++;
 			}
 
-			readFeature(featuresLine, ID, categories);
-			ID++;
+			double[] weightsListArray = new double[weightsList.size()];
+
+			for ( int i = 0; i < weightsList.size(); i++ ) {
+				weightsListArray[i] = weightsList.get(i);
+			}
+
+			weights.setWeights(weightsListArray);
+
+			numFeatures = ID;
+			// ID starts at 1 (because of logp)
+			// and gets incremented after each feature has been read
+			System.out.println("Total number of features read in: " + numFeatures);
+		} finally {
+			if ( featuresIn != null ) { featuresIn.close(); }
+			if ( weightsIn != null ) { weightsIn.close(); }
 		}
-
-		double[] weightsListArray = new double[weightsList.size()];
-
-		for ( int i = 0; i < weightsList.size(); i++ ) {
-			weightsListArray[i] = weightsList.get(i);
-		}
-
-		weights.setWeights(weightsListArray);
-
-		numFeatures = ID;
-		// ID starts at 1 (because of logp)
-		// and gets incremented after each feature has been read
-		System.out.println("Total number of features read in: " + numFeatures);
 	}
 
 	private void readFeature(String featuresLine, int ID, Categories categories) {

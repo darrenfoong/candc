@@ -32,16 +32,22 @@ public class Lexicon {
 	 * distinguish word and pos
 	 */
 	private void readWordPosFile(String file) throws IOException {
-		BufferedReader in = new BufferedReader(new FileReader(file));
+		BufferedReader in = null;
 
-		Preface.readPreface(in);
+		try {
+			in = new BufferedReader(new FileReader(file));
 
-		String wordPos = null;
-		int ID = 0;
+			Preface.readPreface(in);
 
-		while ((wordPos = in.readLine()) != null) {
-			lexicon.put(wordPos, ID);
-			ID++;
+			String wordPos = null;
+			int ID = 0;
+
+			while ((wordPos = in.readLine()) != null) {
+				lexicon.put(wordPos, ID);
+				ID++;
+			}
+		} finally {
+			if ( in != null ) { in.close(); }
 		}
 	}
 }
