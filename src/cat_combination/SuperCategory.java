@@ -564,13 +564,14 @@ public class SuperCategory implements Comparable<SuperCategory> {
 
 		if ( superCategory1.unfilledDeps.size() != superCategory2.unfilledDeps.size() ) {
 			return false;
-		} else {
-			Collections.sort(superCategory1.unfilledDeps);
-			Collections.sort(superCategory2.unfilledDeps);
-			for ( int i = 0; i < superCategory1.unfilledDeps.size(); i++ ) {
-				if ( !Dependency.equal(superCategory1.unfilledDeps.get(i), superCategory2.unfilledDeps.get(i)) ) {
-					return false;
-				}
+		}
+
+		Collections.sort(superCategory1.unfilledDeps);
+		Collections.sort(superCategory2.unfilledDeps);
+
+		for ( int i = 0; i < superCategory1.unfilledDeps.size(); i++ ) {
+			if ( !superCategory1.unfilledDeps.get(i).equals(superCategory2.unfilledDeps.get(i)) ) {
+				return false;
 			}
 		}
 

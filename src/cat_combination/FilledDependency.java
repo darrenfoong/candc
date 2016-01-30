@@ -12,9 +12,7 @@ import utils.Hash;
 
 /*
  * this is the class for filled dependencies; very similar to
- * Dependency (for unfilled deps), but with a constant for the filler
- *
- * also has the linked list through the next field
+ * Dependency (for unfilled deps), but with a constant for the filler*
  *
  */
 
@@ -37,24 +35,6 @@ public class FilledDependency implements Comparable<FilledDependency> {
 		this.fillerIndex = fillerIndex;
 		this.unaryRuleID = unaryRuleID;
 		this.conjFactor = 1;
-		this.lrange = lrange;
-
-		if ( fillerIndex == 0 ) {
-			throw new Error("expecting a non-zero filler index when constructing the filled dependency!");
-		}
-	}
-
-	public FilledDependency(short relID,
-			short headIndex,
-			short fillerIndex,
-			short unaryRuleID,
-			short lrange,
-			short conjFactor) {
-		this.relID = relID;
-		this.headIndex = headIndex;
-		this.fillerIndex = fillerIndex;
-		this.unaryRuleID = unaryRuleID;
-		this.conjFactor = conjFactor;
 		this.lrange = lrange;
 
 		if ( fillerIndex == 0 ) {
@@ -135,14 +115,12 @@ public class FilledDependency implements Comparable<FilledDependency> {
 		return 0;
 	}
 
-	/*
-	 * hashCode and equals needed for the HashSet in the OracleDepsDecoder; same
-	 * hash as in the C&C depscore class except we ignore the unaryRuleID and
-	 * lrange fields, since these are not part of the CCGbank dependencies that
-	 * we use
-	 */
 	@Override
 	public int hashCode() {
+		/*
+		 * ignore the unaryRuleID and lrange fields, since these are not part of the
+		 * CCGbank dependencies that we use
+		 */
 		Hash h = new Hash(relID);
 		h.plusEqual(headIndex);
 		h.plusEqual(fillerIndex);

@@ -69,19 +69,6 @@ public class Dependency implements Comparable<Dependency> {
 	}
 
 	/*
-	 * this constructor multiplies two conjFactors together to get a new
-	 * conjFactor
-	 */
-	public Dependency(Dependency other, byte var, short lrange, short conjFactor) {
-		this.relID = other.relID;
-		this.headIndex = other.headIndex;
-		this.var = var;
-		this.unaryRuleID = other.unaryRuleID;
-		this.conjFactor = (short) (other.conjFactor * conjFactor);
-		this.lrange = (lrange > other.lrange) ? lrange : other.lrange;
-	}
-
-	/*
 	 * goes through the Category object collecting all the relations, creating
 	 * dependencies for each one
 	 */
@@ -150,20 +137,14 @@ public class Dependency implements Comparable<Dependency> {
 		return deps;
 	}
 
-	/*
-	 * used in the SuperCategory equal() method which is used for the DP
-	 * equivalence check in the chart
-	 */
-	public static boolean equal(Dependency dep1, Dependency dep2) {
-		return dep1.relID == dep2.relID && dep1.headIndex == dep2.headIndex && dep1.var == dep2.var && dep1.lrange == dep2.lrange && dep1.unaryRuleID == dep2.unaryRuleID;
-	}
-
 	@Override
 	public int compareTo(Dependency other) {
 		int compare;
 		if ( (compare = Short.compare(this.relID, other.relID)) != 0 ) { return compare; }
 		if ( (compare = Short.compare(this.headIndex, other.headIndex)) != 0 ) { return compare; }
 		if ( (compare = Byte.compare(this.var, other.var)) != 0 ) { return compare; }
+		if ( (compare = Short.compare(this.lrange, other.lrange)) != 0 ) { return compare; }
+		if ( (compare = Short.compare(this.unaryRuleID, other.unaryRuleID)) != 0 ) { return compare; }
 
 		return 0;
 	}
@@ -173,9 +154,10 @@ public class Dependency implements Comparable<Dependency> {
 		Hash h = new Hash(relID);
 		h.plusEqual(headIndex);
 		h.plusEqual(var);
-		// h.plusEqual(unaryRuleID);
+		h.plusEqual(lrange);
+		h.plusEqual(unaryRuleID);
 		// h.plusEqual(conjFactor);
-		// h.plusEqual(lrange);
+
 		return (int) (h.value());
 	}
 
