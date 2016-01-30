@@ -12,24 +12,10 @@ import lexicon.VarID;
 import utils.Hash;
 import utils.IntWrapper;
 
-/*
- * unfilledDeps is a linked list of Dependency objects, with each
- * dependency having a next reference; not very transparent, but same
- * implemenation as C&C so stick with it for now; same for filledDeps
- *
- * we also have a linked list of SuperCategories, using the next
- * field; this is used to implement the equivalent (Super-)Categories
- * in a packed chart; again not the most transparent, but stick with
- * the C&C implementation for now
- */
-
 public class SuperCategory implements Comparable<SuperCategory> {
 	public final Category cat;
 
-	// linked list of dependencies waiting to be filled
 	public ArrayList<Dependency> unfilledDeps = null;
-
-	// linked list of deps that were filled when children combined
 	public ArrayList<FilledDependency> filledDeps = null;
 
 	/*
@@ -91,10 +77,7 @@ public class SuperCategory implements Comparable<SuperCategory> {
 		return ignoreDeps;
 	}
 
-	/*
-	 * used as a global counter to count the number of categories being produced
-	 * for a sentence
-	 */
+	// used as a global counter to count the number of categories being produced for a sentence
 	private static int numSuperCategories;
 
 	public static void setNumSuperCategories(int n) {
@@ -107,7 +90,7 @@ public class SuperCategory implements Comparable<SuperCategory> {
 
 	public static void incrementNumSuperCategories() {
 		numSuperCategories++;
-		if (numSuperCategories % 50000 == 0) {
+		if ( numSuperCategories % 50000 == 0 ) {
 			System.out.println("numSuperCategories: " + numSuperCategories);
 		}
 	}
@@ -121,29 +104,25 @@ public class SuperCategory implements Comparable<SuperCategory> {
 		this.numActiveVars = this.numVars; // same as numVars since lexical category
 		this.vars = new Variable[this.numVars];
 
-		for (int i = 0; i < numVars; i++) {
+		for ( int i = 0; i < numVars; i++ ) {
 			vars[i] = new Variable();
 		}
 
 		this.leftChild = null;
 		this.rightChild = null;
 
-		if (cat.var != VarID.NONE) {
-			vars[cat.var] = new Variable(headIndex);
+		if ( cat.var != VarID.NONE ) {
+			this.vars[cat.var] = new Variable(headIndex);
 		} else {
 			throw new Error("shouldn't we have a variable on a lexical category?!");
 		}
 
-		equivalenceHash = equivalenceHash();
+		this.equivalenceHash = equivalenceHash();
 		incrementNumSuperCategories();
 
-		outside = 0.0;
+		this.outside = 0.0;
 	}
 
-	/*
-	 * uses the constructor above; naming the method (with titlecaps) to make
-	 * the use of the constructor more transparent
-	 */
 	public static SuperCategory Lexical(short headIndex, Category cat, short flags) {
 		return new SuperCategory(headIndex, cat, flags);
 	}
@@ -152,19 +131,25 @@ public class SuperCategory implements Comparable<SuperCategory> {
 	 * sentence argument only used by numFilledDeps() and for the oracleFscore
 	 * decoder - maybe there's a nicer solution
 	 */
-	public SuperCategory(Category cat, short flags, SuperCategory leftChild, SuperCategory rightChild, Unify unification, Sentence sentence) {
+	public SuperCategory(Category cat,
+			short flags,
+			SuperCategory leftChild,
+			SuperCategory rightChild,
+			Unify unification,
+			Sentence sentence) {
 		this.cat = cat;
+		this.unfilledDeps = new ArrayList<Dependency>();
+		this.filledDeps = new ArrayList<FilledDependency>();
 		this.flags = flags;
 		this.numVars = unification.numVariables; // numActiveVars from Unification
 		this.numActiveVars = cat.getNumVars(); // numVars from the resulting category
 		this.vars = new Variable[this.numVars];
-		vars[0] = new Variable(); // the other variables get created below
 		this.leftChild = leftChild;
 		this.rightChild = rightChild;
 		this.next = null;
 
 		// old sanity check from C&C; numActiveVars should never be greater than numVars (caught now below in the static call):
-		if (numActiveVars > numVars) {
+		if ( numActiveVars > numVars ) {
 			throw new Error("numActiveVars > numVars!");
 		}
 
@@ -174,9 +159,11 @@ public class SuperCategory implements Comparable<SuperCategory> {
 		 * 
 		 * note ignore i = 0, which corresponds to the "NONE" Variable
 		 */
-		for (int i = 1; i < numVars; i++) {
+		this.vars[0] = new Variable(); // the other variables get created below
+
+		for ( int i = 1; i < numVars; i++ ) {
 			// old sanity check from C&C:
-			if (unification.old1[i] >= leftChild.numVars || unification.old2[i] >= rightChild.numVars) {
+			if ( unification.old1[i] >= leftChild.numVars || unification.old2[i] >= rightChild.numVars ) {
 				throw new Error("attempt to access variables outside range");
 			}
 
@@ -184,63 +171,45 @@ public class SuperCategory implements Comparable<SuperCategory> {
 			vars[i] = new Variable(leftChild.vars[unification.old1[i]], rightChild.vars[unification.old2[i]]);
 		}
 
-		unfilledDeps = new ArrayList<Dependency>();
-		filledDeps = new ArrayList<FilledDependency>();
-
 		for ( Dependency dep : leftChild.unfilledDeps ) {
 			byte var = unification.trans1[dep.var];
 
-			if (var == VarID.NONE) {
+			if ( var == VarID.NONE ) {
 				continue;
 			}
 
-			// CatID lrange = unify.lrange2[unify.old2[var]];
 			short lrange = 0;
 
-			if (vars[var].isFilled()) {
+			if ( vars[var].isFilled() ) {
 				filledDeps = FilledDependency.fromUnfilled(dep, vars[var], lrange, filledDeps);
 			} else {
-				/* 
-				 * final boolean arg just differentiates constructors which
-				 * otherwise would have same signature
-				 */
-				Dependency newDep = new Dependency(dep, var, lrange, true);
-				// newUnfilledDeps.add(newDep);
-				unfilledDeps.add(newDep);
+				unfilledDeps.add(new Dependency(dep, var, lrange, true));
 			}
 		}
 
 		for ( Dependency dep : rightChild.unfilledDeps ) {
 			byte var = unification.trans2[dep.var];
-			if (var == VarID.NONE) {
+
+			if ( var == VarID.NONE ) {
 				continue;
 			}
 
-			// CatID lrange = unify.lrange1[unify.old1[var]];
 			short lrange = 0;
 
-			if (vars[var].isFilled()) {
+			if ( vars[var].isFilled() ) {
 				filledDeps = FilledDependency.fromUnfilled(dep, vars[var], lrange, filledDeps);
 			} else {
-				/*
-				 * final boolean arg just differentiates constructors which
-				 * otherwise would have same signature
-				 */
-				Dependency newDep = new Dependency(dep, var, lrange, true);
-				// newUnfilledDeps.add(newDep);
-				unfilledDeps.add(newDep);
+				unfilledDeps.add(new Dependency(dep, var, lrange, true));
 			}
 		}
 
-		// unfilledDeps = newUnfilledDeps;
-
-		equivalenceHash = equivalenceHash();
+		this.equivalenceHash = equivalenceHash();
 		incrementNumSuperCategories();
 		/*
 		 * this gets used by the oracleFscore decoder to split equivalence
 		 * classes by the number of dependencies produced
 		 */
-		outside = leftChild.outside + rightChild.outside + numFilledDeps(sentence);
+		this.outside = leftChild.outside + rightChild.outside + numFilledDeps(sentence);
 	}
 
 	public static SuperCategory BinaryCombinator(Category cat, short flags, SuperCategory leftChild, SuperCategory rightChild, Unify unification, Sentence sentence) {
@@ -248,14 +217,17 @@ public class SuperCategory implements Comparable<SuperCategory> {
 		 * there are some pathological cases where this appears to happen, so
 		 * just rule these out as ungrammatical
 		 */
-		if (cat.getNumVars() > unification.numVariables) {
+		if ( cat.getNumVars() > unification.numVariables ) {
 			return null;
 		}
 
 		return new SuperCategory(cat, flags, leftChild, rightChild, unification, sentence);
 	}
 
-	public SuperCategory(Category cat, short flags, SuperCategory leftChild, SuperCategory rightChild) {
+	public SuperCategory(Category cat,
+			short flags,
+			SuperCategory leftChild,
+			SuperCategory rightChild) {
 		this.cat = cat;
 		this.unfilledDeps = new ArrayList<Dependency>(rightChild.unfilledDeps);
 		this.filledDeps = new ArrayList<FilledDependency>();
@@ -263,23 +235,23 @@ public class SuperCategory implements Comparable<SuperCategory> {
 		this.numVars = rightChild.numVars;
 		this.numActiveVars = rightChild.numActiveVars;
 		this.vars = new Variable[this.numVars];
-		vars[0] = new Variable(); // the other variables get created below
 		this.leftChild = leftChild;
 		this.rightChild = rightChild;
 		this.next = null;
 
 		// old sanity check from C&C; numActiveVars should never be greater than numVars:
-		if (numActiveVars > numVars) {
+		if ( numActiveVars > numVars ) {
 			throw new Error("numActiveVars > numVars!");
 		}
 
+		vars[0] = new Variable(); // the other variables get created below
 		// copying Variables from non-conj category
-		for (int i = 1; i < numVars; i++) {
+		for ( int i = 1; i < numVars; i++ ) {
 			vars[i] = new Variable(rightChild.vars[i]);
 		}
 
 		// need this check? just makes sure that conj cat has a head
-		if (!leftChild.vars[1].isFilled()) {
+		if ( !leftChild.vars[1].isFilled() ) {
 			throw new Error("no head on conj cat!");
 		}
 
@@ -293,20 +265,20 @@ public class SuperCategory implements Comparable<SuperCategory> {
 		 */
 		// "outer" variable on the non-conj cat
 		Variable var = rightChild.vars[rightChild.cat.var];
-		if (var.isFilled()) { // shouldn't this always be the case?
+		if ( var.isFilled() ) { // shouldn't this always be the case?
 			// this is the "head" on the conj cat, eg "and"
 			short head = leftChild.vars[1].getFiller();
 			unfilledDeps.add(new Dependency(Relations.conj1, head, cat.argument.var, (short) (0)));
 			// unfilledDeps is already set to those from rightChild; these become the next field
 		}
 
-		equivalenceHash = equivalenceHash();
+		this.equivalenceHash = equivalenceHash();
 		incrementNumSuperCategories();
 		/*
 		 * this gets used by the oracleFscore decoder to split equivalence
 		 * classes by the number of dependencies produced
 		 */
-		outside = leftChild.outside + rightChild.outside;
+		this.outside = leftChild.outside + rightChild.outside;
 	}
 
 	public static SuperCategory Coordination(Category cat, short flags, SuperCategory leftSuperCat, SuperCategory rightSuperCat) {
@@ -319,21 +291,25 @@ public class SuperCategory implements Comparable<SuperCategory> {
 	 * always make copies when changes are made to the object; eg see the
 	 * creation of FilledDeps above
 	 */
-	public SuperCategory(Category cat, short flags, SuperCategory leftSuperCat, SuperCategory rightSuperCat, SuperCategory variablesSuperCat) {
+	public SuperCategory(Category cat,
+			short flags,
+			SuperCategory leftSuperCat,
+			SuperCategory rightSuperCat,
+			SuperCategory variablesSuperCat) {
 		this.cat = cat;
-		unfilledDeps = variablesSuperCat.unfilledDeps;
-		filledDeps = new ArrayList<FilledDependency>();
+		this.unfilledDeps = new ArrayList<Dependency>(variablesSuperCat.unfilledDeps);
+		this.filledDeps = new ArrayList<FilledDependency>();
 		this.flags = flags;
-		numVars = variablesSuperCat.numVars;
-		numActiveVars = variablesSuperCat.numActiveVars;
-		vars = variablesSuperCat.vars;
-		leftChild = leftSuperCat;
-		rightChild = rightSuperCat;
-		equivalenceHash = variablesSuperCat.equivalenceHash;
-		next = null;
+		this.numVars = variablesSuperCat.numVars;
+		this.numActiveVars = variablesSuperCat.numActiveVars;
+		this.vars = variablesSuperCat.vars;
+		this.leftChild = leftSuperCat;
+		this.rightChild = rightSuperCat;
+		this.equivalenceHash = variablesSuperCat.equivalenceHash;
+		this.next = null;
 
 		// old sanity check from C&C; numActiveVars should never be greater than numVars:
-		if (numActiveVars > numVars) {
+		if ( numActiveVars > numVars ) {
 			throw new Error("numActiveVars > numVars!");
 		}
 
@@ -342,62 +318,70 @@ public class SuperCategory implements Comparable<SuperCategory> {
 		 * this gets used by the oracleFscore decoder to split equivalence
 		 * classes by the number of dependencies produced
 		 */
-		outside = leftChild.outside + rightChild.outside;
+		this.outside = leftChild.outside + rightChild.outside;
 	}
 
 	public static SuperCategory Punct(Category cat, short flags, SuperCategory leftSuperCat, SuperCategory rightSuperCat, SuperCategory variablesSuperCat) {
 		return new SuperCategory(cat, flags, leftSuperCat, rightSuperCat, variablesSuperCat);
 	}
 
-	public SuperCategory(Category cat, short flags, SuperCategory leftSuperCat, SuperCategory rightSuperCat, SuperCategory headSuperCat, boolean replace, short ruleID) {
+	public SuperCategory(Category cat,
+			short flags,
+			SuperCategory leftSuperCat,
+			SuperCategory rightSuperCat,
+			SuperCategory headSuperCat,
+			boolean replace,
+			short ruleID) {
 		this.cat = cat;
-		unfilledDeps = new ArrayList<Dependency>();
-		filledDeps = new ArrayList<FilledDependency>();
+		this.unfilledDeps = new ArrayList<Dependency>();
+		this.filledDeps = new ArrayList<FilledDependency>();
 		this.flags = flags;
-		numVars = cat.getNumVars();
-		numActiveVars = numVars;
+		this.numVars = cat.getNumVars();
+		this.numActiveVars = numVars;
 		vars = new Variable[numVars];
-		for (int i = 0; i < numVars; i++) {
+
+		for ( int i = 0; i < numVars; i++ ) {
 			vars[i] = new Variable();
 		}
-		leftChild = leftSuperCat;
-		rightChild = rightSuperCat;
-		next = null;
+
+		this.leftChild = leftSuperCat;
+		this.rightChild = rightSuperCat;
+		this.next = null;
 
 		// old sanity check from C&C; numActiveVars should never be greater than numVars:
-		if (numActiveVars > numVars) {
+		if ( numActiveVars > numVars ) {
 			throw new Error("numActiveVars > numVars!");
 		}
 
 		Variable outerVariable = headSuperCat.vars[headSuperCat.cat.var];
 
-		if (replace) {
+		if ( replace ) {
 			/*
 			 * added this (not in the C&C code): (gets cases like
 			 * "references would survive unamended", where there is a dep
 			 * between references and unamended)
 			 */
-			if (cat.isSbNPbSbNP()) {
+			if ( cat.isSbNPbSbNP() ) {
 				unfilledDeps = Dependency.clone(headSuperCat.cat.argument.var, cat.argument.argument.var, ruleID, headSuperCat.unfilledDeps);
-			} else if (headSuperCat.cat.argument != null) {
+			} else if ( headSuperCat.cat.argument != null ) {
 				unfilledDeps = Dependency.clone(headSuperCat.cat.argument.var, cat.argument.var, ruleID, headSuperCat.unfilledDeps);
 			}
 		} else {
 			unfilledDeps = Dependency.getDependencies(outerVariable, cat, ruleID);
 		}
 
-		if (cat.var != VarID.NONE) {
+		if ( cat.var != VarID.NONE ) {
 			vars[cat.var] = outerVariable;
 		}
 
-		equivalenceHash = equivalenceHash();
+		this.equivalenceHash = equivalenceHash();
 		incrementNumSuperCategories();
 		/*
 		 * this gets used by the oracleFscore decoder to split equivalence
 		 * classes by the number of dependencies produced
 		 */
-		outside = leftChild.outside;
-		if (rightChild != null) {
+		this.outside = leftChild.outside;
+		if ( rightChild != null ) {
 			outside += rightChild.outside;
 		}
 	}
@@ -413,44 +397,47 @@ public class SuperCategory implements Comparable<SuperCategory> {
 		return new SuperCategory(cat, flags, leftSuperCat, rightSuperCat, headSuperCat, replace, ruleID);
 	}
 
-	public SuperCategory(TypeRaisedCategory trCat, short flags, SuperCategory leftSuperCat) {
-		cat = trCat.cat;
-		unfilledDeps = new ArrayList<Dependency>();
-		filledDeps = new ArrayList<FilledDependency>();
+	public SuperCategory(TypeRaisedCategory trCat,
+			short flags,
+			SuperCategory leftSuperCat) {
+		this.cat = trCat.cat;
+		this.unfilledDeps = new ArrayList<Dependency>();
+		this.filledDeps = new ArrayList<FilledDependency>();
 		this.flags = flags;
-		numVars = cat.getNumVars();
-		numActiveVars = numVars;
-		vars = new Variable[numVars];
-		for (int i = 0; i < numVars; i++) {
+		this.numVars = cat.getNumVars();
+		this.numActiveVars = numVars;
+		this.vars = new Variable[numVars];
+
+		for ( int i = 0; i < numVars; i++ ) {
 			vars[i] = new Variable();
 		}
-		leftChild = leftSuperCat;
-		rightChild = null;
-		next = null;
+
+		this.leftChild = leftSuperCat;
+		this.rightChild = null;
+		this.next = null;
 
 		// note can't be at the end of the defn because there is a return statement earlier!
-		outside = leftChild.outside; 
+		this.outside = leftChild.outside;
 
 		// old sanity check from C&C; numActiveVars should never be greater than numVars:
-		if (numActiveVars > numVars) {
+		if ( numActiveVars > numVars ) {
 			throw new Error("numActiveVars > numVars!");
 		}
 
 		// grab the Variable corresponding to the lexical item:
-		if (trCat.lexVar != VarID.NONE) {
+		if ( trCat.lexVar != VarID.NONE ) {
 			vars[trCat.lexVar] = leftSuperCat.vars[leftSuperCat.cat.var];
 		} else {
 			// added this - not in C&C
 			throw new Error("should always be a lexical item with a tr cat!");
 		}
 
-		if (trCat.depVar == VarID.NONE) { // no dependency in original category
+		if ( trCat.depVar == VarID.NONE ) { // no dependency in original category
 			equivalenceHash = equivalenceHash();
 			return;
 			// TODO: did we forget to increment numSuperCategories++ here?
 		}
 
-		// ArrayList<Dependency> newDeps = new ArrayList<Dependency>();
 		unfilledDeps.clear();
 
 		/*
@@ -460,13 +447,10 @@ public class SuperCategory implements Comparable<SuperCategory> {
 		 */
 		for ( Dependency dep : leftSuperCat.unfilledDeps ) {
 			// boolean argument distinguishes the constructor from another with same signature
-			Dependency newDep = new Dependency(dep, trCat.depVar, dep.lrange, true);
-			unfilledDeps.add(newDep);
+			unfilledDeps.add(new Dependency(dep, trCat.depVar, dep.lrange, true));
 		}
 
-		// unfilledDeps = Dependency.link(newDeps);
-
-		equivalenceHash = equivalenceHash();
+		this.equivalenceHash = equivalenceHash();
 		incrementNumSuperCategories();
 	}
 
@@ -477,31 +461,35 @@ public class SuperCategory implements Comparable<SuperCategory> {
 	/*
 	 * Apposition only called on NP and S[dcl] cases
 	 */
-	public SuperCategory(short flags, SuperCategory leftSuperCat, SuperCategory rightSuperCat) {
-		cat = leftSuperCat.cat;
-		unfilledDeps = new ArrayList<Dependency>();
-		filledDeps = new ArrayList<FilledDependency>();
+	public SuperCategory(short flags,
+			SuperCategory leftSuperCat,
+			SuperCategory rightSuperCat) {
+		this.cat = leftSuperCat.cat;
+		this.unfilledDeps = new ArrayList<Dependency>();
+		this.filledDeps = new ArrayList<FilledDependency>();
 		this.flags = flags;
-		numVars = 2; // ugly?
-		numActiveVars = numVars;
-		vars = new Variable[numVars];
-		for (int i = 0; i < numVars; i++) {
+		this.numVars = 2;
+		this.numActiveVars = numVars;
+		this.vars = new Variable[numVars];
+
+		for ( int i = 0; i < numVars; i++ ) {
 			vars[i] = new Variable();
 		}
-		leftChild = leftSuperCat;
-		rightChild = rightSuperCat;
-		equivalenceHash = equivalenceHash();
-		next = null;
 
 		// calling this constructor directly is a little ugly (?)
 		vars[1] = new Variable(leftSuperCat.vars[1], rightSuperCat.vars[1]);
 
+		this.leftChild = leftSuperCat;
+		this.rightChild = rightSuperCat;
+		this.next = null;
+
+		this.equivalenceHash = equivalenceHash();
 		incrementNumSuperCategories();
 		/*
 		 * this gets used by the oracleFscore decoder to split equivalence
 		 * classes by the number of dependencies produced
 		 */
-		outside = leftChild.outside + rightChild.outside;
+		this.outside = leftChild.outside + rightChild.outside;
 	}
 
 	public static SuperCategory Apposition(short flags, SuperCategory leftSuperCat, SuperCategory rightSuperCat) {
@@ -509,16 +497,17 @@ public class SuperCategory implements Comparable<SuperCategory> {
 	}
 
 	public int numFilledDeps(Sentence sentence) {
-		if (ignoreDeps == null) {
+		if ( ignoreDeps == null ) {
 			return 0;
 		}
 
 		int numDeps = 0;
 		for ( FilledDependency dep : filledDeps ) {
-			if (!ignoreDeps.ignoreDependency(dep, sentence)) {
+			if ( !ignoreDeps.ignoreDependency(dep, sentence) ) {
 				numDeps++;
 			}
 		}
+
 		return numDeps;
 	}
 
@@ -529,16 +518,19 @@ public class SuperCategory implements Comparable<SuperCategory> {
 	 */
 	private Hash equivalenceHash() {
 		Hash h = new Hash(cat.getEhash());
+
 		for ( Dependency dep : unfilledDeps ) {
 			h.plusEqual(dep.relID);
 		}
-		for (int i = 1; i < numActiveVars; i++) {
+
+		for ( int i = 1; i < numActiveVars; i++ ) {
 			// numActiveVars is always 1 more than the real number
-			for (int j = 1; j != Variable.NUM_FILLERS; j++) {
+			for ( int j = 1; j != Variable.NUM_FILLERS; j++ ) {
 				// note the start index is 1
 				h.plusEqual(vars[i].fillers[j]);
 			}
 		}
+
 		return h;
 	}
 
@@ -551,22 +543,22 @@ public class SuperCategory implements Comparable<SuperCategory> {
 	 * objects are equivalent w.r.t. DP in the chart
 	 */
 	public static boolean equal(SuperCategory superCategory1, SuperCategory superCategory2) {
-		if (superCategory1.numActiveVars != superCategory2.numActiveVars) {
+		if ( superCategory1.numActiveVars != superCategory2.numActiveVars ) {
 			return false;
 		}
 
-		for (int i = 1; i < superCategory1.numActiveVars; i++) {
-			if (!Variable.equal(superCategory1.vars[i], superCategory2.vars[i])) {
+		for ( int i = 1; i < superCategory1.numActiveVars; i++ ) {
+			if ( !Variable.equal(superCategory1.vars[i], superCategory2.vars[i]) ) {
 				return false;
 			}
 		}
 
 		// ensures cats created via unary rules get their own equiv classes
-		if (superCategory1.unary() != superCategory2.unary()) {
+		if ( superCategory1.unary() != superCategory2.unary() ) {
 			return false;
 		}
 
-		if (!Category.equal(superCategory1.cat, superCategory2.cat)) {
+		if ( !Category.equal(superCategory1.cat, superCategory2.cat) ) {
 			return false;
 		}
 
@@ -597,37 +589,37 @@ public class SuperCategory implements Comparable<SuperCategory> {
 		numDisjNodes.value++;
 
 		markActive();
-		if (leftChild != null && !leftChild.isActive()) {
+		if ( leftChild != null && !leftChild.isActive() ) {
 			leftChild.markActiveDisj(numDisjNodes);
 		}
 
-		if (rightChild != null && !rightChild.isActive()) {
+		if ( rightChild != null && !rightChild.isActive() ) {
 			rightChild.markActiveDisj(numDisjNodes);
 		}
 
-		if (next != null) {
+		if ( next != null ) {
 			next.markActiveConj(numDisjNodes);
 		}
 	}
 
 	public void markActiveConj(IntWrapper numDisjNodes) {
 		markActive();
-		if (leftChild != null && !leftChild.isActive()) {
+		if ( leftChild != null && !leftChild.isActive() ) {
 			leftChild.markActiveDisj(numDisjNodes);
 		}
 
-		if (rightChild != null && !rightChild.isActive()) {
+		if ( rightChild != null && !rightChild.isActive() ) {
 			rightChild.markActiveDisj(numDisjNodes);
 		}
 
-		if (next != null) {
+		if ( next != null ) {
 			next.markActiveConj(numDisjNodes);
 		}
 	}
 
 	public void printFilledDeps(Relations relations) {
 		System.out.println("printing deps:");
-		for ( FilledDependency dep : filledDeps ){
+		for ( FilledDependency dep : filledDeps ) {
 			System.out.println(dep);
 		}
 	}
@@ -662,32 +654,32 @@ public class SuperCategory implements Comparable<SuperCategory> {
 	/*
 	 * these are the same flags from C&C (with LEX renamed UNARY_TC)
 	 */
-	protected static short CONJ = (short) (1 << 0);
-	protected static short TR = (short) (1 << 1);
-	protected static short UNARY_TC = (short) (1 << 2);
+	protected static final short CONJ = (short) (1 << 0);
+	protected static final short TR = (short) (1 << 1);
+	protected static final short UNARY_TC = (short) (1 << 2);
 
-	protected static short FWD_APP = (short) (1 << 3);
-	protected static short BWD_APP = (short) (1 << 4);
-	protected static short FWD_COMP = (short) (1 << 5);
-	protected static short BWD_COMP = (short) (1 << 6);
-	protected static short BWD_CROSS = (short) (1 << 7);
+	protected static final short FWD_APP = (short) (1 << 3);
+	protected static final short BWD_APP = (short) (1 << 4);
+	protected static final short FWD_COMP = (short) (1 << 5);
+	protected static final short BWD_COMP = (short) (1 << 6);
+	protected static final short BWD_CROSS = (short) (1 << 7);
 
-	protected static short RECURSIVE = (short) (1 << 8);
+	protected static final short RECURSIVE = (short) (1 << 8);
 
-	protected static short FUNNY_CONJ = (short) (1 << 9);
+	protected static final short FUNNY_CONJ = (short) (1 << 9);
 
-	protected static short LEFT_PUNCT = (short) (1 << 10);
-	protected static short RIGHT_PUNCT = (short) (1 << 11);
+	protected static final short LEFT_PUNCT = (short) (1 << 10);
+	protected static final short RIGHT_PUNCT = (short) (1 << 11);
 
-	protected static short LEFT_TC = (short) (1 << 12);
-	protected static short RIGHT_TC = (short) (1 << 13);
+	protected static final short LEFT_TC = (short) (1 << 12);
+	protected static final short RIGHT_TC = (short) (1 << 13);
 
-	protected static short APPO = (short) (1 << 14);
-	protected static short GEN_MISC = (short) (1 << 15);
+	protected static final short APPO = (short) (1 << 14);
+	protected static final short GEN_MISC = (short) (1 << 15);
 
-	protected static short CONJ_TR = (short) (CONJ | TR);
-	protected static short TR_UNARY = (short) (TR | UNARY_TC);
-	protected static short GEN_RULES = (short) (CONJ | TR | UNARY_TC | FWD_APP | BWD_APP | FWD_COMP | BWD_COMP | BWD_CROSS);
+	protected static final short CONJ_TR = (short) (CONJ | TR);
+	protected static final short TR_UNARY = (short) (TR | UNARY_TC);
+	protected static final short GEN_RULES = (short) (CONJ | TR | UNARY_TC | FWD_APP | BWD_APP | FWD_COMP | BWD_COMP | BWD_CROSS);
 
 	public boolean coordinated() {
 		return (flags & CONJ) != 0;
