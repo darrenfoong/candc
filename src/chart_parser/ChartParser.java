@@ -38,8 +38,6 @@ public class ChartParser {
 	public ArrayList<SuperCategory> results;
 	public ArrayList<Integer> featureIDs;
 
-	private int printPipeLeafIndex;
-
 	public ChartParser(
 					String grammarDir,
 					boolean altMarkedup,
@@ -527,75 +525,6 @@ public class ChartParser {
 		if (!foundGold) {
 			System.out.println("Didn't find any oracle deps.");
 		}
-	}
-
-	public void printTree(SuperCategory superCat) {
-		SuperCategory leftChild = superCat.leftChild;
-		SuperCategory rightChild = superCat.rightChild;
-
-		if (leftChild != null) {
-			if (rightChild != null) {
-				System.out.println(" Binary: " + superCat.cat.toStringNoOuterBrackets() + " " + superCat.score);
-				printTree(leftChild);
-				printTree(rightChild);
-			} else {
-				System.out.println(" Unary: " + superCat.cat.toStringNoOuterBrackets() + " " + superCat.score);
-				printTree(leftChild);
-			}
-		} else {
-			System.out.println(" Leaf: " + superCat.cat.toStringNoOuterBrackets() + " " + superCat.score);
-		}
-	}
-
-	public void printPipeViterbi(PrintWriter out) {
-		Cell root = chart.root();
-
-		double maxScore = Double.NEGATIVE_INFINITY;
-		SuperCategory maxRoot = null;
-
-		for (SuperCategory superCat : root.getSuperCategories()) {
-			double currentScore = superCat.maxEquivScore;
-			if (currentScore > maxScore) {
-				maxScore = currentScore;
-				maxRoot = superCat.maxEquivSuperCat;
-			}
-		}
-
-		printPipe(maxRoot, out);
-	}
-
-	public void printPipe(SuperCategory superCat, PrintWriter out) {
-		out.println("###");
-		printPipeLeafIndex = 0;
-
-		if (superCat != null) {
-			printPipeInner(superCat, out);
-		}
-
-		out.println();
-	}
-
-	private void printPipeInner(SuperCategory superCat, PrintWriter out) {
-		SuperCategory leftChild = superCat.leftChild;
-		SuperCategory rightChild = superCat.rightChild;
-
-		out.print("(");
-
-		if (leftChild != null) {
-			if (rightChild != null) {
-				out.println("<T *** " + superCat.cat.toStringNoOuterBrackets() + " * X 2>");
-				printPipeInner(leftChild, out);
-				printPipeInner(rightChild, out);
-			} else {
-				out.println("<T *** " + superCat.cat.toStringNoOuterBrackets() + " * X 1>");
-				printPipeInner(leftChild, out);
-			}
-		} else {
-			out.println("<L *** " + superCat.cat.toStringNoOuterBrackets() + " Y " + sentence.words.get(printPipeLeafIndex) + ">");
-			printPipeLeafIndex++;
-		}
-
-		out.println(")");
 	}
 
 	public void printChart() {
