@@ -127,15 +127,12 @@ public class FilledDependency implements Comparable<FilledDependency> {
 
 	@Override
 	public int compareTo(FilledDependency other) {
-		if ( this.relID == other.relID ) {
-			if ( this.headIndex == other.headIndex ) {
-				return Short.compare(this.fillerIndex, other.fillerIndex);
-			} else {
-				return Short.compare(this.headIndex, other.headIndex);
-			}
-		} else {
-			return Short.compare(this.relID, other.relID);
-		}
+		int compare;
+		if ( (compare = Short.compare(this.relID, other.relID)) != 0 ) { return compare; }
+		if ( (compare = Short.compare(this.headIndex, other.headIndex)) != 0 ) { return compare; }
+		if ( (compare = Short.compare(this.fillerIndex, other.fillerIndex)) != 0 ) { return compare; }
+
+		return 0;
 	}
 
 	/*
@@ -146,10 +143,10 @@ public class FilledDependency implements Comparable<FilledDependency> {
 	 */
 	@Override
 	public int hashCode() {
-		Hash h = new Hash(headIndex);
-		h.plusEqual(relID);
+		Hash h = new Hash(relID);
+		h.plusEqual(headIndex);
 		h.plusEqual(fillerIndex);
-		return (int) (h.value()); // int's go up to around 2 billion
+		return (int) (h.value());
 	}
 
 	@Override
@@ -160,6 +157,6 @@ public class FilledDependency implements Comparable<FilledDependency> {
 
 		FilledDependency cother = (FilledDependency) other;
 
-		return relID == cother.relID && headIndex == cother.headIndex && fillerIndex == cother.fillerIndex;
+		return compareTo(cother) == 0;
 	}
 }

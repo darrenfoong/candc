@@ -177,15 +177,23 @@ public class Dependency implements Comparable<Dependency> {
 
 	@Override
 	public int compareTo(Dependency other) {
-		if ( this.relID == other.relID ) {
-			if ( this.headIndex == other.headIndex ) {
-				return Byte.compare(this.var, other.var);
-			} else {
-				return Short.compare(this.headIndex,  other.headIndex);
-			}
-		} else {
-			return Short.compare(this.relID, other.relID);
-		}
+		int compare;
+		if ( (compare = Short.compare(this.relID, other.relID)) != 0 ) { return compare; }
+		if ( (compare = Short.compare(this.headIndex, other.headIndex)) != 0 ) { return compare; }
+		if ( (compare = Byte.compare(this.var, other.var)) != 0 ) { return compare; }
+
+		return 0;
+	}
+
+	@Override
+	public int hashCode() {
+		Hash h = new Hash(relID);
+		h.plusEqual(headIndex);
+		h.plusEqual(var);
+		// h.plusEqual(unaryRuleID);
+		// h.plusEqual(conjFactor);
+		// h.plusEqual(lrange);
+		return (int) (h.value());
 	}
 
 	@Override
@@ -197,16 +205,5 @@ public class Dependency implements Comparable<Dependency> {
 		Dependency cother = (Dependency) other;
 
 		return compareTo(cother) == 0;
-	}
-
-	@Override
-	public int hashCode() {
-		Hash h = new Hash(relID);
-		h.plusEqual(headIndex);
-		h.plusEqual(var);
-		h.plusEqual(unaryRuleID);
-		h.plusEqual(conjFactor);
-		h.plusEqual(lrange);
-		return (int) (h.value());
 	}
 }
