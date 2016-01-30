@@ -52,14 +52,8 @@ public class VarID implements Comparable<VarID> {
 	}
 
 	@Override
-	public boolean equals(Object other) {
-		if ( other == null || getClass() != other.getClass() ) {
-			return false;
-		}
-
-		VarID cother = (VarID) other;
-
-		return compareTo(cother) == 0;
+	public int compareTo(VarID other) {
+		return Byte.compare(this.varID, other.varID);
 	}
 
 	@Override
@@ -68,8 +62,14 @@ public class VarID implements Comparable<VarID> {
 	}
 
 	@Override
-	public int compareTo(VarID other) {
-		return Byte.compare(this.varID, other.varID);
+	public boolean equals(Object other) {
+		if ( other == null || getClass() != other.getClass() ) {
+			return false;
+		}
+
+		VarID cother = (VarID) other;
+
+		return compareTo(cother) == 0;
 	}
 
 	/*
