@@ -2,6 +2,7 @@ package io;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 public class Preface {
 	public static void readPreface(BufferedReader in) throws IOException {
@@ -19,5 +20,11 @@ public class Preface {
 				throw new IllegalArgumentException("Uncommented line within preface.");
 			}
 		}
+	}
+
+	public static void printPreface(PrintWriter out) {
+		out.println("# mandatory preface");
+		out.println("# mandatory preface");
+		out.println();
 	}
 }

@@ -1,16 +1,13 @@
 package chart_parser;
 
 import io.Sentence;
-import io.Supertag;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
 
 import lexicon.Categories;
-import lexicon.Category;
 import model.Features;
 import model.Lexicon;
 import model.Weights;
@@ -77,7 +74,7 @@ public class ChartParser {
 		this.chart.setWeights(this.weights);
 	}
 
-	public boolean parseSentence(BufferedReader in, BufferedReader stagsIn, PrintWriter log, double[] betas) {
+	public boolean parseSentence(Sentence sentence, PrintWriter log, double[] betas) {
 		int betaLevel;
 
 		if (adaptiveSupertagging) {
@@ -90,9 +87,7 @@ public class ChartParser {
 			betaLevel = 2;
 		}
 
-		if (!readSentence(in, stagsIn)) {
-			return false;
-		}
+		this.sentence = sentence;
 
 		maxWordsExceeded = false;
 		int numWords = sentence.words.size();
@@ -185,111 +180,6 @@ public class ChartParser {
 		}
 
 		return true;
-	}
-
-	/**
-	 * Reads a supertagged sentence and updates current sentence in chart to
-	 * parse. 
-	 * 
-	 * @param in file containing supertagged sentences to parse
-	 * @param stagsIn file containing additional supertags
-	 * @return true if sentence is read, false if there are no sentences left
-	 */
-	public boolean readSentence(BufferedReader in, BufferedReader stagsIn) {
-		try {
-			sentence.clear();
-
-			while (true) {
-				String line = in.readLine();
-
-				if (line == null) {
-					// no valid sentence
-					return false;
-				} else if (line.isEmpty()) {
-					// end of sentence
-					return true;
-				}
-
-				String[] tokens = line.split("\\s");
-				sentence.addWord(tokens[0]);
-				sentence.addPostag(tokens[1]);
-
-				int numSupertags = Integer.parseInt(tokens[2]);
-				ArrayList<Supertag> supertags = new ArrayList<Supertag>(numSupertags);
-
-				String supertagString = null;
-				String goldSupertagString = null;
-				String stagsLine = null;
-				String[] stagTokens;
-
-				boolean seenGold = false;
-				double lowestProb = 1.0;
-
-				if (stagsIn != null) {
-					stagsLine = stagsIn.readLine();
-
-					if ( stagsLine != null ) {
-						stagTokens = stagsLine.split("\\s");
-					} else {
-						throw new IllegalArgumentException("Unexpected end of stream");
-					}
-
-					if (stagTokens.length != 3 || !stagTokens[0].equals(tokens[0]) || !stagTokens[1].equals(tokens[1])) {
-						throw new IllegalArgumentException("Mismatch between input and gold supertags: " + tokens[0] + " " + tokens[1] + " " + stagTokens[0] + " " + stagTokens[1]);
-					}
-
-					goldSupertagString = stagTokens[2];
-				}
-
-				for (int i = 0; i < numSupertags; i++) {
-					supertagString = tokens[2 * i + 3];
-					double probability = Double.parseDouble(tokens[2 * i + 4]);
-					lowestProb = probability;
-					// assumes supertags are ordered by probability (highest first)
-					// TODO: bad assumption
-					// further more lowestProb gets assigned prob at every iteration
-					// if assumption holds, can optimise by assuming lowestProb = probability after loop
-
-					if (supertagString.equals(goldSupertagString)) {
-						if (printDetailedOutput) {
-							System.out.println("MATCHING GOLD SUPERTAG: " + supertagString);
-						}
-
-						seenGold = true;
-					}
-
-					Category lexicalCategory = categories.getCategory(supertagString);
-
-					if (lexicalCategory == null) {
-						throw new IllegalArgumentException("No such supertag: " + supertagString);
-					}
-
-					Supertag supertag = new Supertag(supertagString, lexicalCategory, probability);
-					supertags.add(supertag);
-				}
-
-				if (stagsIn != null && seenGold == false) {
-					if (printDetailedOutput) {
-						System.out.println("Didn't find gold so adding: " + goldSupertagString);
-					}
-
-					Category goldLexicalCategory = categories.getCategory(goldSupertagString);
-
-					if (goldLexicalCategory == null) {
-						throw new IllegalArgumentException("No such gold supertag: " + goldSupertagString);
-					}
-
-					Supertag goldSupertag = new Supertag(goldSupertagString, goldLexicalCategory, lowestProb);
-					// use the lowest probability
-					supertags.add(goldSupertag);
-				}
-
-				sentence.addSupertags(supertags);
-			}
-		} catch (IOException e) {
-			System.err.println(e);
-			return false;
-		}
 	}
 
 	public void combine(Cell leftCell, Cell rightCell, int position, int span) {

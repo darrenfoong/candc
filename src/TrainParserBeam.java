@@ -1,4 +1,5 @@
 import io.Preface;
+import io.Sentences;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -99,9 +100,7 @@ public class TrainParserBeam {
 			  PrintWriter log = new PrintWriter(new BufferedWriter(new FileWriter(logFile)));
 			  PrintWriter writer = new PrintWriter(System.out) ) {
 
-			out.println("# mandatory preface");
-			out.println("# mandatory preface");
-			out.println();
+			Preface.printPreface(out);
 
 			long TS_PARSING_TOTAL = Benchmark.getTime();
 			for (int iteration = 1; iteration <= numIterations; iteration++) {
@@ -119,16 +118,15 @@ public class TrainParserBeam {
 					parser.hasUpdateStatistics.clear();
 					parser.hypothesisSizeStatistics.clear();
 
+					Sentences sentences = new Sentences(in, null, parser.categories, MAX_WORDS);
+					sentences.skip(fromSentence - 1);
+
 					long TS_PARSING = Benchmark.getTime();
-					for (int numSentence = fromSentence; numSentence <= toSentence; numSentence++) {
+					for (int numSentence = fromSentence; numSentence <= toSentence && sentences.hasNext(); numSentence++) {
 						System.out.println("Parsing sentence " + iteration + "/"+ numSentence);
 						log.println("Parsing sentence " + iteration + "/"+ numSentence);
 
-						if ( !parser.parseSentence(in, goldDepsPerCell, null, log, betas, oracleDecoder) ) {
-							System.out.println("No such sentence; no more sentences.");
-							log.println("No such sentence; no more sentences.");
-							break;
-						}
+						parser.parseSentence(sentences.next(), log, betas);
 
 						oracleDecoder.readDeps(goldDeps, parser.categories);
 						// oracleDecoder.readRootCat(roots, parser.categories);
@@ -157,9 +155,7 @@ public class TrainParserBeam {
 
 						if (numSentence % 5000 == 0) {
 							try ( PrintWriter outIterPart = new PrintWriter(new BufferedWriter(new FileWriter(outputWeightsFile + "." + iteration + "." + numSentence))) ) {
-								outIterPart.println("# mandatory preface");
-								outIterPart.println("# mandatory preface");
-								outIterPart.println();
+								Preface.printPreface(outIterPart);
 								parser.printWeights(outIterPart, numTrainInstances);
 							}
 						}
@@ -170,9 +166,7 @@ public class TrainParserBeam {
 					System.out.println("# Statistics for iteration " + iteration + ": hasUpdate: " + parser.hasUpdateStatistics.calcHasUpdates() + "/" + parser.hasUpdateStatistics.getSize() + " (" + ((double) parser.hasUpdateStatistics.calcHasUpdates()/(double) parser.hasUpdateStatistics.getSize()) + ")");
 					System.out.println("# Statistics for iteration " + iteration + ": hypothesisSize: " + parser.hypothesisSizeStatistics.calcAverageProportion() + " (" + parser.hypothesisSizeStatistics.getSize() + ")");
 
-					outIter.println("# mandatory preface");
-					outIter.println("# mandatory preface");
-					outIter.println();
+					Preface.printPreface(outIter);
 					parser.printWeights(outIter, numTrainInstances);
 				}
 			}

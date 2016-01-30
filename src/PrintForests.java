@@ -1,4 +1,5 @@
 import io.Preface;
+import io.Sentences;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -92,22 +93,18 @@ public class PrintForests {
 			Preface.readPreface(gold);
 			Preface.readPreface(stagsIn);
 			Preface.readPreface(roots);
-
-			out.println("# mandatory preface");
-			out.println("# mandatory preface");
-			out.println();
+			Preface.printPreface(out);
 
 			out.println(parser.features.numFeatures);
 
-			for (int numSentence = fromSentence; numSentence <= toSentence; numSentence++) {
+			Sentences sentences = new Sentences(in, null, parser.categories, MAX_WORDS);
+			sentences.skip(fromSentence - 1);
+
+			for (int numSentence = fromSentence; numSentence <= toSentence && sentences.hasNext(); numSentence++) {
 				System.out.println("Parsing sentence "+ numSentence);
 				log.println("Parsing sentence "+ numSentence);
 
-				if ( !parser.parseSentence(in, null, log, betas) ) {
-					System.out.println("No such sentence; no more sentences.");
-					log.println("No such sentence; no more sentences.");
-					break;
-				}
+				parser.parseSentence(sentences.next(), log, betas);
 
 				oracleDecoder.readDeps(gold, parser.categories);
 				// ugly - passing parser.categories?

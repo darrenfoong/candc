@@ -1,4 +1,5 @@
 import io.Preface;
+import io.Sentences;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -89,24 +90,17 @@ public class CountFeatures {
 			  PrintWriter weights = new PrintWriter(new BufferedWriter(new FileWriter(outputWeightsFile))) ) {
 
 			Preface.readPreface(in);
+			Preface.printPreface(out);
+			Preface.printPreface(weights);
 
-			out.println("# mandatory preface");
-			out.println("# mandatory preface");
-			out.println();
+			Sentences sentences = new Sentences(in, null, parser.categories, MAX_WORDS);
+			sentences.skip(fromSentence - 1);
 
-			weights.println("# mandatory preface");
-			weights.println("# mandatory preface");
-			weights.println();
-
-			for (int numSentence = fromSentence; numSentence <= toSentence; numSentence++) {
+			for (int numSentence = fromSentence; numSentence <= toSentence && sentences.hasNext(); numSentence++) {
 				System.out.println("Parsing sentence "+ numSentence);
 				log.println("Parsing sentence "+ numSentence);
 
-				if ( !parser.parseSentence(in, null, log, betas) ) {
-					System.out.println("No such sentence; no more sentences.");
-					log.println("No such sentence; no more sentences.");
-					break;
-				}
+				parser.parseSentence(sentences.next(), log, betas);
 
 				if (!parser.maxWordsExceeded && !parser.maxSuperCatsExceeded) {
 					boolean success = countFeaturesDecoder.countFeatures(parser.chart, parser.sentence);

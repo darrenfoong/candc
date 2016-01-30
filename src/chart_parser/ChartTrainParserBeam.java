@@ -1,5 +1,7 @@
 package chart_parser;
 
+import io.Sentence;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -86,10 +88,10 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 	 * @return true if sentence is parsed or skipped, false if there are no
 	 * sentences left
 	 */
-	public boolean parseSentence(BufferedReader in, BufferedReader goldDepsPerCell, BufferedReader stagsIn, PrintWriter log, double[] betas, OracleDecoder oracleDecoder) {
+	public boolean parseSentence(Sentence sentence, PrintWriter log, double[] betas, BufferedReader goldDepsPerCell, OracleDecoder oracleDecoder) {
 		this.goldDepsPerCell = goldDepsPerCell;
 		this.oracleDecoder = oracleDecoder;
-		return parseSentence(in, stagsIn, log, betas);
+		return parseSentence(sentence, log, betas);
 	}
 
 	/**

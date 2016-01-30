@@ -2,7 +2,6 @@ package chart_parser;
 
 import io.Sentence;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Collections;
@@ -69,14 +68,12 @@ public class ChartParserBeam extends ChartParser {
 	 * sentences left
 	 */
 	@Override
-	public boolean parseSentence(BufferedReader in, BufferedReader stagsIn, PrintWriter log, double[] betas) {
+	public boolean parseSentence(Sentence sentence, PrintWriter log, double[] betas) {
 		if (betas.length != 1) {
 			throw new IllegalArgumentException("Only need 1 beta value.");
 		}
 
-		if (!readSentence(in, stagsIn)) {
-			return false;
-		}
+		this.sentence = sentence;
 
 		maxWordsExceeded = false;
 		int numWords = sentence.words.size();

@@ -1,4 +1,5 @@
 import io.Preface;
+import io.Sentences;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -100,21 +101,17 @@ public class Parser {
 			  PrintWriter log = new PrintWriter(new BufferedWriter(new FileWriter(logFile))) ) {
 
 			Preface.readPreface(in);
+			Preface.printPreface(out);
 
-			out.println("# mandatory preface");
-			out.println("# mandatory preface");
-			out.println();
+			Sentences sentences = new Sentences(in, null, parser.categories, MAX_WORDS);
+			sentences.skip(fromSentence - 1);
 
 			long TS_PARSING = Benchmark.getTime();
-			for (int numSentence = fromSentence; numSentence <= toSentence; numSentence++) {
+			for (int numSentence = fromSentence; numSentence <= toSentence && sentences.hasNext(); numSentence++) {
 				System.out.println("Parsing sentence "+ numSentence);
 				log.println("Parsing sentence "+ numSentence);
 
-				if ( !parser.parseSentence(in, null, log, betas) ) {
-					System.out.println("No such sentence; no more sentences.");
-					log.println("No such sentence; no more sentences.");
-					break;
-				}
+				parser.parseSentence(sentences.next(), log, betas);
 
 				if (!parser.maxWordsExceeded && !parser.maxSuperCatsExceeded) {
 					boolean success = parser.calcScores();
