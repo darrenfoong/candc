@@ -21,24 +21,31 @@ public class Weights {
 	}
 
 	public void setWeights(double[] weights) {
-		this.weights = (double[]) weights.clone();
+		this.weights = weights.clone();
 	}
 
 	private void readWeights(String weightsFile) throws IOException {
 		int ID = 0;
 
-		BufferedReader in = new BufferedReader(new FileReader(weightsFile));
-		Preface.readPreface(in);
+		BufferedReader in = null;
 
-		String line = null;
-		while ((line = in.readLine()) != null) {
-			double weight = Double.parseDouble(line);
-			weights[ID] = weight;
-			ID++;
-		}
+		try {
+			in = new BufferedReader(new FileReader(weightsFile));
 
-		if (ID != weights.length) {
-			throw new IllegalArgumentException("number of weights != number of features!");
+			Preface.readPreface(in);
+
+			String line = null;
+			while ((line = in.readLine()) != null) {
+				double weight = Double.parseDouble(line);
+				weights[ID] = weight;
+				ID++;
+			}
+
+			if (ID != weights.length) {
+				throw new IllegalArgumentException("number of weights != number of features!");
+			}
+		} finally {
+			if ( in != null ) { in.close(); }
 		}
 	}
 
