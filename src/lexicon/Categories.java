@@ -86,10 +86,7 @@ public class Categories {
 
 		String markedupFile = grammarDir + "/markedup";
 
-		BufferedReader in = null;
-
-		try {
-			in = new BufferedReader(new FileReader(markedupFile));
+		try ( BufferedReader in = new BufferedReader(new FileReader(markedupFile)) ) {
 			Preface.readPreface(in);
 
 			States state = States.CAT;
@@ -191,12 +188,6 @@ public class Categories {
 			}
 		} catch ( IOException e ) {
 			System.err.println(e);
-		} finally {
-			try {
-				if ( in != null ) { in.close(); }
-			} catch ( IOException e ) {
-				System.err.println(e);
-			}
 		}
 	}
 
@@ -420,10 +411,7 @@ public class Categories {
 	 * needs carrying over
 	 */
 	private void readTRcategories(String trFile, ArrayList<TypeRaisedCategory> trList) {
-		BufferedReader in = null;
-
-		try {
-			in = new BufferedReader(new FileReader(trFile));
+		try ( BufferedReader in = new BufferedReader(new FileReader(trFile)) ) {
 
 			String markedupCatString = "";
 			String varString = "";
@@ -462,12 +450,6 @@ public class Categories {
 			}
 		} catch ( IOException e ) {
 			System.err.println(e);
-		} finally {
-			try {
-				if ( in != null ) { in.close(); }
-			} catch ( IOException e ) {
-				System.err.println(e);
-			}
 		}
 	}
 

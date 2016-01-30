@@ -27,10 +27,7 @@ public class Weights {
 	private void readWeights(String weightsFile) throws IOException {
 		int ID = 0;
 
-		BufferedReader in = null;
-
-		try {
-			in = new BufferedReader(new FileReader(weightsFile));
+		try ( BufferedReader in = new BufferedReader(new FileReader(weightsFile)) ) {
 
 			Preface.readPreface(in);
 
@@ -44,8 +41,6 @@ public class Weights {
 			if (ID != weights.length) {
 				throw new IllegalArgumentException("number of weights != number of features!");
 			}
-		} finally {
-			if ( in != null ) { in.close(); }
 		}
 	}
 

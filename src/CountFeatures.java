@@ -83,19 +83,12 @@ public class CountFeatures {
 
 		CountFeaturesDecoder countFeaturesDecoder = new CountFeaturesDecoder(parser.categories);
 
-		BufferedReader in = null;
-		PrintWriter out = null;
-		PrintWriter log = null;
-		PrintWriter weights = null;
-
-		try {
-			in = new BufferedReader(new FileReader(inputFile));
+		try ( BufferedReader in = new BufferedReader(new FileReader(inputFile));
+			  PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(outputFile)));
+			  PrintWriter log = new PrintWriter(new BufferedWriter(new FileWriter(logFile)));
+			  PrintWriter weights = new PrintWriter(new BufferedWriter(new FileWriter(outputWeightsFile))) ) {
 
 			Preface.readPreface(in);
-
-			out = new PrintWriter(new BufferedWriter(new FileWriter(outputFile)));
-			log = new PrintWriter(new BufferedWriter(new FileWriter(logFile)));
-			weights = new PrintWriter(new BufferedWriter(new FileWriter(outputWeightsFile)));
 
 			out.println("# mandatory preface");
 			out.println("# mandatory preface");
@@ -133,15 +126,6 @@ public class CountFeatures {
 			parser.features.printWeights(parser.weights, weights);
 		} catch (IOException e) {
 			System.err.println(e);
-		} finally {
-			try {
-				if ( weights != null ) { weights.close(); }
-				if ( log != null ) { log.close(); }
-				if ( out != null ) { out.close(); }
-				if ( in != null ) { in.close(); }
-			} catch (IOException e) {
-				System.err.println(e);
-			}
 		}
 	}
 }

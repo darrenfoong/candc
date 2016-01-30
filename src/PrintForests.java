@@ -13,7 +13,7 @@ import cat_combination.RuleInstancesParams;
 import chart_parser.ChartParser;
 import chart_parser.OracleDepsSumDecoder;
 
-class PrintForests {
+public class PrintForests {
 	public static void main(String[] args) {
 		int MAX_WORDS = 250;
 		int MAX_SUPERCATS = 1000000;
@@ -81,26 +81,17 @@ class PrintForests {
 
 		OracleDepsSumDecoder oracleDecoder = new OracleDepsSumDecoder(parser.categories, false);
 
-		BufferedReader in = null;
-		BufferedReader gold = null;
-		BufferedReader stagsIn = null;
-		BufferedReader roots = null;
-		PrintWriter out = null;
-		PrintWriter log = null;
-
-		try {
-			in = new BufferedReader(new FileReader(inputFile));
-			gold = new BufferedReader(new FileReader(goldDepsFile));
-			stagsIn = new BufferedReader(new FileReader(goldSupertagsFile));
-			roots = new BufferedReader(new FileReader(rootCatsFile));
+		try ( BufferedReader in = new BufferedReader(new FileReader(inputFile));
+			  BufferedReader gold = new BufferedReader(new FileReader(goldDepsFile));
+			  BufferedReader stagsIn = new BufferedReader(new FileReader(goldSupertagsFile));
+			  BufferedReader roots = new BufferedReader(new FileReader(rootCatsFile));
+			  PrintWriter out = new PrintWriter(new FileWriter(outputFile));
+			  PrintWriter log = new PrintWriter(new FileWriter(logFile)) ) {
 
 			Preface.readPreface(in);
 			Preface.readPreface(gold);
 			Preface.readPreface(stagsIn);
 			Preface.readPreface(roots);
-
-			out = new PrintWriter(new FileWriter(outputFile));
-			log = new PrintWriter(new FileWriter(logFile));
 
 			out.println("# mandatory preface");
 			out.println("# mandatory preface");
@@ -134,17 +125,6 @@ class PrintForests {
 			System.err.println(e);
 		} catch (IOException e) {
 			System.err.println(e);
-		} finally {
-			try {
-				if ( log != null ) { log.close(); }
-				if ( out != null ) { out.close(); }
-				if ( roots != null ) { roots.close(); }
-				if ( stagsIn != null ) { stagsIn.close(); }
-				if ( gold != null ) { gold.close(); }
-				if ( in != null ) { in.close(); }
-			} catch (IOException e) {
-				System.err.println(e);
-			}
 		}
 	}
 }

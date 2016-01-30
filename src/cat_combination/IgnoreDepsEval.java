@@ -40,16 +40,10 @@ public class IgnoreDepsEval {
 		unfilledDeps = new HashSet<DependencyStringWords>();
 		filledDeps = new HashSet<DependencyStringWords>();
 
-		BufferedReader ruleIDsBuffer = null;
-		BufferedReader relRuleIDsBuffer = null;
-		BufferedReader relHeadBuffer = null;
-		BufferedReader relHeadFillerBuffer = null;
-
-		try {
-			ruleIDsBuffer = new BufferedReader(new FileReader(ruleIDsFile));
-			relRuleIDsBuffer = new BufferedReader(new FileReader(relRuleIDsFile));
-			relHeadBuffer = new BufferedReader(new FileReader(relHeadFile));
-			relHeadFillerBuffer = new BufferedReader(new FileReader(relHeadFillerFile));
+		try ( BufferedReader ruleIDsBuffer = new BufferedReader(new FileReader(ruleIDsFile));
+			  BufferedReader relRuleIDsBuffer = new BufferedReader(new FileReader(relRuleIDsFile));
+			  BufferedReader relHeadBuffer = new BufferedReader(new FileReader(relHeadFile));
+			  BufferedReader relHeadFillerBuffer = new BufferedReader(new FileReader(relHeadFillerFile)) ) {
 
 			String line;
 			String[] tokens;
@@ -142,15 +136,6 @@ public class IgnoreDepsEval {
 
 		} catch (IOException e) {
 			System.err.println(e);
-		} finally {
-			try {
-				if ( ruleIDsBuffer != null ) { ruleIDsBuffer.close(); }
-				if ( relRuleIDsBuffer != null ) { relRuleIDsBuffer.close(); }
-				if ( relHeadBuffer != null ) { relHeadBuffer.close(); }
-				if ( relHeadFillerBuffer != null ) { relHeadFillerBuffer.close(); }
-			} catch (IOException e) {
-				System.err.println(e);
-			}
 		}
 	}
 

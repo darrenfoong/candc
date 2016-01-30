@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import training.Feature;
 import training.Forest;
 
-class TrainLogLinear {
+public class TrainLogLinear {
 	public static void main(String[] args) {
 		int iteration = 1;
 		int numForest = 0;
@@ -31,15 +31,10 @@ class TrainLogLinear {
 		Feature[] features = null;
 		ArrayList<Forest> forests = new ArrayList<Forest>();
 
-		BufferedReader in = null;
-		PrintWriter out = null;
-
-		try {
-			in = new BufferedReader(new FileReader(forestFile));
+		try ( BufferedReader in = new BufferedReader(new FileReader(forestFile));
+			  PrintWriter out = new PrintWriter(new FileWriter(weightsFile)) ) {
 
 			Preface.readPreface(in);
-
-			out = new PrintWriter(new FileWriter(weightsFile));
 
 			String line = in.readLine();
 			int numFeatures = Integer.parseInt(line);
@@ -124,13 +119,6 @@ class TrainLogLinear {
 			System.err.println(e);
 		} catch (IOException e) {
 			System.err.println(e);
-		} finally {
-			try {
-				if ( out != null ) { out.close(); }
-				if ( in != null ) { in.close(); }
-			} catch (IOException e) {
-				System.err.println(e);
-			}
 		}
 	}
 }

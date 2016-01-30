@@ -14,7 +14,7 @@ import cat_combination.RuleInstancesParams;
 import chart_parser.ChartParser;
 import chart_parser.ViterbiDecoder;
 
-class Parser {
+public class Parser {
 	public static void main(String[] args) {
 		int iterations = 1;
 		for ( int i = 1; i <= iterations; i++ ) {
@@ -95,17 +95,11 @@ class Parser {
 
 		ViterbiDecoder viterbiDecoder = new ViterbiDecoder();
 
-		BufferedReader in = null;
-		PrintWriter out = null;
-		PrintWriter log = null;
-
-		try {
-			in = new BufferedReader(new FileReader(inputFile));
+		try ( BufferedReader in = new BufferedReader(new FileReader(inputFile));
+			  PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(outputFile)));
+			  PrintWriter log = new PrintWriter(new BufferedWriter(new FileWriter(logFile))) ) {
 
 			Preface.readPreface(in);
-
-			out = new PrintWriter(new BufferedWriter(new FileWriter(outputFile)));
-			log = new PrintWriter(new BufferedWriter(new FileWriter(logFile)));
 
 			out.println("# mandatory preface");
 			out.println("# mandatory preface");
@@ -144,14 +138,6 @@ class Parser {
 			System.err.println(e);
 		} catch (IOException e) {
 			System.err.println(e);
-		} finally {
-			try {
-				if ( log != null ) { log.close(); }
-				if ( out != null ) { out.close(); }
-				if ( in != null ) { in.close(); }
-			} catch (IOException e) {
-				System.err.println(e);
-			}
 		}
 
 		long TE_PROGRAM = Benchmark.getTime();

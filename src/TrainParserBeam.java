@@ -93,22 +93,11 @@ public class TrainParserBeam {
 
 		OracleDecoder oracleDecoder = new OracleDepsSumDecoder(parser.categories, false);
 
-		BufferedReader in = null;
-		BufferedReader goldDeps = null;
-		BufferedReader goldDepsPerCell = null;
-		BufferedReader roots = null;
-		PrintWriter out = null;
-		PrintWriter log = null;
-		PrintWriter writer = null;
-		PrintWriter outIter = null;
-		PrintWriter outIterPart = null;
-
 		int numTrainInstances = 1;
 
-		try {
-			out = new PrintWriter(new BufferedWriter(new FileWriter(outputWeightsFile)));
-			log = new PrintWriter(new BufferedWriter(new FileWriter(logFile)));
-			writer = new PrintWriter(System.out);
+		try ( PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(outputWeightsFile)));
+			  PrintWriter log = new PrintWriter(new BufferedWriter(new FileWriter(logFile)));
+			  PrintWriter writer = new PrintWriter(System.out) ) {
 
 			out.println("# mandatory preface");
 			out.println("# mandatory preface");
@@ -116,81 +105,76 @@ public class TrainParserBeam {
 
 			long TS_PARSING_TOTAL = Benchmark.getTime();
 			for (int iteration = 1; iteration <= numIterations; iteration++) {
-				in = new BufferedReader(new FileReader(inputFile));
-				goldDeps = new BufferedReader(new FileReader(goldDepsFile));
-				goldDepsPerCell = new BufferedReader(new FileReader(goldDepsFile + ".per_cell"));
-				roots = new BufferedReader(new FileReader(rootCatsFile));
+				try ( BufferedReader in = new BufferedReader(new FileReader(inputFile));
+					  BufferedReader goldDeps = new BufferedReader(new FileReader(goldDepsFile));
+					  BufferedReader goldDepsPerCell = new BufferedReader(new FileReader(goldDepsFile + ".per_cell"));
+					  BufferedReader roots = new BufferedReader(new FileReader(rootCatsFile));
+					  PrintWriter outIter = new PrintWriter(new BufferedWriter(new FileWriter(outputWeightsFile + "." + iteration))) ) {
 
-				Preface.readPreface(in);
-				Preface.readPreface(goldDeps);
-				Preface.readPreface(goldDepsPerCell);
-				Preface.readPreface(roots);
+					Preface.readPreface(in);
+					Preface.readPreface(goldDeps);
+					Preface.readPreface(goldDepsPerCell);
+					Preface.readPreface(roots);
 
-				parser.hasUpdateStatistics.clear();
-				parser.hypothesisSizeStatistics.clear();
+					parser.hasUpdateStatistics.clear();
+					parser.hypothesisSizeStatistics.clear();
 
-				long TS_PARSING = Benchmark.getTime();
-				for (int numSentence = fromSentence; numSentence <= toSentence; numSentence++) {
-					System.out.println("Parsing sentence " + iteration + "/"+ numSentence);
-					log.println("Parsing sentence " + iteration + "/"+ numSentence);
+					long TS_PARSING = Benchmark.getTime();
+					for (int numSentence = fromSentence; numSentence <= toSentence; numSentence++) {
+						System.out.println("Parsing sentence " + iteration + "/"+ numSentence);
+						log.println("Parsing sentence " + iteration + "/"+ numSentence);
 
-					if ( !parser.parseSentence(in, goldDepsPerCell, null, log, betas, oracleDecoder) ) {
-						System.out.println("No such sentence; no more sentences.");
-						log.println("No such sentence; no more sentences.");
-						break;
-					}
+						if ( !parser.parseSentence(in, goldDepsPerCell, null, log, betas, oracleDecoder) ) {
+							System.out.println("No such sentence; no more sentences.");
+							log.println("No such sentence; no more sentences.");
+							break;
+						}
 
-					oracleDecoder.readDeps(goldDeps, parser.categories);
-					// oracleDecoder.readRootCat(roots, parser.categories);
+						oracleDecoder.readDeps(goldDeps, parser.categories);
+						// oracleDecoder.readRootCat(roots, parser.categories);
 
-					if ( oracleDecoder.numGoldDeps() != 0 ) {
-						numTrainInstances++;
-						SuperCategory best = parser.updateWeights(log, numTrainInstances);
+						if ( oracleDecoder.numGoldDeps() != 0 ) {
+							numTrainInstances++;
+							SuperCategory best = parser.updateWeights(log, numTrainInstances);
 
-						if (best != null) {
-							System.out.println("best category deps: ");
-							parser.printDeps(writer, parser.categories.dependencyRelations, parser.sentence, best);
-							writer.flush();
-							System.out.println();
+							if (best != null) {
+								System.out.println("best category deps: ");
+								parser.printDeps(writer, parser.categories.dependencyRelations, parser.sentence, best);
+								writer.flush();
+								System.out.println();
+							} else {
+								System.out.println("No update took place!");
+								System.out.println();
+								log.println("No update took place!");
+								log.println();
+							}
 						} else {
-							System.out.println("No update took place!");
+							System.out.println("No gold dependencies for sentence " + iteration + "/"+ numSentence);
 							System.out.println();
-							log.println("No update took place!");
+							log.println("No gold dependencies for sentence " + iteration + "/"+ numSentence);
 							log.println();
 						}
-					} else {
-						System.out.println("No gold dependencies for sentence " + iteration + "/"+ numSentence);
-						System.out.println();
-						log.println("No gold dependencies for sentence " + iteration + "/"+ numSentence);
-						log.println();
-					}
 
-					if (numSentence % 5000 == 0) {
-						outIterPart = new PrintWriter(new BufferedWriter(new FileWriter(outputWeightsFile + "." + iteration + "." + numSentence)));
-						outIterPart.println("# mandatory preface");
-						outIterPart.println("# mandatory preface");
-						outIterPart.println();
-						parser.printWeights(outIterPart, numTrainInstances);
-						outIterPart.close();
+						if (numSentence % 5000 == 0) {
+							try ( PrintWriter outIterPart = new PrintWriter(new BufferedWriter(new FileWriter(outputWeightsFile + "." + iteration + "." + numSentence))) ) {
+								outIterPart.println("# mandatory preface");
+								outIterPart.println("# mandatory preface");
+								outIterPart.println();
+								parser.printWeights(outIterPart, numTrainInstances);
+							}
+						}
 					}
+					long TE_PARSING = Benchmark.getTime();
+					Benchmark.printTime("training iteration " + iteration, TS_PARSING, TE_PARSING);
+
+					System.out.println("# Statistics for iteration " + iteration + ": hasUpdate: " + parser.hasUpdateStatistics.calcHasUpdates() + "/" + parser.hasUpdateStatistics.getSize() + " (" + ((double) parser.hasUpdateStatistics.calcHasUpdates()/(double) parser.hasUpdateStatistics.getSize()) + ")");
+					System.out.println("# Statistics for iteration " + iteration + ": hypothesisSize: " + parser.hypothesisSizeStatistics.calcAverageProportion() + " (" + parser.hypothesisSizeStatistics.getSize() + ")");
+
+					outIter.println("# mandatory preface");
+					outIter.println("# mandatory preface");
+					outIter.println();
+					parser.printWeights(outIter, numTrainInstances);
 				}
-				long TE_PARSING = Benchmark.getTime();
-				Benchmark.printTime("training iteration " + iteration, TS_PARSING, TE_PARSING);
-
-				System.out.println("# Statistics for iteration " + iteration + ": hasUpdate: " + parser.hasUpdateStatistics.calcHasUpdates() + "/" + parser.hasUpdateStatistics.getSize() + " (" + ((double) parser.hasUpdateStatistics.calcHasUpdates()/(double) parser.hasUpdateStatistics.getSize()) + ")");
-				System.out.println("# Statistics for iteration " + iteration + ": hypothesisSize: " + parser.hypothesisSizeStatistics.calcAverageProportion() + " (" + parser.hypothesisSizeStatistics.getSize() + ")");
-
-				in.close();
-				goldDeps.close();
-				goldDepsPerCell.close();
-				roots.close();
-
-				outIter = new PrintWriter(new BufferedWriter(new FileWriter(outputWeightsFile + "." + iteration)));
-				outIter.println("# mandatory preface");
-				outIter.println("# mandatory preface");
-				outIter.println();
-				parser.printWeights(outIter, numTrainInstances);
-				outIter.close();
 			}
 			long TE_PARSING_TOTAL = Benchmark.getTime();
 			Benchmark.printTime("training total", TS_PARSING_TOTAL, TE_PARSING_TOTAL);
@@ -198,20 +182,6 @@ public class TrainParserBeam {
 			parser.printWeights(out, numTrainInstances);
 		} catch (IOException e) {
 			System.err.println(e);
-		} finally {
-			try {
-				if ( outIterPart != null ) { outIterPart.close(); }
-				if ( outIter != null ) { outIter.close(); }
-				if ( writer != null ) { writer.close(); }
-				if ( log != null ) { log.close(); }
-				if ( out != null ) { out.close(); }
-				if ( roots != null ) { roots.close(); }
-				if ( goldDepsPerCell != null ) { goldDepsPerCell.close(); }
-				if ( goldDeps != null ) { goldDeps.close(); }
-				if ( in != null ) { in.close(); }
-			} catch (IOException e) {
-				System.err.println(e);
-			}
 		}
 
 		long TE_PROGRAM = Benchmark.getTime();

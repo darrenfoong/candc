@@ -27,7 +27,7 @@ import chart_parser.OracleFscoreDecoder;
  * (currently not used)
  */
 
-class OracleParser {
+public class OracleParser {
 	public static void main(String[] args) {
 		int MAX_WORDS = 250;
 		int MAX_SUPERCATS = 1000000;
@@ -90,26 +90,14 @@ class OracleParser {
 			oracleDecoder = new OracleFscoreDecoder(parser.categories, extractRuleInstances);
 		}
 
-		BufferedReader in = null;
-		BufferedReader gold = null;
-		BufferedReader stagsIn = null;
-		BufferedReader roots = null;
-		PrintWriter out = null;
-		PrintWriter out2 = null;
-		PrintWriter log = null;
-		PrintWriter rules = null;
-
-		try {
-			in = new BufferedReader(new FileReader(inputFile));
-			gold = new BufferedReader(new FileReader(goldDepsFile));
-
-			if (!goldSupertagsFile.equals("null")) {
-				stagsIn = new BufferedReader(new FileReader(goldSupertagsFile));
-			} else {
-				stagsIn = null;
-			}
-
-			roots = new BufferedReader(new FileReader(rootCatsFile));
+		try ( BufferedReader in = new BufferedReader(new FileReader(inputFile));
+			  BufferedReader gold = new BufferedReader(new FileReader(goldDepsFile));
+			  BufferedReader stagsIn = !goldSupertagsFile.equals("null") ? new BufferedReader(new FileReader(goldSupertagsFile)) : null;
+			  BufferedReader roots = new BufferedReader(new FileReader(rootCatsFile));
+			  PrintWriter out = new PrintWriter(new FileWriter(outputFile));
+			  PrintWriter out2 = new PrintWriter(new FileWriter(outputFile + ".per_cell"));
+			  PrintWriter log = new PrintWriter(new FileWriter(logFile)); 
+			  PrintWriter rules = extractRuleInstances ? new PrintWriter(new FileWriter(oracleRuleInstancesFile)) : null ) {
 
 			Preface.readPreface(in);
 			Preface.readPreface(gold);
@@ -117,14 +105,6 @@ class OracleParser {
 				Preface.readPreface(stagsIn);
 			}
 			Preface.readPreface(roots);
-
-			out = new PrintWriter(new FileWriter(outputFile));
-			out2 = new PrintWriter(new FileWriter(outputFile + ".per_cell"));
-			log = new PrintWriter(new FileWriter(logFile));
-
-			if (extractRuleInstances) {
-				rules = new PrintWriter(new FileWriter(oracleRuleInstancesFile));
-			}
 
 			out.println("# mandatory preface");
 			out.println("# mandatory preface");
@@ -221,19 +201,6 @@ class OracleParser {
 			System.err.println(e);
 		} catch (IOException e) {
 			System.err.println(e);
-		} finally {
-			try {
-				if ( rules != null ) { rules.close(); }
-				if ( log != null ) { log.close(); }
-				if ( out2 != null ) { out2.close(); }
-				if ( out != null ) { out.close(); }
-				if ( roots != null ) { roots.close(); }
-				if ( stagsIn != null ) { stagsIn.close(); }
-				if ( gold != null ) { gold.close(); }
-				if ( in != null ) { in.close(); }
-			} catch (IOException e) {
-				System.err.println(e);
-			}
 		}
 	}
 }

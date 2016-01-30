@@ -168,10 +168,7 @@ public class Features {
 	}
 
 	private void readFeatures(String featuresFile, Categories categories) throws IOException {
-		BufferedReader featuresIn = null;
-
-		try {
-			featuresIn = new BufferedReader(new FileReader(featuresFile));
+		try ( BufferedReader featuresIn = new BufferedReader(new FileReader(featuresFile)) ) {
 
 			Preface.readPreface(featuresIn);
 
@@ -187,20 +184,14 @@ public class Features {
 			// ID starts at 1 (because of logp)
 			// and gets incremented after each feature has been read
 			System.out.println("Total number of features read in: " + numFeatures);
-		} finally {
-			if ( featuresIn != null ) { featuresIn.close(); }
 		}
 	}
 
 	private void readFeaturesWeights(String featuresFile, String weightsFile, Weights weights, Categories categories) throws IOException {
 		ArrayList<Double> weightsList = new ArrayList<Double>();
 
-		BufferedReader featuresIn = null;
-		BufferedReader weightsIn = null;
-
-		try {
-			featuresIn = new BufferedReader(new FileReader(featuresFile));
-			weightsIn = new BufferedReader(new FileReader(weightsFile));
+		try ( BufferedReader featuresIn = new BufferedReader(new FileReader(featuresFile));
+			  BufferedReader weightsIn = new BufferedReader(new FileReader(weightsFile)) ) {
 
 			Preface.readPreface(featuresIn);
 			Preface.readPreface(weightsIn);
@@ -250,9 +241,6 @@ public class Features {
 			// ID starts at 1 (because of logp)
 			// and gets incremented after each feature has been read
 			System.out.println("Total number of features read in: " + numFeatures);
-		} finally {
-			if ( featuresIn != null ) { featuresIn.close(); }
-			if ( weightsIn != null ) { weightsIn.close(); }
 		}
 	}
 

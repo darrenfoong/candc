@@ -11,7 +11,7 @@ import training.DisjNode;
 import training.Feature;
 import training.Forest;
 
-class TrainModel {
+public class TrainModel {
 	public static void main(String[] args) {
 		int iteration = 1;
 		int numForest = 0;
@@ -31,17 +31,11 @@ class TrainModel {
 		Feature[] features = null;
 		ArrayList<Forest> forests = new ArrayList<Forest>();
 
-		BufferedReader in = null;
-		PrintWriter out = null;
-		PrintWriter outIter = null;
-
-		try {
-			in = new BufferedReader(new FileReader(forestFile));
+		try ( BufferedReader in = new BufferedReader(new FileReader(forestFile));
+			 PrintWriter out = new PrintWriter(new FileWriter(weightsFile));
+			 PrintWriter outIter = new PrintWriter(new FileWriter(weightsFile + "." + iteration)) ) {
 
 			Preface.readPreface(in);
-
-			out = new PrintWriter(new FileWriter(weightsFile));
-			outIter = new PrintWriter(new FileWriter(weightsFile + "." + iteration));
 
 			String line = in.readLine();
 			int numFeatures = Integer.parseInt(line);
@@ -116,14 +110,6 @@ class TrainModel {
 			}
 		} catch (IOException e) {
 			System.err.println(e);
-		} finally {
-			try {
-				if ( outIter != null ) { outIter.close(); }
-				if ( out != null ) { out.close(); }
-				if ( in != null ) { in.close(); }
-			} catch (IOException e) {
-				System.err.println(e);
-			}
 		}
 	}
 }

@@ -93,30 +93,22 @@ public class ParserBeam {
 			return;
 		}
 
-		BufferedReader in = null;
-		PrintWriter out = null;
-		PrintWriter log = null;
-		PrintWriter outChartDeps = null;
-
-		try {
-			in = new BufferedReader(new FileReader(inputFile));
+		try ( BufferedReader in = new BufferedReader(new FileReader(inputFile));
+			  PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(outputFile)));
+			  PrintWriter log = new PrintWriter(new BufferedWriter(new FileWriter(logFile)));
+			  PrintWriter outChartDeps = printChartDeps ? new PrintWriter(new BufferedWriter(new FileWriter(outputFile + ".chartdeps"))) : null ) {
 
 			Preface.readPreface(in);
-
-			out = new PrintWriter(new BufferedWriter(new FileWriter(outputFile)));
-			log = new PrintWriter(new BufferedWriter(new FileWriter(logFile)));
-
-			if ( printChartDeps ) {
-				outChartDeps = new PrintWriter(new BufferedWriter(new FileWriter(outputFile + ".chartdeps")));
-
-				outChartDeps.println("# mandatory preface");
-				outChartDeps.println("# mandatory preface");
-				outChartDeps.println();
-			}
 
 			out.println("# mandatory preface");
 			out.println("# mandatory preface");
 			out.println();
+
+			if ( printChartDeps ) {
+				outChartDeps.println("# mandatory preface");
+				outChartDeps.println("# mandatory preface");
+				outChartDeps.println();
+			}
 
 			long TS_PARSING = Benchmark.getTime();
 			for (int numSentence = fromSentence; numSentence <= toSentence; numSentence++) {
@@ -152,15 +144,6 @@ public class ParserBeam {
 			Benchmark.printTime("parsing", TS_PARSING, TE_PARSING);
 		} catch (IOException e) {
 			System.err.println(e);
-		} finally {
-			try {
-				if ( outChartDeps != null ) { outChartDeps.close(); }
-				if ( log != null ) { log.close(); }
-				if ( out != null ) { out.close(); }
-				if ( in != null ) { in.close(); }
-			} catch (IOException e) {
-				System.err.println(e);
-			}
 		}
 
 		long TE_PROGRAM = Benchmark.getTime();

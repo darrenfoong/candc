@@ -37,10 +37,7 @@ public class RuleInstances {
 	}
 
 	private void readRuleInstances(String ruleInstancesFile, Categories categories) {
-		BufferedReader in = null;
-
-		try {
-			in = new BufferedReader(new FileReader( ruleInstancesFile));
+		try ( BufferedReader in = new BufferedReader(new FileReader(ruleInstancesFile)) ) {
 			Preface.readPreface(in);
 
 			String line;
@@ -56,12 +53,6 @@ public class RuleInstances {
 			}
 		} catch (IOException e) {
 			System.err.println(e);
-		} finally {
-			try {
-				if ( in != null ) { in.close(); }
-			} catch ( IOException e ) {
-				e.printStackTrace();
-			}
 		}
 	}
 }
