@@ -13,23 +13,22 @@ import training.Forest;
 
 public class TrainLogLinear {
 	public static void main(String[] args) {
-		int iteration = 1;
-		int numForest = 0;
-		int numSentences = 40000;
-		double learningRate = 0.5;
+		double LEARNING_RATE = 0.5;
 
-		if ( args.length < 3 ) {
-			System.err.println("TrainLogLinear requires 3 arguments: <forestFile> <weightsFile> <numIters>");
+		if ( args.length < 5 ) {
+			System.err.println("TrainLogLinear requires 5 arguments: <forestFile> <weightsFile> <numIters> <fromSentence> <toSentence>");
 			return;
 		}
 
 		String forestFile = args[0];
 		String weightsFile = args[1];
 		String numItersStr = args[2];
-		int numIterations = Integer.parseInt(numItersStr);
+		String fromSent = args[3];
+		String toSent = args[4];
 
-		Feature[] features = null;
-		ArrayList<Forest> forests = new ArrayList<Forest>();
+		int fromSentence = Integer.parseInt(fromSent);
+		int toSentence = Integer.parseInt(toSent);
+		int numIterations = Integer.parseInt(numItersStr);
 
 		try ( BufferedReader in = new BufferedReader(new FileReader(forestFile));
 			  PrintWriter out = new PrintWriter(new FileWriter(weightsFile)) ) {
@@ -38,58 +37,38 @@ public class TrainLogLinear {
 
 			String line = in.readLine();
 			int numFeatures = Integer.parseInt(line);
-			features = new Feature[numFeatures];
+			Feature[] features = new Feature[numFeatures];
 
-			for (int i = 0; i < numFeatures; i++) {
+			for ( int i = 0; i < numFeatures; i++ ) {
 				features[i] = new Feature(i);
 			}
 
-			numForest = 0;
+			ArrayList<Forest> forests = new ArrayList<Forest>();
 
-			while (true) {
-				numForest++;
+			for ( int numForest = 1; numForest <= (toSentence - fromSentence + 1) ; numForest++ ) {
+				System.out.println("Reading forest " + numForest);
 
-				if (numForest > numSentences) {
-					break;
-				}
-
-				System.out.println("reading forest " + numForest);
-
-				line = in.readLine();
-				if (line == null) {
+				if ( (line = in.readLine()) == null) {
 					break;
 				}
 
 				int numNodes = Integer.parseInt(line);
-				Forest forest = new Forest(in, features, numNodes);
-				forests.add(forest);
+				forests.add(new Forest(in, features, numNodes));
 			}
 
-			while (iteration <= numIterations) {
+			for ( int iteration = 1; iteration <= numIterations; iteration++ ) {
 				double logLikelihood = 0.0;
-				// double sumZ = 0.0;
-				numForest = 0;
 
-				for (Forest forest : forests) {
+				for ( Forest forest : forests ) {
 					forest.resetNodeValues();
-					numForest++;
 
-					for (int i = 0; i < numFeatures; i++) {
+					for ( int i = 0; i < numFeatures; i++ ) {
 						features[i].resetExpValues();
 					}
 
-					if (numForest % 50 == 0) {
-						System.out.println("calculating inside and outside for forest " + numForest + " on iteration " + iteration);
-					}
-
 					double Z = forest.calcInside(false);
-					// sumZ += Z;
 					forest.calcOutside(-Z, false);
 					// outside also calculates the feature expectations
-
-					if (numForest % 50 == 0) {
-						System.out.println("calculating inside and outside for gold forest " + numForest + " on iteration " + iteration);
-					}
 
 					forest.resetNodeValues();
 					// presumably we need to reset here?
@@ -98,21 +77,15 @@ public class TrainLogLinear {
 
 					logLikelihood += forest.logLikelihood();
 
-					if (numForest % 50 == 0) {
-						System.out.println("updating features");
-					}
-
-					for (int i = 0; i < numFeatures; i++) {
-						features[i].adaGradUpdate(learningRate);
+					for ( int i = 0; i < numFeatures; i++ ) {
+						features[i].adaGradUpdate(LEARNING_RATE);
 					}
 				}
 
-				System.out.println("log-likelihood after iteration " + iteration + " " + logLikelihood);
-
-				iteration++;
+				System.out.println("Log-likelihood after iteration " + iteration + ": " + logLikelihood);
 			}
 
-			for (int i = 0; i < features.length; i++) {
+			for ( int i = 0; i < features.length; i++ ) {
 				out.println(i + " " + features[i].getLambda());
 			}
 		} catch (FileNotFoundException e) {

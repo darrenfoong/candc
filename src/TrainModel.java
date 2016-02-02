@@ -13,73 +13,49 @@ import training.Forest;
 
 public class TrainModel {
 	public static void main(String[] args) {
-		int iteration = 1;
-		int numForest = 0;
-		int fromSentence = 1;
-		int toSentence = 40000;
-
-		if ( args.length < 3 ) {
-			System.err.println("TrainModel requires 3 arguments: <forestFile> <weightsFile> <numIters>");
+		if ( args.length < 5 ) {
+			System.err.println("TrainLogLinear requires 5 arguments: <forestFile> <weightsFile> <numIters> <fromSentence> <toSentence>");
 			return;
 		}
 
 		String forestFile = args[0];
 		String weightsFile = args[1];
 		String numItersStr = args[2];
+		String fromSent = args[3];
+		String toSent = args[4];
+
+		int fromSentence = Integer.parseInt(fromSent);
+		int toSentence = Integer.parseInt(toSent);
 		int numIterations = Integer.parseInt(numItersStr);
 
-		Feature[] features = null;
-		ArrayList<Forest> forests = new ArrayList<Forest>();
-
 		try ( BufferedReader in = new BufferedReader(new FileReader(forestFile));
-			 PrintWriter out = new PrintWriter(new FileWriter(weightsFile));
-			 PrintWriter outIter = new PrintWriter(new FileWriter(weightsFile + "." + iteration)) ) {
+			 PrintWriter out = new PrintWriter(new FileWriter(weightsFile)) ) {
 
 			Preface.readPreface(in);
 
 			String line = in.readLine();
 			int numFeatures = Integer.parseInt(line);
-			features = new Feature[numFeatures];
+			Feature[] features = new Feature[numFeatures];
 
-			for (int i = 0; i < numFeatures; i++) {
+			for ( int i = 0; i < numFeatures; i++ ) {
 				features[i] = new Feature(i);
 			}
 
-			numForest = 0;
+			ArrayList<Forest> forests = new ArrayList<Forest>();
 
-			while (true) {
-				numForest++;
+			for ( int numForest = 1; numForest <= (toSentence - fromSentence + 1) ; numForest++ ) {
+				System.out.println("Reading forest " + numForest);
 
-				if (numForest > toSentence) {
-					break;
-				}
-
-				System.out.println("reading forest " + numForest);
-
-				line = in.readLine();
-				if (line == null) {
+				if ( (line = in.readLine()) == null) {
 					break;
 				}
 
 				int numNodes = Integer.parseInt(line);
-				Forest forest = new Forest(in, features, numNodes);
-
-				if (numForest < fromSentence) {
-					continue;
-				}
-
-				forests.add(forest);
+				forests.add(new Forest(in, features, numNodes));
 			}
 
-			while (iteration <= numIterations) {
-				numForest = 0;
+			for ( int iteration = 1; iteration <= numIterations; iteration++ ) {
 				for (Forest forest : forests) {
-					numForest++;
-
-					if (numForest % 100 == 0) {
-						System.out.println("doing update for forest " + numForest + " on iteration " + iteration);
-					}
-
 					forest.resetNodeValues();
 					DisjNode maxRoot = forest.viterbi(false);
 					// boolean indicates we go over all derivations
@@ -92,21 +68,22 @@ public class TrainModel {
 					forest.perceptronUpdate(maxRoot, true);
 					// boolean indicates a positive update
 
-					for (int i = 0; i < numFeatures; i++) {
+					for ( int i = 0; i < numFeatures; i++ ) {
 						features[i].perceptronUpdate();
 					}
 				}
 
-				for (int i = 0; i < features.length; i++) {
-					outIter.print(i + " " + features[i].getLambda() + " ");
-					outIter.println(features[i].getCumulativeLambda() / (numForest * iteration));
+				try ( PrintWriter outIter = new PrintWriter(new FileWriter(weightsFile + "." + iteration)) ) {
+					for ( int i = 0; i < features.length; i++ ) {
+						outIter.print(i + " " + features[i].getLambda() + " ");
+						outIter.println(features[i].getCumulativeLambda() / (forests.size() * iteration));
+					}
 				}
-				iteration++;
 			}
 
-			for (int i = 0; i < features.length; i++) {
+			for ( int i = 0; i < features.length; i++ ) {
 				out.print(i + " " + features[i].getLambda() + " ");
-				out.println(features[i].getCumulativeLambda() / (numForest * numIterations));
+				out.println(features[i].getCumulativeLambda() / (forests.size() * numIterations));
 			}
 		} catch (IOException e) {
 			System.err.println(e);
