@@ -16,15 +16,14 @@ import chart_parser.CountFeaturesDecoder;
 
 public class CountFeatures {
 	public static void main(String[] args) {
-		int MAX_WORDS = 150;
-		int MAX_SUPERCATS = 500000;
+		int MAX_WORDS = 250;
+		int MAX_SUPERCATS = 50000;
 
 		boolean altMarkedup = false;
 		boolean eisnerNormalForm = true;
 		boolean detailedOutput = false;
-		boolean newFeatures = true;
-		boolean cubePruning = false;
-		// boolean oracleFscore = false;
+		boolean newFeatures = false;
+		boolean cubePruning = true;
 
 		String grammarDir = "data/baseline_expts/grammar";
 		String lexiconFile = "data/baseline_expts/working/lexicon/wsj02-21.wordsPos";
@@ -33,9 +32,6 @@ public class CountFeatures {
 		RuleInstancesParams ruleInstancesParams = new RuleInstancesParams(true, false, false, false, false, false, grammarDir);
 
 		double[] betas = { 0.0001 };
-
-		// boolean adaptiveSupertagging = false;
-		// double[] betas = { 0.0001, 0.001, 0.01, 0.03, 0.075 };
 
 		int beamSize = 32;
 		double beta = Double.NEGATIVE_INFINITY;
@@ -60,7 +56,7 @@ public class CountFeatures {
 
 		try {
 			lexicon = new Lexicon(lexiconFile);
-		} catch (IOException e) {
+		} catch ( IOException e ) {
 			System.err.println(e);
 			return;
 		}
@@ -68,17 +64,11 @@ public class CountFeatures {
 		ChartParserBeam parser = null;
 
 		try {
-			/*
-			parser = new ChartParser(grammarDir, altMarkedup,
-					eisnerNormalForm, MAX_WORDS, MAX_SUPERCATS, detailedOutput,
-					oracleFscore, adaptiveSupertagging, ruleInstancesParams,
-					lexicon, null, null);
-			*/
 			parser = new ChartParserBeam(grammarDir, altMarkedup,
 					eisnerNormalForm, MAX_WORDS, MAX_SUPERCATS, detailedOutput,
 					ruleInstancesParams, lexicon, featuresFile, weightsFile,
 					newFeatures, false, cubePruning, beamSize, beta);
-		} catch (IOException e) {
+		} catch ( IOException e ) {
 			System.err.println(e);
 			return;
 		}
@@ -86,9 +76,9 @@ public class CountFeatures {
 		CountFeaturesDecoder countFeaturesDecoder = new CountFeaturesDecoder(parser.categories);
 
 		try ( BufferedReader in = new BufferedReader(new FileReader(inputFile));
-			  PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(outputFile)));
-			  PrintWriter log = new PrintWriter(new BufferedWriter(new FileWriter(logFile)));
-			  PrintWriter weights = new PrintWriter(new BufferedWriter(new FileWriter(outputWeightsFile))) ) {
+				PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(outputFile)));
+				PrintWriter log = new PrintWriter(new BufferedWriter(new FileWriter(logFile)));
+				PrintWriter weights = new PrintWriter(new BufferedWriter(new FileWriter(outputWeightsFile))) ) {
 
 			Preface.readPreface(in);
 			Preface.printPreface(out);
@@ -97,16 +87,16 @@ public class CountFeatures {
 			Sentences sentences = new Sentences(in, null, parser.categories, MAX_WORDS);
 			sentences.skip(fromSentence - 1);
 
-			for (int numSentence = fromSentence; numSentence <= toSentence && sentences.hasNext(); numSentence++) {
-				System.out.println("Parsing sentence "+ numSentence);
-				log.println("Parsing sentence "+ numSentence);
+			for ( int numSentence = fromSentence; numSentence <= toSentence && sentences.hasNext(); numSentence++ ) {
+				System.out.println("Parsing sentence " + numSentence);
+				log.println("Parsing sentence " + numSentence);
 
 				parser.parseSentence(sentences.next(), log, betas);
 
-				if (!parser.maxWordsExceeded && !parser.maxSuperCatsExceeded) {
+				if ( !parser.maxWordsExceeded && !parser.maxSuperCatsExceeded ) {
 					boolean success = countFeaturesDecoder.countFeatures(parser.chart, parser.sentence);
 
-					if (success) {
+					if ( success ) {
 						System.out.println("Success.");
 						log.println("Success.");
 					} else {
@@ -119,9 +109,9 @@ public class CountFeatures {
 			countFeaturesDecoder.mergeAllFeatureCounts(parser.features);
 			parser.features.print(out);
 			parser.features.printWeights(parser.weights, weights);
-		} catch (FileNotFoundException e) {
+		} catch ( FileNotFoundException e ) {
 			System.err.println(e);
-		} catch (IOException e) {
+		} catch ( IOException e ) {
 			System.err.println(e);
 		}
 	}
