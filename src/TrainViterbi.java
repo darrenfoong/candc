@@ -1,3 +1,4 @@
+import io.Forests;
 import io.Preface;
 
 import java.io.BufferedReader;
@@ -5,7 +6,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 
 import training.DisjNode;
 import training.Feature;
@@ -41,21 +41,19 @@ public class TrainViterbi {
 				features[i] = new Feature(i);
 			}
 
-			ArrayList<Forest> forests = new ArrayList<Forest>();
+			Forests forests = new Forests(in, features);
 
-			for ( int numForest = 1; numForest <= (toSentence - fromSentence + 1) ; numForest++ ) {
-				System.out.println("Reading forest " + numForest);
-
-				if ( (line = in.readLine()) == null) {
-					break;
-				}
-
-				int numNodes = Integer.parseInt(line);
-				forests.add(new Forest(in, features, numNodes));
-			}
+			int numTrainInstances = 1;
 
 			for ( int iteration = 1; iteration <= numIterations; iteration++ ) {
-				for (Forest forest : forests) {
+
+				forests.skip(fromSentence - 1);
+
+				for ( int numForest = fromSentence; numForest <= toSentence && forests.hasNext() ; numForest++ ) {
+					System.out.println("Reading forest " + numForest);
+
+					Forest forest = forests.next();
+
 					forest.resetNodeValues();
 					DisjNode maxRoot = forest.viterbi(false);
 					// boolean indicates we go over all derivations
@@ -68,22 +66,26 @@ public class TrainViterbi {
 					forest.perceptronUpdate(maxRoot, true);
 					// boolean indicates a positive update
 
-					for ( int i = 0; i < numFeatures; i++ ) {
-						features[i].perceptronUpdate();
+					for ( Feature feature : features ) {
+						feature.perceptronUpdate();
 					}
+
+					numTrainInstances++;
 				}
 
 				try ( PrintWriter outIter = new PrintWriter(new FileWriter(weightsFile + "." + iteration)) ) {
 					for ( int i = 0; i < features.length; i++ ) {
 						outIter.print(i + " " + features[i].getLambda() + " ");
-						outIter.println(features[i].getCumulativeLambda() / (forests.size() * iteration));
+						outIter.println(features[i].getCumulativeLambda()/numTrainInstances);
 					}
 				}
+
+				forests.reset();
 			}
 
 			for ( int i = 0; i < features.length; i++ ) {
 				out.print(i + " " + features[i].getLambda() + " ");
-				out.println(features[i].getCumulativeLambda() / (forests.size() * numIterations));
+				out.println(features[i].getCumulativeLambda()/numTrainInstances);
 			}
 		} catch (IOException e) {
 			System.err.println(e);
