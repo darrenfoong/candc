@@ -30,7 +30,7 @@ public class TrainViterbi {
 		int numIterations = Integer.parseInt(numItersStr);
 
 		try ( BufferedReader in = new BufferedReader(new FileReader(forestFile));
-			 PrintWriter out = new PrintWriter(new FileWriter(weightsFile)) ) {
+				PrintWriter out = new PrintWriter(new FileWriter(weightsFile)) ) {
 
 			Preface.readPreface(in);
 
@@ -50,7 +50,7 @@ public class TrainViterbi {
 
 				forests.skip(fromSentence - 1);
 
-				for ( int numForest = fromSentence; numForest <= toSentence && forests.hasNext() ; numForest++ ) {
+				for ( int numForest = fromSentence; numForest <= toSentence && forests.hasNext(); numForest++ ) {
 					System.out.println("Reading forest " + numForest);
 
 					Forest forest = forests.next();
@@ -77,7 +77,7 @@ public class TrainViterbi {
 				try ( PrintWriter outIter = new PrintWriter(new FileWriter(weightsFile + "." + iteration)) ) {
 					for ( int i = 0; i < features.length; i++ ) {
 						outIter.print(i + " " + features[i].getLambda() + " ");
-						outIter.println(features[i].getCumulativeLambda()/numTrainInstances);
+						outIter.println(features[i].getCumulativeLambda() / numTrainInstances);
 					}
 				}
 
@@ -86,11 +86,11 @@ public class TrainViterbi {
 
 			for ( int i = 0; i < features.length; i++ ) {
 				out.print(i + " " + features[i].getLambda() + " ");
-				out.println(features[i].getCumulativeLambda()/numTrainInstances);
+				out.println(features[i].getCumulativeLambda() / numTrainInstances);
 			}
-		} catch (FileNotFoundException e) {
+		} catch ( FileNotFoundException e ) {
 			System.err.println(e);
-		} catch (IOException e) {
+		} catch ( IOException e ) {
 			System.err.println(e);
 		}
 	}
