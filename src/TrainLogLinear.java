@@ -31,7 +31,7 @@ public class TrainLogLinear {
 		int numIterations = Integer.parseInt(numItersStr);
 
 		try ( BufferedReader in = new BufferedReader(new FileReader(forestFile));
-			  PrintWriter out = new PrintWriter(new FileWriter(weightsFile)) ) {
+				PrintWriter out = new PrintWriter(new FileWriter(weightsFile)) ) {
 
 			Preface.readPreface(in);
 
