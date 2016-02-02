@@ -15,8 +15,8 @@ import chart_parser.ChartParserBeam;
 
 public class ParserBeam {
 	public static void main(String[] args) {
-		int MAX_WORDS = 150;
-		int MAX_SUPERCATS = 500000;
+		int MAX_WORDS = 250;
+		int MAX_SUPERCATS = 50000;
 
 		boolean altMarkedup = false;
 		boolean eisnerNormalForm = true;
@@ -60,7 +60,7 @@ public class ParserBeam {
 
 		try {
 			lexicon = new Lexicon(lexiconFile);
-		} catch (IOException e) {
+		} catch ( IOException e ) {
 			System.err.println(e);
 			return;
 		}
@@ -72,15 +72,15 @@ public class ParserBeam {
 					eisnerNormalForm, MAX_WORDS, MAX_SUPERCATS, detailedOutput,
 					ruleInstancesParams, lexicon, featuresFile, weightsFile,
 					newFeatures, compactWeights, cubePruning, beamSize, beta);
-		} catch (IOException e) {
+		} catch ( IOException e ) {
 			System.err.println(e);
 			return;
 		}
 
 		try ( BufferedReader in = new BufferedReader(new FileReader(inputFile));
-			  PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(outputFile)));
-			  PrintWriter log = new PrintWriter(new BufferedWriter(new FileWriter(logFile)));
-			  PrintWriter outChartDeps = printChartDeps ? new PrintWriter(new BufferedWriter(new FileWriter(outputFile + ".chartdeps"))) : null ) {
+				PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(outputFile)));
+				PrintWriter log = new PrintWriter(new BufferedWriter(new FileWriter(logFile)));
+				PrintWriter outChartDeps = printChartDeps ? new PrintWriter(new BufferedWriter(new FileWriter(outputFile + ".chartdeps"))) : null ) {
 
 			Preface.readPreface(in);
 			Preface.printPreface(out);
@@ -92,16 +92,16 @@ public class ParserBeam {
 			Sentences sentences = new Sentences(in, null, parser.categories, MAX_WORDS);
 			sentences.skip(fromSentence - 1);
 
-			for (int numSentence = fromSentence; numSentence <= toSentence && sentences.hasNext(); numSentence++) {
-				System.out.println("Parsing sentence "+ numSentence);
-				log.println("Parsing sentence "+ numSentence);
+			for ( int numSentence = fromSentence; numSentence <= toSentence && sentences.hasNext(); numSentence++ ) {
+				System.out.println("Parsing sentence " + numSentence);
+				log.println("Parsing sentence " + numSentence);
 
 				parser.parseSentence(sentences.next(), log, betas);
 
-				if (!parser.maxWordsExceeded && !parser.maxSuperCatsExceeded) {
+				if ( !parser.maxWordsExceeded && !parser.maxSuperCatsExceeded ) {
 					boolean success = parser.root();
 
-					if (success) {
+					if ( success ) {
 						parser.printDeps(out, parser.categories.dependencyRelations, parser.sentence);
 						parser.sentence.printC_line(out);
 					} else {
@@ -117,9 +117,9 @@ public class ParserBeam {
 					outChartDeps.println();
 				}
 			}
-		} catch (FileNotFoundException e) {
+		} catch ( FileNotFoundException e ) {
 			System.err.println(e);
-		} catch (IOException e) {
+		} catch ( IOException e ) {
 			System.err.println(e);
 		}
 	}
