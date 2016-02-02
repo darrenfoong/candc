@@ -126,14 +126,14 @@ public class ChartParser {
 			jloop:
 			for (int j = 2; j <= numWords; j++) {
 				for (int i = j - 2; i >= 0; i--) {
-					if (SuperCategory.getNumSuperCategories() > MAX_SUPERCATS) {
-						maxSuperCatsExceeded = true;
-						System.out.println("MAX_SUPERCATS exceeded!");
-						log.println("MAX_SUPERCATS exceeded!");
-						break jloop;
-					}
-
 					for (int k = i + 1; k < j; k++) {
+						if (SuperCategory.getNumSuperCategories() > MAX_SUPERCATS) {
+							maxSuperCatsExceeded = true;
+							System.out.println("MAX_SUPERCATS exceeded!");
+							log.println("MAX_SUPERCATS exceeded!");
+							break jloop;
+						}
+
 						int right1 = k - i;
 						int right2 = j - k;
 
