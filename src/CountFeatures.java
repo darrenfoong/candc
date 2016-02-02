@@ -16,13 +16,13 @@ import chart_parser.CountFeaturesDecoder;
 
 public class CountFeatures {
 	public static void main(String[] args) {
-		int MAX_WORDS = 250;
-		int MAX_SUPERCATS = 50000;
+		int MAX_WORDS = 150;
+		int MAX_SUPERCATS = 500000;
 
 		boolean altMarkedup = false;
 		boolean eisnerNormalForm = true;
 		boolean detailedOutput = false;
-		boolean newFeatures = false;
+		boolean newFeatures = true;
 		boolean cubePruning = false;
 
 		String grammarDir = "data/baseline_expts/grammar";

@@ -18,11 +18,11 @@ import chart_parser.OracleDepsSumDecoder;
 
 public class TrainParserBeam {
 	public static void main(String[] args) {
-		int MAX_WORDS = 250;
-		int MAX_SUPERCATS = 50000;
+		int MAX_WORDS = 150;
+		int MAX_SUPERCATS = 500000;
 
 		boolean altMarkedup = false;
-		boolean eisnerNormalForm = false;
+		boolean eisnerNormalForm = true;
 		boolean detailedOutput = false;
 		boolean newFeatures = false;
 		boolean cubePruning = false;

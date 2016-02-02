@@ -17,7 +17,7 @@ import chart_parser.ViterbiDecoder;
 public class Parser {
 	public static void main(String[] args) {
 		int MAX_WORDS = 250;
-		int MAX_SUPERCATS = 1000000;
+		int MAX_SUPERCATS = 300000;
 
 		boolean altMarkedup = false;
 		boolean eisnerNormalForm = true;
