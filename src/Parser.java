@@ -17,7 +17,7 @@ import chart_parser.ViterbiDecoder;
 public class Parser {
 	public static void main(String[] args) {
 		int MAX_WORDS = 250;
-		int MAX_SUPERCATS = 300000;
+		int MAX_SUPERCATS = 1000000;
 
 		boolean altMarkedup = false;
 		boolean eisnerNormalForm = true;
@@ -33,11 +33,7 @@ public class Parser {
 		RuleInstancesParams ruleInstancesParams = new RuleInstancesParams(true, false, false, false, false, false, grammarDir);
 
 		boolean adaptiveSupertagging = false;
-		double[] betas = { 0.0001, 0.001, 0.01, 0.03, 0.075 };
-		// boolean adaptiveSupertagging = true;
-		// double[] betas = { 0.075, 0.03, 0.01, 0.001, 0.0001 };
-		// true indicates beta values get larger, and first value is betas[0];
-		// false is the opposite, and first value is betas[2]
+		double[] betas = { 0.075, 0.03, 0.01, 0.001 };
 
 		if ( args.length < 6 ) {
 			System.err.println("Parser requires 6 arguments: <inputFile> <outputFile> <logFile> <weightsFile> <fromSentence> <toSentence>");
@@ -58,7 +54,7 @@ public class Parser {
 
 		try {
 			lexicon = new Lexicon(lexiconFile);
-		} catch (IOException e) {
+		} catch ( IOException e ) {
 			System.err.println(e);
 			return;
 		}
@@ -69,9 +65,8 @@ public class Parser {
 			parser = new ChartParser(grammarDir, altMarkedup,
 					eisnerNormalForm, MAX_WORDS, MAX_SUPERCATS, detailedOutput,
 					oracleFscore, adaptiveSupertagging, ruleInstancesParams,
-					lexicon, featuresFile, weightsFile, newFeatures,
-					compactWeights);
-		} catch (IOException e) {
+					lexicon, featuresFile, weightsFile, newFeatures, compactWeights);
+		} catch ( IOException e ) {
 			System.err.println(e);
 			return;
 		}
@@ -79,8 +74,8 @@ public class Parser {
 		ViterbiDecoder viterbiDecoder = new ViterbiDecoder();
 
 		try ( BufferedReader in = new BufferedReader(new FileReader(inputFile));
-			  PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(outputFile)));
-			  PrintWriter log = new PrintWriter(new BufferedWriter(new FileWriter(logFile))) ) {
+				PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(outputFile)));
+				PrintWriter log = new PrintWriter(new BufferedWriter(new FileWriter(logFile))) ) {
 
 			Preface.readPreface(in);
 			Preface.printPreface(out);
@@ -88,16 +83,16 @@ public class Parser {
 			Sentences sentences = new Sentences(in, null, parser.categories, MAX_WORDS);
 			sentences.skip(fromSentence - 1);
 
-			for (int numSentence = fromSentence; numSentence <= toSentence && sentences.hasNext(); numSentence++) {
-				System.out.println("Parsing sentence "+ numSentence);
-				log.println("Parsing sentence "+ numSentence);
+			for ( int numSentence = fromSentence; numSentence <= toSentence && sentences.hasNext(); numSentence++ ) {
+				System.out.println("Parsing sentence " + numSentence);
+				log.println("Parsing sentence " + numSentence);
 
 				parser.parseSentence(sentences.next(), log, betas);
 
-				if (!parser.maxWordsExceeded && !parser.maxSuperCatsExceeded) {
+				if ( !parser.maxWordsExceeded && !parser.maxSuperCatsExceeded ) {
 					boolean success = parser.calcScores();
 
-					if (success) {
+					if ( success ) {
 						viterbiDecoder.decode(parser.chart, parser.sentence);
 						viterbiDecoder.print(out, parser.categories.dependencyRelations, parser.sentence);
 
@@ -110,9 +105,9 @@ public class Parser {
 
 				out.println();
 			}
-		} catch (FileNotFoundException e) {
+		} catch ( FileNotFoundException e ) {
 			System.err.println(e);
-		} catch (IOException e) {
+		} catch ( IOException e ) {
 			System.err.println(e);
 		}
 	}
