@@ -11,10 +11,10 @@ import training.DisjNode;
 import training.Feature;
 import training.Forest;
 
-public class TrainModel {
+public class TrainViterbi {
 	public static void main(String[] args) {
 		if ( args.length < 5 ) {
-			System.err.println("TrainLogLinear requires 5 arguments: <forestFile> <weightsFile> <numIters> <fromSentence> <toSentence>");
+			System.err.println("TrainViterbi requires 5 arguments: <forestFile> <weightsFile> <numIters> <fromSentence> <toSentence>");
 			return;
 		}
 
