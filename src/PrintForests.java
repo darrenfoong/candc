@@ -42,11 +42,8 @@ public class PrintForests {
 		 * will as well if betas[0] == betas[1])
 		 */
 
-		int fromSentence = 32001;
-		int toSentence = 40000;
-
-		if ( args.length < 6 ) {
-			System.err.println("PrintForests requires 6 arguments: <inputFile> <goldSupertagsFile> <outputFile> <logFile> <goldDepsFile> <rootCatsFile>");
+		if ( args.length < 8 ) {
+			System.err.println("PrintForests requires 8 arguments: <inputFile> <goldSupertagsFile> <outputFile> <logFile> <goldDepsFile> <rootCatsFile> <fromSentence> <toSentence>");
 			return;
 		}
 
@@ -56,6 +53,11 @@ public class PrintForests {
 		String logFile = args[3];
 		String goldDepsFile = args[4];
 		String rootCatsFile = args[5];
+		String fromSent = args[6];
+		String toSent = args[7];
+
+		int fromSentence = Integer.parseInt(fromSent);
+		int toSentence = Integer.parseInt(toSent);
 
 		Lexicon lexicon = null;
 
