@@ -31,36 +31,31 @@ import chart_parser.OracleFscoreDecoder;
 public class OracleParser {
 	public static void main(String[] args) {
 		int MAX_WORDS = 250;
-		int MAX_SUPERCATS = 1000000;
+		int MAX_SUPERCATS = 2000000;
 		boolean altMarkedup = false;
 		boolean eisnerNormalForm = true;
 		boolean detailedOutput = false;
-		boolean newFeatures = true;
 
 		boolean depsSumDecoder = false;
 		// if false then uses the F-score decoder
 		boolean oracleFscore = !depsSumDecoder;
 
 		String grammarDir = "data/baseline_expts/grammar";
-		String oracleRuleInstancesFile = "data/baseline_expts/working/oracleRuleInstances";
 
 		RuleInstancesParams ruleInstancesParams = new RuleInstancesParams(true, false, false, false, false, false, grammarDir);
 
 		boolean extractRuleInstances = false;
+		String oracleRuleInstancesFile = "data/baseline_expts/working/oracleRuleInstances";
 		// not currently used (but can be used to get rules files above)
 
 		boolean adaptiveSupertagging = false;
-		// adaptive means starting with largest beta value
 		double[] betas = { 0.0001, 0.001, 0.01, 0.03, 0.075 };
 
 		boolean training = true;
 		// set to false if the string category and slot are needed for evaluation; true gives deps used for training
 
-		int fromSentence = 36001;
-		int toSentence = 40000;
-
-		if ( args.length < 6 ) {
-			System.err.println("OracleParser requires 6 arguments: <inputFile> <goldSupertagsFile> <outputFile> <logFile> <goldDepsFile> <rootCatsFile>");
+		if ( args.length < 8 ) {
+			System.err.println("OracleParser requires 8 arguments: <inputFile> <goldSupertagsFile> <outputFile> <logFile> <goldDepsFile> <rootCatsFile> <fromSentence> <toSentence>");
 			return;
 		}
 
@@ -70,6 +65,11 @@ public class OracleParser {
 		String logFile = args[3];
 		String goldDepsFile = args[4];
 		String rootCatsFile = args[5]; // could be "null"
+		String fromSent = args[6];
+		String toSent = args[7];
+
+		int fromSentence = Integer.parseInt(fromSent);
+		int toSentence = Integer.parseInt(toSent);
 
 		ChartParser parser = null;
 
@@ -77,32 +77,32 @@ public class OracleParser {
 			parser = new ChartParser(grammarDir, altMarkedup,
 					eisnerNormalForm, MAX_WORDS, MAX_SUPERCATS, detailedOutput,
 					oracleFscore, adaptiveSupertagging, ruleInstancesParams, null,
-					null, null, newFeatures, false);
-		} catch (IOException e) {
+					null, null, false, false);
+		} catch ( IOException e ) {
 			System.err.println(e);
 			return;
 		}
 
 		OracleDecoder oracleDecoder = null;
 
-		if (depsSumDecoder) {
+		if ( depsSumDecoder ) {
 			oracleDecoder = new OracleDepsSumDecoder(parser.categories, extractRuleInstances);
 		} else {
 			oracleDecoder = new OracleFscoreDecoder(parser.categories, extractRuleInstances);
 		}
 
 		try ( BufferedReader in = new BufferedReader(new FileReader(inputFile));
-			  BufferedReader gold = new BufferedReader(new FileReader(goldDepsFile));
-			  BufferedReader stagsIn = !goldSupertagsFile.equals("null") ? new BufferedReader(new FileReader(goldSupertagsFile)) : null;
-			  BufferedReader roots = new BufferedReader(new FileReader(rootCatsFile));
-			  PrintWriter out = new PrintWriter(new FileWriter(outputFile));
-			  PrintWriter out2 = new PrintWriter(new FileWriter(outputFile + ".per_cell"));
-			  PrintWriter log = new PrintWriter(new FileWriter(logFile)); 
-			  PrintWriter rules = extractRuleInstances ? new PrintWriter(new FileWriter(oracleRuleInstancesFile)) : null ) {
+				BufferedReader gold = new BufferedReader(new FileReader(goldDepsFile));
+				BufferedReader stagsIn = !goldSupertagsFile.equals("null") ? new BufferedReader(new FileReader(goldSupertagsFile)) : null;
+				BufferedReader roots = new BufferedReader(new FileReader(rootCatsFile));
+				PrintWriter out = new PrintWriter(new FileWriter(outputFile));
+				PrintWriter out2 = new PrintWriter(new FileWriter(outputFile + ".per_cell"));
+				PrintWriter log = new PrintWriter(new FileWriter(logFile));
+				PrintWriter rules = extractRuleInstances ? new PrintWriter(new FileWriter(oracleRuleInstancesFile)) : null ) {
 
 			Preface.readPreface(in);
 			Preface.readPreface(gold);
-			if (stagsIn != null) {
+			if ( stagsIn != null ) {
 				Preface.readPreface(stagsIn);
 			}
 			Preface.readPreface(roots);
@@ -113,67 +113,57 @@ public class OracleParser {
 			Sentences sentences = new Sentences(in, null, parser.categories, MAX_WORDS);
 			sentences.skip(fromSentence - 1);
 
-			for (int numSentence = fromSentence; numSentence <= toSentence && sentences.hasNext(); numSentence++) {
-				System.out.println("Parsing sentence "+ numSentence);
-				log.println("Parsing sentence "+ numSentence);
+			for ( int numSentence = fromSentence; numSentence <= toSentence && sentences.hasNext(); numSentence++ ) {
+				System.out.println("Parsing sentence " + numSentence);
+				log.println("Parsing sentence " + numSentence);
 
 				parser.parseSentence(sentences.next(), log, betas);
 
 				oracleDecoder.readDeps(gold, parser.categories);
-				// ugly - passing parser.categories?
-				// if (depsSumDecoder)
-				oracleDecoder.readRootCat(roots, parser.categories);
 
-				if (!parser.maxWordsExceeded && !parser.maxSuperCatsExceeded) {
+				if ( roots != null ) {
+					oracleDecoder.readRootCat(roots, parser.categories);
+				}
+
+				if ( !parser.maxWordsExceeded && !parser.maxSuperCatsExceeded ) {
 					double maxScore = oracleDecoder.decode(parser.chart, parser.sentence);
-					// Viterbi score
+
 					log.println("Max score: " + maxScore);
 					log.println("Num gold deps: " + oracleDecoder.numGoldDeps());
-					if (maxScore == Double.NEGATIVE_INFINITY) {
+					if ( maxScore == Double.NEGATIVE_INFINITY ) {
 						log.println("NO SPAN!");
 					}
 
 					boolean checkRoot = true;
-					if (oracleDecoder.getParserDeps(parser.chart, maxScore,
-							parser.sentence, ignoreDepsFlag, checkRoot)) {
-						log.println("Num parser deps: "
-								+ oracleDecoder.numParserDeps());
-						oracleDecoder.printMissingDeps(log,
-								parser.categories.dependencyRelations,
-								parser.sentence);
+					if ( oracleDecoder.getParserDeps(parser.chart, maxScore, parser.sentence, ignoreDepsFlag, checkRoot) ) {
+						log.println("Num parser deps: " + oracleDecoder.numParserDeps());
+						oracleDecoder.printMissingDeps(log, parser.categories.dependencyRelations, parser.sentence);
 
-						if (!training) {
-							oracleDecoder.printDeps(out,
-									parser.categories.dependencyRelations,
-									parser.sentence, false);
+						if ( !training ) {
+							oracleDecoder.printDeps(out, parser.categories.dependencyRelations, parser.sentence, false);
 							parser.sentence.printC_line(out);
 						} else {
-							boolean foundMax = oracleDecoder
-									.markOracleDeps(parser.chart, maxScore,
-											extractRuleInstances, checkRoot);
-							if (foundMax) {
-								oracleDecoder.printDepsForTraining(out,
-										parser.categories, parser.sentence);
+							boolean foundMax = oracleDecoder.markOracleDeps(parser.chart, maxScore, extractRuleInstances, checkRoot);
+							if ( foundMax ) {
+								oracleDecoder.printDepsForTraining(out, parser.categories, parser.sentence);
 								parser.sentence.printSupertags(out2);
-								parser.printCellDepsForTraining(out2,
-										parser.categories, parser.sentence,
-										oracleDecoder);
-								// decoder is used to provide the
-								// IgnoreDepsEval object
+								parser.printCellDepsForTraining(out2, parser.categories, parser.sentence, oracleDecoder);
+								// decoder is used to provide the IgnoreDepsEval object
 							}
 						}
 					}
-					if (extractRuleInstances) {
-						oracleDecoder.markOracleDeps(parser.chart,
-								maxScore, extractRuleInstances, checkRoot);
+
+					if ( extractRuleInstances ) {
+						oracleDecoder.markOracleDeps(parser.chart, maxScore, extractRuleInstances, checkRoot);
 					}
 				}
+
 				out.println();
 				out2.println();
 				log.println();
 			}
 
-			if (extractRuleInstances) {
+			if ( extractRuleInstances ) {
 				oracleDecoder.printRuleInstances(rules);
 			}
 
@@ -194,9 +184,9 @@ public class OracleParser {
 			log.println("Right comma type-change: " + Rules.rightCommaTCCount);
 			log.println("Conj count: " + Rules.conjCount);
 			log.println("Funny conj count: " + Rules.funnyConjCount);
-		} catch (FileNotFoundException e) {
+		} catch ( FileNotFoundException e ) {
 			System.err.println(e);
-		} catch (IOException e) {
+		} catch ( IOException e ) {
 			System.err.println(e);
 		}
 	}
