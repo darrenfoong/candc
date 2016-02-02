@@ -78,24 +78,6 @@ public class SuperCategory {
 		return ignoreDeps;
 	}
 
-	// used as a global counter to count the number of categories being produced for a sentence
-	private static int numSuperCategories;
-
-	public static void setNumSuperCategories(int n) {
-		numSuperCategories = n;
-	}
-
-	public static int getNumSuperCategories() {
-		return numSuperCategories;
-	}
-
-	public static void incrementNumSuperCategories() {
-		numSuperCategories++;
-		if ( numSuperCategories % 50000 == 0 ) {
-			System.out.println("numSuperCategories: " + numSuperCategories);
-		}
-	}
-
 	public SuperCategory(short headIndex, Category cat, short flags) {
 		this.cat = cat;
 		this.unfilledDeps = Dependency.getDependencies(headIndex, cat, (short) (0)); // last argument is ruleID
@@ -119,7 +101,6 @@ public class SuperCategory {
 		}
 
 		this.equivalenceHash = equivalenceHash();
-		incrementNumSuperCategories();
 
 		this.outside = 0.0;
 	}
@@ -205,7 +186,6 @@ public class SuperCategory {
 		}
 
 		this.equivalenceHash = equivalenceHash();
-		incrementNumSuperCategories();
 		/*
 		 * this gets used by the oracleFscore decoder to split equivalence
 		 * classes by the number of dependencies produced
@@ -274,7 +254,6 @@ public class SuperCategory {
 		}
 
 		this.equivalenceHash = equivalenceHash();
-		incrementNumSuperCategories();
 		/*
 		 * this gets used by the oracleFscore decoder to split equivalence
 		 * classes by the number of dependencies produced
@@ -314,7 +293,6 @@ public class SuperCategory {
 			throw new Error("numActiveVars > numVars!");
 		}
 
-		incrementNumSuperCategories();
 		/*
 		 * this gets used by the oracleFscore decoder to split equivalence
 		 * classes by the number of dependencies produced
@@ -376,7 +354,6 @@ public class SuperCategory {
 		}
 
 		this.equivalenceHash = equivalenceHash();
-		incrementNumSuperCategories();
 		/*
 		 * this gets used by the oracleFscore decoder to split equivalence
 		 * classes by the number of dependencies produced
@@ -452,7 +429,6 @@ public class SuperCategory {
 		}
 
 		this.equivalenceHash = equivalenceHash();
-		incrementNumSuperCategories();
 	}
 
 	public static SuperCategory TypeRaising(TypeRaisedCategory trCat, short flags, SuperCategory leftSuperCat) {
@@ -485,7 +461,6 @@ public class SuperCategory {
 		this.next = null;
 
 		this.equivalenceHash = equivalenceHash();
-		incrementNumSuperCategories();
 		/*
 		 * this gets used by the oracleFscore decoder to split equivalence
 		 * classes by the number of dependencies produced

@@ -203,7 +203,6 @@ public class Chart {
 			equivFscore.clear();
 		}
 
-		SuperCategory.setNumSuperCategories(0);
 		Chart.setNumSuperCategories(0);
 	}
 }
