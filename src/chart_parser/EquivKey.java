@@ -27,10 +27,9 @@ public class EquivKey {
 
 		EquivKey cother = (EquivKey) other;
 
-		return superCategory.getEhash() == cother.superCategory.getEhash()
-				&& position == cother.position
+		return position == cother.position
 				&& span == cother.span
-				&& SuperCategory.equal(superCategory, cother.superCategory);
+				&& superCategory.equals(cother.superCategory);
 	}
 
 	// same code as used in the equiv class in C&C

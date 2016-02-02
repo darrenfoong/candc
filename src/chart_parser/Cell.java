@@ -39,8 +39,8 @@ public class Cell {
 	 */
 	public void applyBeam(int beamSize, double beta) {
 		if (!superCategories.isEmpty()) {
-			Collections.sort(superCategories);
 			// sorts in descending order of scores
+			Collections.sort(superCategories, SuperCategory.scoreComparator());
 
 			if ( beamSize > 0 ) {
 				double maxScore = superCategories.get(0).score;
@@ -140,7 +140,7 @@ public class Cell {
 						new Comparator<Pair<SuperCategory, Integer>>(){
 					@Override
 					public int compare(Pair<SuperCategory, Integer> p1, Pair<SuperCategory, Integer> p2){
-						return p1.x.compareTo(p2.x);
+						return p1.x.compareToScore(p2.x);
 					}});
 
 		for ( int i = 0; i < preSuperCategories.size(); i++ ) {

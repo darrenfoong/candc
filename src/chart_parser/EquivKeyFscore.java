@@ -30,10 +30,9 @@ public class EquivKeyFscore {
 
 		EquivKeyFscore cother = (EquivKeyFscore) other;
 
-		return superCategory.getEhash() == cother.superCategory.getEhash()
-				&& position == cother.position
+		return position == cother.position
 				&& span == cother.span
-				&& SuperCategory.equal(superCategory, cother.superCategory)
+				&& superCategory.equals(cother.superCategory)
 				&& maxDeps == cother.maxDeps;
 	}
 
@@ -44,6 +43,5 @@ public class EquivKeyFscore {
 		h.plusEqual(span);
 		h.plusEqual((int) (maxDeps));
 		return (int) (h.value());
-		// int's go up to around 2 billion
 	}
 }

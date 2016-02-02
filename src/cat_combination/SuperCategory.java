@@ -4,6 +4,7 @@ import io.Sentence;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 
 import lexicon.Category;
 import lexicon.Relations;
@@ -12,7 +13,7 @@ import lexicon.VarID;
 import utils.Hash;
 import utils.IntWrapper;
 
-public class SuperCategory implements Comparable<SuperCategory> {
+public class SuperCategory {
 	public final Category cat;
 
 	public ArrayList<Dependency> unfilledDeps = null;
@@ -538,44 +539,69 @@ public class SuperCategory implements Comparable<SuperCategory> {
 		return equivalenceHash.value();
 	}
 
-	/*
-	 * designed for the equivalence check in EquivKey; ie what SuperCategory
-	 * objects are equivalent w.r.t. DP in the chart
-	 */
-	public static boolean equal(SuperCategory superCategory1, SuperCategory superCategory2) {
-		if ( superCategory1.numActiveVars != superCategory2.numActiveVars ) {
+	@Override
+	public int hashCode() {
+		return (int) (equivalenceHash.value());
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		if ( other == null || getClass() != other.getClass() ) {
 			return false;
 		}
 
-		for ( int i = 1; i < superCategory1.numActiveVars; i++ ) {
-			if ( !Variable.equal(superCategory1.vars[i], superCategory2.vars[i]) ) {
+		SuperCategory cother = (SuperCategory) other;
+
+		if ( this.equivalenceHash.value() != cother.equivalenceHash.value() ) {
+			return false;
+		}
+
+		if ( this.numActiveVars != cother.numActiveVars ) {
+			return false;
+		}
+
+		for ( int i = 1; i < this.numActiveVars; i++ ) {
+			if ( !this.vars[i].equals(cother.vars[i]) ) {
 				return false;
 			}
 		}
 
 		// ensures cats created via unary rules get their own equiv classes
-		if ( superCategory1.unary() != superCategory2.unary() ) {
+		if ( this.unary() != cother.unary() ) {
 			return false;
 		}
 
-		if ( !superCategory1.cat.equalsWithVars(superCategory2.cat) ) {
+		if ( !this.cat.equalsWithVars(cother.cat) ) {
 			return false;
 		}
 
-		if ( superCategory1.unfilledDeps.size() != superCategory2.unfilledDeps.size() ) {
+		if ( this.unfilledDeps.size() != cother.unfilledDeps.size() ) {
 			return false;
 		}
 
-		Collections.sort(superCategory1.unfilledDeps);
-		Collections.sort(superCategory2.unfilledDeps);
+		Collections.sort(this.unfilledDeps);
+		Collections.sort(cother.unfilledDeps);
 
-		for ( int i = 0; i < superCategory1.unfilledDeps.size(); i++ ) {
-			if ( !superCategory1.unfilledDeps.get(i).equals(superCategory2.unfilledDeps.get(i)) ) {
+		for ( int i = 0; i < this.unfilledDeps.size(); i++ ) {
+			if ( !this.unfilledDeps.get(i).equals(cother.unfilledDeps.get(i)) ) {
 				return false;
 			}
 		}
 
 		return true;
+	}
+
+	public int compareToScore(SuperCategory other) {
+		return Double.compare(other.score, this.score);
+	}
+
+	public static Comparator<SuperCategory> scoreComparator() {
+		return new Comparator<SuperCategory>() {
+			@Override
+			public int compare(SuperCategory superCat1, SuperCategory superCat2) {
+				return Double.compare(superCat2.score, superCat1.score);
+			}
+		};
 	}
 
 	public void markActive() {
@@ -627,29 +653,6 @@ public class SuperCategory implements Comparable<SuperCategory> {
 
 	public int numEquivNodes() {
 		return next != null ? 1 + next.numEquivNodes() : 1;
-	}
-
-	// used by the beam search decoder in Cell
-	// x.score < y.score <=> x > y
-	@Override
-	public int compareTo(SuperCategory other) {
-		return Double.compare(other.score, this.score);
-	}
-
-	@Override
-	public boolean equals(Object other) {
-		if ( other == null || getClass() != other.getClass() ) {
-			return false;
-		}
-
-		SuperCategory cother = (SuperCategory) other;
-
-		return compareTo(cother) == 0;
-	}
-
-	@Override
-	public int hashCode() {
-		return (int) getEhash();
 	}
 
 	/*

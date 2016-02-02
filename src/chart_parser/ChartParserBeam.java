@@ -258,7 +258,7 @@ public class ChartParserBeam extends ChartParser {
 								} else if ( p2.x == null ) {
 									return -1;
 								} else {
-									return p1.x.compareTo(p2.x);
+									return p1.x.compareToScore(p2.x);
 								}
 							}});
 
@@ -315,7 +315,7 @@ public class ChartParserBeam extends ChartParser {
 				}
 			}
 
-			Collections.sort(kbest);
+			Collections.sort(kbest, SuperCategory.scoreComparator());
 			chart.cell(position, span).getPreSuperCategories().add(kbest);
 		}
 	}

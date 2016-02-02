@@ -102,8 +102,8 @@ public class Variable {
 		}
 	}
 
-	public static boolean equal(Variable v1, Variable v2) {
-		return Arrays.equals(v1.fillers, v2.fillers);
+	public boolean equals(Variable v) {
+		return Arrays.equals(this.fillers, v.fillers);
 	}
 
 	public boolean isUnfilled() {
