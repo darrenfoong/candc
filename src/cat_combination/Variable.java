@@ -102,8 +102,20 @@ public class Variable {
 		}
 	}
 
-	public boolean equals(Variable v) {
-		return Arrays.equals(this.fillers, v.fillers);
+	@Override
+	public int hashCode() {
+		return Arrays.hashCode(fillers);
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		if ( other == null || getClass() != other.getClass() ) {
+			return false;
+		}
+
+		Variable cother = (Variable) other;
+
+		return Arrays.equals(this.fillers, cother.fillers);
 	}
 
 	public boolean isUnfilled() {
