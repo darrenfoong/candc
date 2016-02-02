@@ -1,5 +1,6 @@
 Java C&C Parser
-Copyright (c) 2014-15, Stephen Clark, James R. Curran and Darren Foong
+
+Copyright (c) 2014-16, Stephen Clark, James R. Curran and Darren Foong
 
 All rights reserved.
 
