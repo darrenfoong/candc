@@ -3,6 +3,7 @@ import io.Sentences;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -118,6 +119,8 @@ public class CountFeatures {
 			countFeaturesDecoder.mergeAllFeatureCounts(parser.features);
 			parser.features.print(out);
 			parser.features.printWeights(parser.weights, weights);
+		} catch (FileNotFoundException e) {
+			System.err.println(e);
 		} catch (IOException e) {
 			System.err.println(e);
 		}

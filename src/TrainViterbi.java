@@ -2,6 +2,7 @@ import io.Forests;
 import io.Preface;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -87,6 +88,8 @@ public class TrainViterbi {
 				out.print(i + " " + features[i].getLambda() + " ");
 				out.println(features[i].getCumulativeLambda()/numTrainInstances);
 			}
+		} catch (FileNotFoundException e) {
+			System.err.println(e);
 		} catch (IOException e) {
 			System.err.println(e);
 		}

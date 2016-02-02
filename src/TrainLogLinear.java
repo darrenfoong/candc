@@ -83,6 +83,8 @@ public class TrainLogLinear {
 			for ( int i = 0; i < features.length; i++ ) {
 				out.println(i + " " + features[i].getLambda());
 			}
+		} catch (FileNotFoundException e) {
+			System.err.println(e);
 		} catch (IOException e) {
 			System.err.println(e);
 		}
