@@ -173,6 +173,7 @@ public class Cell {
 
 	public void add(ArrayList<SuperCategory> superCats) {
 		superCategories.addAll(superCats);
+		Chart.setNumSuperCategories(Chart.getNumSuperCategories()+superCats.size());
 	}
 
 	public int size() {
