@@ -558,7 +558,7 @@ public class SuperCategory implements Comparable<SuperCategory> {
 			return false;
 		}
 
-		if ( !Category.equal(superCategory1.cat, superCategory2.cat) ) {
+		if ( !superCategory1.cat.equalsWithVars(superCategory2.cat) ) {
 			return false;
 		}
 

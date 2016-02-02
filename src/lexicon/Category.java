@@ -7,59 +7,57 @@ public class Category {
 	public static final byte BWD_SLASH = 0;
 	public static final byte FWD_SLASH = 1;
 
-	// basic category (atom should be set to NONE for complex category):
-	public final Atom atom;
-	public final GrammaticalFeature feature;
 	public byte var;
-
 	public final short relID;
 	public final short lrange;
 
-	// complex category:
-	public final byte slash;
-	public final Category result;
-	public final Category argument;
-
-	/*
-	 * unificationHash is used as a quick check to see if two categories cannot
-	 * unify; equivalenceHash is used to see if two categories are equivalent in
-	 * the chart; the only difference is that eHash() takes the grammatical
-	 * feature on S into account
-	 */
-	private final Hash unificationHash;
 	private final Hash equivalenceHash;
+	private final Hash unificationHash;
 
-	// categories are limited to a maximum no. of arguments:
+	// basic categories
+	public final Atom atom;
+	public final GrammaticalFeature feature;
+
+	// complex categories
+	public final byte slash;
+	public final Category argument;
+	public final Category result;
 	public byte numArgs;
 
 	// constructor for basic categories:
 	public Category(Atom atom, GrammaticalFeature feature, byte var, short relID, short lrange) {
-		this.atom = atom;
-		this.feature = feature;
 		this.var = var;
 		this.relID = relID;
 		this.lrange = lrange;
+
+		this.atom = atom;
+		this.feature = feature;
+
 		this.slash = 0;
-		this.result = null;
 		this.argument = null;
+		this.result = null;
+		this.numArgs = 0;
+
 		this.unificationHash = uHashBasic();
 		this.equivalenceHash = eHashBasic();
-		this.numArgs = 0;
 	}
 
 	// constructor for complex categories:
 	public Category(Category result, byte slash, Category argument, byte var, short relID, short lrange) {
-		this.atom = new Atom(Atom.NONE);
-		this.feature = new GrammaticalFeature(GrammaticalFeature.NONE);
 		this.var = var;
 		this.relID = relID;
 		this.lrange = lrange;
-		this.result = result;
-		this.argument = argument;
+
+		this.atom = new Atom(Atom.NONE);
+		this.feature = new GrammaticalFeature(GrammaticalFeature.NONE);
+
 		this.slash = slash;
+		this.argument = argument;
+		this.result = result;
+		this.numArgs = countArgs();
+
 		this.unificationHash = uHashComplex();
 		this.equivalenceHash = eHashComplex();
-		this.numArgs = countArgs();
 	}
 
 	/*
@@ -67,18 +65,22 @@ public class Category {
 	 * provided the variable transTable and feat
 	 */
 	public Category(Category other, byte[] transTable, GrammaticalFeature feat) {
-		this.atom = new Atom(other.atom);
-		this.feature = ((other.feature.isVar() && !feat.isNone()) ? new GrammaticalFeature(feat) : new GrammaticalFeature(other.feature));
 		this.var = transTable[other.var];
 		this.relID = other.relID;
 		this.lrange = other.lrange;
+
+		this.atom = new Atom(other.atom);
+		this.feature = (other.feature.isVar() && !feat.isNone()) ? new GrammaticalFeature(feat) : new GrammaticalFeature(other.feature);
+
 		this.slash = other.slash;
-		this.result = ((other.result != null) ? new Category(other.result, transTable, feat) : null);
-		this.argument = ((other.argument != null) ? new Category(other.argument, transTable, feat) : null);
-		this.unificationHash = new Hash(other.unificationHash);
-		this.equivalenceHash = ((result == null) ? eHashBasic() : eHashComplex());
-		// need to call eHash method again since the feature may have changed from other
+		this.result = other.isComplex() ? new Category(other.result, transTable, feat) : null;
+		this.argument = other.isComplex() ? new Category(other.argument, transTable, feat) : null;
 		this.numArgs = other.numArgs;
+
+		this.unificationHash = new Hash(other.unificationHash);
+		this.equivalenceHash = isComplex() ? eHashComplex() : eHashBasic();
+		// need to call eHash method again since the feature may have changed from other
+
 	}
 
 	/*
@@ -91,10 +93,10 @@ public class Category {
 	}
 
 	private byte countArgs() {
-		if ( result != null ) {
-			return (byte) (result.countArgs() + 1);
+		if ( isBasic() ) {
+			return (byte) 0;
 		} else {
-			return (byte) (0);
+			return (byte) (result.countArgs() + 1);
 		}
 	}
 
@@ -105,14 +107,14 @@ public class Category {
 	 * variable is treated like any other, eg: ((S{Z}\NP{Y})/NP{Z}){_} becomes:
 	 * ((S{X}\NP{Y})/NP{Z}){W}
 	 */
-	public void reorderVariables(byte[] seenVariables, ByteWrapper order) {
-		if (result != null) {
-			result.reorderVariables(seenVariables, order);
-			argument.reorderVariables(seenVariables, order);
+	public void reorderVariables(byte[] seenVariables, ByteWrapper nextVarID) {
+		if ( isComplex() ) {
+			result.reorderVariables(seenVariables, nextVarID);
+			argument.reorderVariables(seenVariables, nextVarID);
 		}
 
-		if (var != VarID.NONE && seenVariables[var] == VarID.NONE) {
-			seenVariables[var] = ++order.value;
+		if ( var != VarID.NONE && seenVariables[var] == VarID.NONE ) {
+			seenVariables[var] = ++nextVarID.value;
 		}
 
 		var = seenVariables[var];
@@ -123,18 +125,14 @@ public class Category {
 	 * on the category objects - it only keeps track of the new order in the
 	 * seen array
 	 */
-	public void reorderVariables(byte[] transTable, byte[] seenVariables, ByteWrapper order) {
-		if (isAtomic()) {
-			if (var != VarID.NONE && seenVariables[transTable[var]] == VarID.NONE) {
-				seenVariables[transTable[var]] = ++order.value;
-			}
-		} else {
-			result.reorderVariables(transTable, seenVariables, order);
-			argument.reorderVariables(transTable, seenVariables, order);
+	public void reorderVariables(byte[] transTable, byte[] seenVariables, ByteWrapper nextVarID) {
+		if ( isComplex() ) {
+			result.reorderVariables(transTable, seenVariables, nextVarID);
+			argument.reorderVariables(transTable, seenVariables, nextVarID);
+		}
 
-			if (var != VarID.NONE && seenVariables[transTable[var]] == VarID.NONE) {
-				seenVariables[transTable[var]] = ++order.value;
-			}
+		if (var != VarID.NONE && seenVariables[transTable[var]] == VarID.NONE) {
+			seenVariables[transTable[var]] = ++nextVarID.value;
 		}
 	}
 
@@ -146,46 +144,33 @@ public class Category {
 	 * NONE variable; eg with X and Y variables, numVars = 3
 	 */
 	public byte getNumVars() {
-		byte current = var;
-		current++;
-
-		if (this.isAtomic()) {
-			return current;
+		if ( isBasic() ) {
+			return (byte) (var + 1);
 		} else {
-			byte max = result.getNumVars();
-			byte maxArg = argument.getNumVars();
+			byte current = (byte) (var + 1);
+			byte resNumVars = result.getNumVars();
+			byte argNumVars = argument.getNumVars();
 
-			if (max < maxArg) {
-				max = maxArg;
-			}
-
-			if (max < current) {
-				max = current;
-			}
+			byte max = current;
+			if ( resNumVars > max ) { max = resNumVars; }
+			if ( argNumVars > max ) { max = argNumVars; }
 
 			return max;
 		}
 	}
 
-	private Hash uHashBasic() {
-		return new Hash(atom.value());
-	}
-
-	private Hash uHashComplex() {
-		Hash h = new Hash(result.unificationHash);
-		h.timesEqual(2);
-		h.barEqual(slash);
-		h.plusEqual(argument.unificationHash.value());
-		return h;
-	}
-
-	// ignore all features except on the S atom where we also ignore NONE and the variable X
 	private Hash eHashBasic() {
-		Hash h = uHashBasic();
-		if (isS() && !feature.isFree()) {
+		Hash h = new Hash(atom.value());
+
+		if ( ( this.isS() && !this.feature.isFree() ) || !this.isS() ) {
 			h.plusEqual(feature.value());
 		}
+
 		return h;
+	}
+
+	private Hash uHashBasic() {
+		return new Hash(atom.value());
 	}
 
 	private Hash eHashComplex() {
@@ -196,93 +181,20 @@ public class Category {
 		return h;
 	}
 
-	public long getUhash() {
-		return unificationHash.value();
+	private Hash uHashComplex() {
+		Hash h = new Hash(result.unificationHash);
+		h.timesEqual(2);
+		h.barEqual(slash);
+		h.plusEqual(argument.unificationHash.value());
+		return h;
 	}
 
 	public long getEhash() {
 		return equivalenceHash.value();
 	}
 
-	/*
-	 * there are various equality functions defined for categories in C&C; this
-	 * one is used by the SuperCategory equals() method
-	 */
-	public static boolean equal(Category cat1, Category cat2) {
-		if (cat1.getEhash() != cat2.getEhash() || cat1.getUhash() != cat2.getUhash()) {
-			return false;
-		}
-
-		return !unequal(cat1, cat2);
-	}
-
-	private static boolean unequal(Category cat1, Category cat2) {
-		if (cat1.isAtomic()) {
-			if (!cat2.isAtomic()) {
-				return true;
-			} else {
-				// both atomic
-				return cat1.atom.value() != cat2.atom.value()
-						|| cat1.var != cat2.var
-						|| cat1.feature.value() != cat2.feature.value()
-						|| cat1.lrange != cat2.lrange;
-			}
-		} else {
-			// cat1 complex
-			if (cat2.isAtomic()) {
-				return true;
-			} else {
-				// both complex
-				if (cat1.var != cat2.var) {
-					return true;
-				}
-
-				if (cat1.result.getEhash() != cat2.result.getEhash() || cat1.argument.getEhash() != cat2.argument.getEhash()) {
-					return true;
-				}
-
-				return unequal(cat1.result, cat2.result) || unequal(cat1.argument, cat2.argument);
-			}
-		}
-	}
-
-	// this one used by the equals method (used for Hash structures)
-	public static boolean equalIgnoreVars2(Category cat1, Category cat2) {
-		if (cat1.getEhash() != cat2.getEhash() || cat1.getUhash() != cat2.getUhash()) {
-			return false;
-		}
-
-		return !unequalIgnoreVars2(cat1, cat2);
-	}
-
-	// note that S[X] is the same as S here, but not NP[nb] and NP,
-	// nor are N and N[num]
-	private static boolean unequalIgnoreVars2(Category cat1, Category cat2) {
-		if (cat1.isAtomic()) {
-			if (!cat2.isAtomic()) {
-				return true;
-			} else {
-				// both atomic
-				return cat1.atom.value() != cat2.atom.value()
-						|| (cat1.isS()
-								&& (!cat1.feature.isFree() || !cat2.feature.isFree())
-								&& cat1.feature.value() != cat2.feature.value())
-						|| (!cat1.isS()
-								&& cat1.feature.value() != cat2.feature.value());
-			}
-		} else {
-			// cat1 complex
-			if (cat2.isAtomic()) {
-				return true;
-			} else {
-				// both complex
-				if (cat1.result.getEhash() != cat2.result.getEhash() || cat1.argument.getEhash() != cat2.argument.getEhash()) {
-					return true;
-				}
-
-				return unequalIgnoreVars2(cat1.result, cat2.result) || unequalIgnoreVars2(cat1.argument, cat2.argument);
-			}
-		}
+	public long getUhash() {
+		return unificationHash.value();
 	}
 
 	@Override
@@ -290,8 +202,6 @@ public class Category {
 		return (int) (equivalenceHash.value());
 	}
 
-	// equalIgnoreVars2 *does* take the features on NPs into account,
-	// so N[num] != N (updated 10/6/14)
 	@Override
 	public boolean equals(Object other) {
 		if ( other == null || getClass() != other.getClass() ) {
@@ -300,13 +210,69 @@ public class Category {
 
 		Category cother = (Category) other;
 
-		return equalIgnoreVars2(this, cother);
-		// return equalIgnoreVars(this, cother);
+		// not equal if hashes are different
+		if ( this.equivalenceHash.value() != cother.equivalenceHash.value() ) {
+			return false;
+		}
+
+		if ( isBasic() ) {
+			// not equal if atoms are different
+			if ( this.atom.value() != cother.atom.value() ) {
+				return false;
+			}
+
+			// not equal if S's do not match, ignoring variables on S
+			// e.g. S[X] = (S = S[_]), S[a] != S[b]
+			if ( this.isS()
+					&& ( this.feature.value() != cother.feature.value() )
+					&& ( !(this.feature.isFree() && cother.feature.isFree()) ) ) {
+				return false;
+			}
+
+			// not equal if non-S's (e.g. N and NP) do not match, considering variables
+			// e.g. (N = N[_]) != N[num], (NP = NP[_]) != NP[nb]
+			if ( !this.isS()
+					&& ( this.feature.value() != cother.feature.value() ) ) {
+				return false;
+			}
+
+			return true;
+		} else {
+			return this.argument.equals(cother.argument)
+					&& this.result.equals(cother.result);
+		}
+	}
+
+	public boolean equalsWithVars(Object other) {
+		if ( other == null || getClass() != other.getClass() ) {
+			return false;
+		}
+
+		Category cother = (Category) other;
+
+		// not equal if hashes are different
+		if ( this.equivalenceHash.value() != cother.equivalenceHash.value() ) {
+			return false;
+		}
+
+		if ( isBasic() ) {
+			return this.atom.value() == cother.atom.value()
+					&& this.feature.value() == cother.feature.value()
+					&& this.var == cother.var
+					&& this.lrange == cother.lrange;
+		} else {
+			if ( this.var != cother.var ) {
+				return false;
+			}
+
+			return this.argument.equals(cother.argument)
+					&& this.result.equals(cother.result);
+		}
 	}
 
 	@Override
 	public String toString() {
-		if ( isAtomic() ) {
+		if ( isBasic() ) {
 			return toStringNoOuterBrackets();
 		} else {
 			return "(" + toStringNoOuterBrackets() + ")";
@@ -316,7 +282,7 @@ public class Category {
 	public String toStringNoOuterBrackets() {
 		String output = "";
 
-		if ( isAtomic() ) {
+		if ( isBasic() ) {
 			output += atom;
 			if ( feature.value() != GrammaticalFeature.NONE ) {
 				output += "[" + feature + "]";
@@ -334,34 +300,36 @@ public class Category {
 		return output;
 	}
 
-	public String toStringNoOuterBrackets(boolean outer) {
+	public String toStringNoVars() {
+		if ( isBasic() ) {
+			return toStringNoOuterBracketsNoVars();
+		} else {
+			return "(" + toStringNoOuterBracketsNoVars() + ")";
+		}
+	}
+
+	public String toStringNoOuterBracketsNoVars() {
 		String output = "";
 
-		if ( isAtomic() ) {
+		if ( isBasic() ) {
 			output += atom;
 			if ( feature.value() != GrammaticalFeature.NONE && feature.value() != GrammaticalFeature.X ) {
 				output += "[" + feature + "]";
 			}
 		} else {
-			if ( !outer ) {
-				output += "(";
-			}
-			output += result.toStringNoOuterBrackets(false);
+			output += result.toStringNoVars();
 			if ( isFwd() ) {
 				output += "/";
 			} else {
 				output += "\\";
 			}
-			output += argument.toStringNoOuterBrackets(false);
-			if ( !outer ) {
-				output += ")";
-			}
+			output += argument.toStringNoVars();
 		}
 
 		return output;
 	}
 
-	public boolean isAtomic() {
+	public boolean isBasic() {
 		return atom.value() != Atom.NONE;
 	}
 

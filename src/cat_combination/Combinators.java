@@ -738,7 +738,7 @@ public class Combinators {
 		 * innermost category on the right (after checking that the right
 		 * category has enough "depth")
 		 */
-		return !left.cat.argument.isSbNP() || right.cat.result.notFwd() || right.cat.result.result.isAtomic() || right.cat.result.result.result.hasFeatureVar();
+		return !left.cat.argument.isSbNP() || right.cat.result.notFwd() || right.cat.result.result.isBasic() || right.cat.result.result.result.hasFeatureVar();
 	}
 
 	private boolean generalisedForwardCompB3Reject(SuperCategory left, SuperCategory right) {
@@ -750,7 +750,7 @@ public class Combinators {
 		 * innermost category on the right (after checking that the right
 		 * category has enough "depth")
 		 */
-		return right.cat.result.result.notFwd() || right.cat.result.result.result.isAtomic() || right.cat.result.result.result.result.hasFeatureVar();
+		return right.cat.result.result.notFwd() || right.cat.result.result.result.isBasic() || right.cat.result.result.result.result.hasFeatureVar();
 	}
 
 	private boolean backwardCompReject(SuperCategory left, SuperCategory right) {
@@ -811,11 +811,11 @@ public class Combinators {
 	}
 
 	private boolean generalisedBackwardCrossB2Reject(SuperCategory left, SuperCategory right) {
-		return !right.cat.argument.isSbNP() || left.cat.result.notFwd() || left.cat.result.result.isAtomic() || left.cat.result.result.result.hasFeatureVar();
+		return !right.cat.argument.isSbNP() || left.cat.result.notFwd() || left.cat.result.result.isBasic() || left.cat.result.result.result.hasFeatureVar();
 	}
 
 	private boolean generalisedBackwardCrossB3Reject(SuperCategory left, SuperCategory right) {
-		return left.cat.result.result.notFwd() || left.cat.result.result.result.isAtomic() || left.cat.result.result.result.result.hasFeatureVar();
+		return left.cat.result.result.notFwd() || left.cat.result.result.result.isBasic() || left.cat.result.result.result.result.hasFeatureVar();
 	}
 
 	private boolean coordinationReject(SuperCategory left, SuperCategory right) {

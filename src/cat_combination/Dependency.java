@@ -107,7 +107,7 @@ public class Dependency implements Comparable<Dependency> {
 	public static ArrayList<Dependency> getDependencies(short headIndex, Category cat, short ruleID) {
 		ArrayList<Dependency> deps = new ArrayList<Dependency>();
 
-		if ( cat.isAtomic() ) {
+		if ( cat.isBasic() ) {
 			if ( cat.relID != 0 ) {
 				deps.add(new Dependency(cat.relID, headIndex, cat.var, ruleID));
 			}

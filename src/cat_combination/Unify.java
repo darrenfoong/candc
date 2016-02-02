@@ -115,8 +115,8 @@ public class Unify {
 	 */
 	private boolean unifyRecursive(Category cat1, Category cat2) {
 		// the atomic case:
-		if (cat1.isAtomic()) {
-			if (!cat2.isAtomic()) {
+		if (cat1.isBasic()) {
+			if (!cat2.isBasic()) {
 				return false;
 			}
 			/*
@@ -142,7 +142,7 @@ public class Unify {
 				// cat2 feature whatever it is
 			}
 		} else {
-			if (cat2.isAtomic())
+			if (cat2.isBasic())
 			{
 				return false; // cat1 is not atomic, cat2 is
 			}
