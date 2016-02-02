@@ -1,3 +1,4 @@
+import io.Forests;
 import io.Preface;
 
 import java.io.BufferedReader;
@@ -6,7 +7,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 
 import training.Feature;
 import training.Forest;
@@ -43,23 +43,18 @@ public class TrainLogLinear {
 				features[i] = new Feature(i);
 			}
 
-			ArrayList<Forest> forests = new ArrayList<Forest>();
-
-			for ( int numForest = 1; numForest <= (toSentence - fromSentence + 1) ; numForest++ ) {
-				System.out.println("Reading forest " + numForest);
-
-				if ( (line = in.readLine()) == null) {
-					break;
-				}
-
-				int numNodes = Integer.parseInt(line);
-				forests.add(new Forest(in, features, numNodes));
-			}
+			Forests forests = new Forests(in, features);
 
 			for ( int iteration = 1; iteration <= numIterations; iteration++ ) {
 				double logLikelihood = 0.0;
 
-				for ( Forest forest : forests ) {
+				forests.skip(fromSentence - 1);
+
+				for ( int numForest = fromSentence; numForest <= toSentence && forests.hasNext() ; numForest++ ) {
+					System.out.println("Reading forest " + numForest);
+
+					Forest forest = forests.next();
+
 					forest.resetNodeValues();
 
 					for ( int i = 0; i < numFeatures; i++ ) {
@@ -77,8 +72,8 @@ public class TrainLogLinear {
 
 					logLikelihood += forest.logLikelihood();
 
-					for ( int i = 0; i < numFeatures; i++ ) {
-						features[i].adaGradUpdate(LEARNING_RATE);
+					for ( Feature feature : features ) {
+						feature.adaGradUpdate(LEARNING_RATE);
 					}
 				}
 
@@ -88,8 +83,6 @@ public class TrainLogLinear {
 			for ( int i = 0; i < features.length; i++ ) {
 				out.println(i + " " + features[i].getLambda());
 			}
-		} catch (FileNotFoundException e) {
-			System.err.println(e);
 		} catch (IOException e) {
 			System.err.println(e);
 		}
