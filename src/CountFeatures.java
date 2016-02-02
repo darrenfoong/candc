@@ -23,7 +23,7 @@ public class CountFeatures {
 		boolean eisnerNormalForm = true;
 		boolean detailedOutput = false;
 		boolean newFeatures = false;
-		boolean cubePruning = true;
+		boolean cubePruning = false;
 
 		String grammarDir = "data/baseline_expts/grammar";
 		String lexiconFile = "data/baseline_expts/working/lexicon/wsj02-21.wordsPos";

@@ -32,6 +32,7 @@ public class OracleParser {
 	public static void main(String[] args) {
 		int MAX_WORDS = 250;
 		int MAX_SUPERCATS = 2000000;
+
 		boolean altMarkedup = false;
 		boolean eisnerNormalForm = true;
 		boolean detailedOutput = false;
