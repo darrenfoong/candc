@@ -172,7 +172,7 @@ public class Category {
 	}
 
 	private Hash uHashComplex() {
-		Hash h = new Hash(result.unificationHash.value());
+		Hash h = new Hash(result.unificationHash);
 		h.timesEqual(2);
 		h.barEqual(slash);
 		h.plusEqual(argument.unificationHash.value());
@@ -189,7 +189,7 @@ public class Category {
 	}
 
 	private Hash eHashComplex() {
-		Hash h = new Hash(result.equivalenceHash.value());
+		Hash h = new Hash(result.equivalenceHash);
 		h.timesEqual(2);
 		h.barEqual(slash);
 		h.plusEqual(argument.equivalenceHash.value());
