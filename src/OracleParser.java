@@ -49,7 +49,7 @@ public class OracleParser {
 		// not currently used (but can be used to get rules files above)
 
 		boolean adaptiveSupertagging = false;
-		double[] betas = { 0.0001, 0.001, 0.01, 0.03, 0.075 };
+		double[] betas = { 0.01, 0.01, 0.01, 0.03, 0.075 };
 
 		boolean training = true;
 		// set to false if the string category and slot are needed for evaluation; true gives deps used for training

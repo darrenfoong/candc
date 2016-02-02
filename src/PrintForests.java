@@ -33,7 +33,7 @@ public class PrintForests {
 		RuleInstancesParams ruleInstancesParams = new RuleInstancesParams(true, false, false, false, false, false, grammarDir);
 
 		boolean adaptiveSupertagging = false;
-		double[] betas = { 0.01, 0.01, 0.1 };
+		double[] betas = { 0.0001, 0.0001, 0.0001, 0.01, 0.1 };
 		/*
 		 * true indicates beta values get smaller, and first value is betas[0];
 		 * false is the opposite, and first value is betas[1] (which is what we
@@ -63,7 +63,7 @@ public class PrintForests {
 
 		try {
 			lexicon = new Lexicon(lexiconFile);
-		} catch (IOException e) {
+		} catch ( IOException e ) {
 			System.err.println(e);
 			return;
 		}
@@ -75,7 +75,7 @@ public class PrintForests {
 					eisnerNormalForm, MAX_WORDS, MAX_SUPERCATS, detailedOutput,
 					oracleFscore, adaptiveSupertagging, ruleInstancesParams,
 					lexicon, featuresFile, null, newFeatures, false);
-		} catch (IOException e) {
+		} catch ( IOException e ) {
 			System.err.println(e);
 			return;
 		}
@@ -85,11 +85,11 @@ public class PrintForests {
 		OracleDepsSumDecoder oracleDecoder = new OracleDepsSumDecoder(parser.categories, false);
 
 		try ( BufferedReader in = new BufferedReader(new FileReader(inputFile));
-			  BufferedReader gold = new BufferedReader(new FileReader(goldDepsFile));
-			  BufferedReader stagsIn = new BufferedReader(new FileReader(goldSupertagsFile));
-			  BufferedReader roots = new BufferedReader(new FileReader(rootCatsFile));
-			  PrintWriter out = new PrintWriter(new FileWriter(outputFile));
-			  PrintWriter log = new PrintWriter(new FileWriter(logFile)) ) {
+				BufferedReader gold = new BufferedReader(new FileReader(goldDepsFile));
+				BufferedReader stagsIn = new BufferedReader(new FileReader(goldSupertagsFile));
+				BufferedReader roots = new BufferedReader(new FileReader(rootCatsFile));
+				PrintWriter out = new PrintWriter(new FileWriter(outputFile));
+				PrintWriter log = new PrintWriter(new FileWriter(logFile)) ) {
 
 			Preface.readPreface(in);
 			Preface.readPreface(gold);
@@ -102,9 +102,9 @@ public class PrintForests {
 			Sentences sentences = new Sentences(in, null, parser.categories, MAX_WORDS);
 			sentences.skip(fromSentence - 1);
 
-			for (int numSentence = fromSentence; numSentence <= toSentence && sentences.hasNext(); numSentence++) {
-				System.out.println("Parsing sentence "+ numSentence);
-				log.println("Parsing sentence "+ numSentence);
+			for ( int numSentence = fromSentence; numSentence <= toSentence && sentences.hasNext(); numSentence++ ) {
+				System.out.println("Parsing sentence " + numSentence);
+				log.println("Parsing sentence " + numSentence);
 
 				parser.parseSentence(sentences.next(), log, betas);
 
@@ -112,7 +112,7 @@ public class PrintForests {
 				// ugly - passing parser.categories?
 				oracleDecoder.readRootCat(roots, parser.categories);
 
-				if (!parser.maxWordsExceeded && !parser.maxSuperCatsExceeded) {
+				if ( !parser.maxWordsExceeded && !parser.maxSuperCatsExceeded ) {
 					double maxGoldDeps = oracleDecoder.decode(parser.chart, parser.sentence);
 					boolean checkRoot = true;
 					oracleDecoder.markOracleDeps(parser.chart, maxGoldDeps, false, checkRoot);
@@ -120,9 +120,9 @@ public class PrintForests {
 					forest.print(out, parser.chart, parser.sentence);
 				}
 			}
-		} catch (FileNotFoundException e) {
+		} catch ( FileNotFoundException e ) {
 			System.err.println(e);
-		} catch (IOException e) {
+		} catch ( IOException e ) {
 			System.err.println(e);
 		}
 	}
