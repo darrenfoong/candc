@@ -110,14 +110,19 @@ public class Chart {
 				System.out.println("no equivalent");
 			}
 			cell(position, span).add(superCat);
-		} else if (printDetailedOutput) {
-			System.out.println("found equivalent category!");
+		} else {
+			if (printDetailedOutput) {
+				System.out.println("found equivalent category!");
+			}
+			Chart.setNumSuperCategories(Chart.getNumSuperCategories()+1);
 		}
 	}
 
 	public void addFscore(int position, int span, SuperCategory superCat) {
 		if (equivFscore.add(position, span, superCat)) {
 			cell(position, span).add(superCat);
+		} else {
+			Chart.setNumSuperCategories(Chart.getNumSuperCategories()+1);
 		}
 	}
 
