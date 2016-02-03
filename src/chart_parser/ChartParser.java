@@ -125,10 +125,8 @@ public class ChartParser {
 
 			jloop:
 			for (int j = 2; j <= numWords; j++) {
-				for (int i = j - 2; i >= 0; i--) {
-					int span = j - i;
-
-					for (int k = i + 1; k < j; k++) {
+				for (int i = 0; i <= numWords - j; i++) {
+					for (int k = 1; k < j; k++) {
 						if (Chart.getNumSuperCategories() > MAX_SUPERCATS) {
 							maxSuperCatsExceeded = true;
 							System.out.println("MAX_SUPERCATS exceeded. (" + Chart.getNumSuperCategories() + " > " + MAX_SUPERCATS + ")");
@@ -136,19 +134,16 @@ public class ChartParser {
 							break jloop;
 						}
 
-						int leftSpan = k - i;
-						int rightSpan = j - k;
-
 						if (printDetailedOutput) {
-							System.out.println("Combining cells: (" + i + "," + leftSpan + ") (" + k + "," + rightSpan + ")");
+							System.out.println("Combining cells: (" + i + "," + k + ") (" + (i+k) + "," + (j-k) + ")");
 						}
 
-						combine(chart.cell(i, leftSpan), chart.cell(k, rightSpan), i, span);
+						combine(chart.cell(i, k), chart.cell(i+k, j-k), i, j);
 					}
 
-					if (span < numWords) {
-						typeChange(chart.cell(i, span), i, span);
-						typeRaise(chart.cell(i, span), i, span);
+					if (j < numWords) {
+						typeChange(chart.cell(i, j), i, j);
+						typeRaise(chart.cell(i, j), i, j);
 					}
 				}
 			}

@@ -131,11 +131,10 @@ public class ChartParserBeam extends ChartParser {
 
 		jloop:
 		for (int j = 2; j <= numWords; j++) {
-			for (int i = j - 2; i >= 0; i--) {
-				int span = j - i;
-				setCellSize(chart, i, span);
+			for (int i = 0; i <= numWords - j; i++) {
+				setCellSize(chart, i, j);
 
-				for (int k = i + 1; k < j; k++) {
+				for (int k = 1; k < j; k++) {
 					if (Chart.getNumSuperCategories() > MAX_SUPERCATS) {
 						maxSuperCatsExceeded = true;
 						System.out.println("MAX_SUPERCATS exceeded. (" + Chart.getNumSuperCategories() + " > " + MAX_SUPERCATS + ")");
@@ -143,32 +142,29 @@ public class ChartParserBeam extends ChartParser {
 						break jloop;
 					}
 
-					int leftSpan = k - i;
-					int rightSpan = j - k;
-
 					if (printDetailedOutput) {
-						System.out.println("Combining cells: (" + i + "," + leftSpan + ") (" + k + "," + rightSpan + ")");
+						System.out.println("Combining cells: (" + i + "," + k + ") (" + (i+k) + "," + (j-k) + ")");
 					}
 
 					if (cubePruning) {
-						combineBetter(chart.cell(i, leftSpan), chart.cell(k, rightSpan), i, span, (span == numWords));
+						combineBetter(chart.cell(i, k), chart.cell(i+k, j-k), i, j, (j == numWords));
 					} else {
-						combine(chart.cell(i, leftSpan), chart.cell(k, rightSpan), i, span, (span == numWords));
+						combine(chart.cell(i, k), chart.cell(i+k, j-k), i, j, (j == numWords));
 					}
 				}
 
 				if (cubePruning) {
-					chart.cell(i, span).combinePreSuperCategories(beamSize);
+					chart.cell(i, j).combinePreSuperCategories(beamSize);
 				}
 
-				if (span < numWords) {
-					typeChange(chart.cell(i, span), i, span);
-					typeRaise(chart.cell(i, span), i, span);
+				if (j < numWords) {
+					typeChange(chart.cell(i, j), i, j);
+					typeRaise(chart.cell(i, j), i, j);
 				}
 
-				chart.cell(i, span).applyBeam(beamSize, beta);
+				chart.cell(i, j).applyBeam(beamSize, beta);
 
-				postParse(i, span, numWords);
+				postParse(i, j, numWords);
 			}
 		}
 
