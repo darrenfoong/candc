@@ -33,7 +33,7 @@ public class Parser {
 		RuleInstancesParams ruleInstancesParams = new RuleInstancesParams(true, false, false, false, false, false, grammarDir);
 
 		boolean adaptiveSupertagging = false;
-		double[] betas = { 0.075, 0.03, 0.01, 0.001 };
+		double[] betas = { 0.0001, 0.001, 0.01, 0.03, 0.075 };
 
 		if ( args.length < 6 ) {
 			System.err.println("Parser requires 6 arguments: <inputFile> <outputFile> <logFile> <weightsFile> <fromSentence> <toSentence>");
