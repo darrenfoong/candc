@@ -126,6 +126,8 @@ public class ChartParser {
 			jloop:
 			for (int j = 2; j <= numWords; j++) {
 				for (int i = j - 2; i >= 0; i--) {
+					int span = j - i;
+
 					for (int k = i + 1; k < j; k++) {
 						if (Chart.getNumSuperCategories() > MAX_SUPERCATS) {
 							maxSuperCatsExceeded = true;
@@ -134,24 +136,19 @@ public class ChartParser {
 							break jloop;
 						}
 
-						int right1 = k - i;
-						int right2 = j - k;
+						int leftSpan = k - i;
+						int rightSpan = j - k;
 
 						if (printDetailedOutput) {
-							System.out.println("combining cells: (" + i + "," + right1 + ") (" + k + "," + right2 + ")");
+							System.out.println("Combining cells: (" + i + "," + leftSpan + ") (" + k + "," + rightSpan + ")");
 						}
 
-						combine(chart.cell(i, right1), chart.cell(k, right2), i, j - i);
+						combine(chart.cell(i, leftSpan), chart.cell(k, rightSpan), i, span);
 					}
 
-					/*
-					 * apply unary rules to lexical categories; typeChange needs to come
-					 * before typeRaise since some results of typeChange can be
-					 * type-raised (but not vice versa)
-					 */
-					if (j - i < numWords) {
-						typeChange(chart.cell(i, j - i), i, j - i);
-						typeRaise(chart.cell(i, j - i), i, j - i);
+					if (span < numWords) {
+						typeChange(chart.cell(i, span), i, span);
+						typeRaise(chart.cell(i, span), i, span);
 					}
 				}
 			}
