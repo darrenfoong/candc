@@ -68,6 +68,6 @@ public class FeatureCat implements Feature<FeatureCat> {
 
 	@Override
 	public String toString() {
-		return featureType + " " + cat.toStringNoOuterBrackets();
+		return featureType + " " + cat;
 	}
 }
