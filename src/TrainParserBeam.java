@@ -115,7 +115,7 @@ public class TrainParserBeam {
 						System.out.println("Parsing sentence " + iteration + "/" + numSentence);
 						log.println("Parsing sentence " + iteration + "/" + numSentence);
 
-						parser.parseSentence(sentences.next(), log, betas);
+						parser.parseSentence(sentences.next(), log, betas, goldDepsPerCell, oracleDecoder);
 
 						oracleDecoder.readDeps(goldDeps, parser.categories);
 
