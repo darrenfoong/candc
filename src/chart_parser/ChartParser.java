@@ -129,8 +129,8 @@ public class ChartParser {
 					for (int k = i + 1; k < j; k++) {
 						if (Chart.getNumSuperCategories() > MAX_SUPERCATS) {
 							maxSuperCatsExceeded = true;
-							System.out.println("MAX_SUPERCATS exceeded!");
-							log.println("MAX_SUPERCATS exceeded!");
+							System.out.println("MAX_SUPERCATS exceeded. (" + Chart.getNumSuperCategories() + " > " + MAX_SUPERCATS + ")");
+							log.println("MAX_SUPERCATS exceeded. (" + Chart.getNumSuperCategories() + " > " + MAX_SUPERCATS + ")");
 							break jloop;
 						}
 
