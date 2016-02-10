@@ -1,10 +1,12 @@
 bin
 data
 docs
-gc
+grammar
 lib
+model
 output
 scripts
+words_feats
 .settings
 src/.git
 src/.gitignore
@@ -18,8 +20,10 @@ evaluate
 evaluatebeam
 hashcodedist
 incorrectdeps
-init
 Makefile
 parse
 parsebeam
+printforests
 trainbeam
+trainloglinear
+trainviterbi

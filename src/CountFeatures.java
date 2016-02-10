@@ -25,9 +25,9 @@ public class CountFeatures {
 		boolean newFeatures = true;
 		boolean cubePruning = false;
 
-		String grammarDir = "data/baseline_expts/grammar";
-		String lexiconFile = "data/baseline_expts/working/lexicon/wsj02-21.wordsPos";
-		String featuresFile = "data/baseline_expts/working/lexicon/wsj02-21.feats.1-22";
+		String grammarDir = "grammar";
+		String lexiconFile = "words_feats/wsj02-21.wordsPos";
+		String featuresFile = "words_feats/wsj02-21.feats.1-22";
 
 		RuleInstancesParams ruleInstancesParams = new RuleInstancesParams(true, false, false, false, false, false, grammarDir);
 

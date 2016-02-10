@@ -41,7 +41,7 @@ public class OracleParser {
 		// if false then uses the F-score decoder
 		boolean oracleFscore = !depsSumDecoder;
 
-		String grammarDir = "data/baseline_expts/grammar";
+		String grammarDir = "grammar";
 
 		RuleInstancesParams ruleInstancesParams = new RuleInstancesParams(true, false, false, false, false, false, grammarDir);
 
