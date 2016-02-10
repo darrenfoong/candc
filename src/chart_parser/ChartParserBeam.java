@@ -553,5 +553,6 @@ public class ChartParserBeam extends ChartParser {
 				}
 			}
 		}
+		outChartDeps.println();
 	}
 }
