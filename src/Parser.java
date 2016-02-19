@@ -1,6 +1,3 @@
-import io.Preface;
-import io.Sentences;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
@@ -9,19 +6,25 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import model.Lexicon;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import cat_combination.RuleInstancesParams;
 import chart_parser.ChartParser;
 import chart_parser.ViterbiDecoder;
+import io.Preface;
+import io.Sentences;
+import model.Lexicon;
 
 public class Parser {
+	public static final Logger logger = LogManager.getLogger(Parser.class);
+
 	public static void main(String[] args) {
 		int MAX_WORDS = 250;
 		int MAX_SUPERCATS = 300000;
 
 		boolean altMarkedup = false;
 		boolean eisnerNormalForm = true;
-		boolean detailedOutput = false;
 		boolean newFeatures = false;
 		boolean compactWeights = true;
 		boolean oracleFscore = false;
@@ -47,6 +50,8 @@ public class Parser {
 		String fromSent = args[4];
 		String toSent = args[5];
 
+		System.setProperty("logFile", logFile);
+
 		int fromSentence = Integer.parseInt(fromSent);
 		int toSentence = Integer.parseInt(toSent);
 
@@ -55,7 +60,7 @@ public class Parser {
 		try {
 			lexicon = new Lexicon(lexiconFile);
 		} catch ( IOException e ) {
-			System.err.println(e);
+			logger.error(e);
 			return;
 		}
 
@@ -63,19 +68,18 @@ public class Parser {
 
 		try {
 			parser = new ChartParser(grammarDir, altMarkedup,
-					eisnerNormalForm, MAX_WORDS, MAX_SUPERCATS, detailedOutput,
+					eisnerNormalForm, MAX_WORDS, MAX_SUPERCATS,
 					oracleFscore, adaptiveSupertagging, ruleInstancesParams,
 					lexicon, featuresFile, weightsFile, newFeatures, compactWeights);
 		} catch ( IOException e ) {
-			System.err.println(e);
+			logger.error(e);
 			return;
 		}
 
 		ViterbiDecoder viterbiDecoder = new ViterbiDecoder();
 
 		try ( BufferedReader in = new BufferedReader(new FileReader(inputFile));
-				PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(outputFile)));
-				PrintWriter log = new PrintWriter(new BufferedWriter(new FileWriter(logFile))) ) {
+				PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(outputFile))) ) {
 
 			Preface.readPreface(in);
 			Preface.printPreface(out);
@@ -84,10 +88,9 @@ public class Parser {
 			sentences.skip(fromSentence - 1);
 
 			for ( int numSentence = fromSentence; numSentence <= toSentence && sentences.hasNext(); numSentence++ ) {
-				System.out.println("Parsing sentence " + numSentence);
-				log.println("Parsing sentence " + numSentence);
+				logger.info("Parsing sentence " + numSentence);
 
-				parser.parseSentence(sentences.next(), log, betas);
+				parser.parseSentence(sentences.next(),  betas);
 
 				if ( !parser.maxWordsExceeded && !parser.maxSuperCatsExceeded ) {
 					boolean success = parser.calcScores();
@@ -98,17 +101,16 @@ public class Parser {
 
 						parser.sentence.printC_line(out);
 					} else {
-						System.out.println("No root category.");
-						log.println("No root category.");
+						logger.info("No root category.");
 					}
 				}
 
 				out.println();
 			}
 		} catch ( FileNotFoundException e ) {
-			System.err.println(e);
+			logger.error(e);
 		} catch ( IOException e ) {
-			System.err.println(e);
+			logger.error(e);
 		}
 	}
 }

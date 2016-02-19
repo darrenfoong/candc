@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import training.Feature;
 import training.Forest;
 
@@ -14,6 +17,8 @@ public class Forests implements Iterator<Forest> {
 	private Forest next;
 
 	private boolean forestRead = false;
+
+	public static final Logger logger = LogManager.getLogger(Forests.class);
 
 	public Forests(BufferedReader in, Feature[] features) throws IOException {
 		this.in = in;
@@ -35,18 +40,18 @@ public class Forests implements Iterator<Forest> {
 	private void readForest() {
 			try {
 			String line = in.readLine();
-	
+
 			if ( line == null ) {
 				// no valid forest
 				next = null;
 				return;
 			}
-	
+
 			int numNodes = Integer.parseInt(line);
 			Forest forest = new Forest(in, features, numNodes);
 			next = forest;
 		} catch ( IOException e ) {
-			System.err.println(e);
+			logger.error(e);
 			next = null;
 		}
 	}

@@ -1,6 +1,3 @@
-import io.Forests;
-import io.Preface;
-
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -8,22 +5,32 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import io.Forests;
+import io.Preface;
 import training.DisjNode;
 import training.Feature;
 import training.Forest;
 
 public class TrainViterbi {
+	public static final Logger logger = LogManager.getLogger(Parser.class);
+
 	public static void main(String[] args) {
-		if ( args.length < 5 ) {
-			System.err.println("TrainViterbi requires 5 arguments: <forestFile> <weightsFile> <numIters> <fromSentence> <toSentence>");
+		if ( args.length < 6 ) {
+			System.err.println("TrainViterbi requires 6 arguments: <forestFile> <weightsFile> <logFile> <numIters> <fromSentence> <toSentence>");
 			return;
 		}
 
 		String forestFile = args[0];
 		String weightsFile = args[1];
-		String numItersStr = args[2];
-		String fromSent = args[3];
-		String toSent = args[4];
+		String logFile = args[2];
+		String numItersStr = args[3];
+		String fromSent = args[4];
+		String toSent = args[5];
+
+		System.setProperty("logFile", logFile);
 
 		int fromSentence = Integer.parseInt(fromSent);
 		int toSentence = Integer.parseInt(toSent);
@@ -51,7 +58,7 @@ public class TrainViterbi {
 				forests.skip(fromSentence - 1);
 
 				for ( int numForest = fromSentence; numForest <= toSentence && forests.hasNext(); numForest++ ) {
-					System.out.println("Reading forest " + numForest);
+					logger.info("Reading forest " + numForest);
 
 					Forest forest = forests.next();
 
@@ -89,9 +96,9 @@ public class TrainViterbi {
 				out.println(features[i].getCumulativeLambda() / numTrainInstances);
 			}
 		} catch ( FileNotFoundException e ) {
-			System.err.println(e);
+			logger.error(e);
 		} catch ( IOException e ) {
-			System.err.println(e);
+			logger.error(e);
 		}
 	}
 }

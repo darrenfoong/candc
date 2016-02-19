@@ -1,14 +1,16 @@
 package chart_parser;
 
-import io.Sentence;
-
 import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.Iterator;
 
-import lexicon.Relations;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import cat_combination.FilledDependency;
 import cat_combination.SuperCategory;
+import io.Sentence;
+import lexicon.Relations;
 
 public abstract class Decoder {
 	HashSet<FilledDependency> parserDeps;
@@ -22,6 +24,8 @@ public abstract class Decoder {
 	protected abstract void bestEquiv(SuperCategory superCat);
 
 	protected abstract double bestScore(SuperCategory superCat);
+
+	public static final Logger logger = LogManager.getLogger(Decoder.class);
 
 	/*
 	 * finds the dependencies on a best-scoring parse; assumes we've already run
@@ -43,7 +47,7 @@ public abstract class Decoder {
 		}
 
 		if (maxRoot == null) {
-			System.out.println("No best!\n");
+			logger.info("No best!\n");
 			return false;
 		}
 

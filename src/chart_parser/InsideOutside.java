@@ -1,16 +1,18 @@
 package chart_parser;
 
-import io.Sentence;
-
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import lexicon.Relations;
-import utils.NumericalFunctions;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import cat_combination.FilledDependency;
 import cat_combination.SuperCategory;
+import io.Sentence;
+import lexicon.Relations;
+import utils.NumericalFunctions;
 
 /*
  * PUT SOME COMMENTS HERE
@@ -24,6 +26,8 @@ public class InsideOutside {
 	 * probably be taken into account
 	 */
 	HashMap<FilledDependency, Double> depScores;
+
+	public static final Logger logger = LogManager.getLogger(InsideOutside.class);
 
 	public InsideOutside() {
 		depScores = new HashMap<FilledDependency, Double>();
@@ -164,12 +168,11 @@ public class InsideOutside {
 	public void printDepScores(PrintWriter out, Relations relations,
 			Sentence sentence) {
 		for ( Map.Entry<FilledDependency, Double> entry : depScores.entrySet() ) {
-			System.out.print("Dependency score for dep: ");
 			PrintWriter writer = new PrintWriter(System.out);
 			FilledDependency filled = entry.getKey();
 			filled.printFull(writer, relations, sentence);
 			writer.flush();
-			System.out.println(" " + entry.getValue());
+			logger.info("Dependency score for dep: " + entry.getValue());
 		}
 	}
 

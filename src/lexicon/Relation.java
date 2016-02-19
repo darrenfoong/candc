@@ -1,5 +1,8 @@
 package lexicon;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /*
  * a triple consisting of: markedup category string, relation slot number,
  * and relation slot number according to Julia's ordering in CCGbank, which
@@ -10,6 +13,8 @@ public class Relation {
 	public final String category;
 	public final short slot;
 	public final short jslot;
+
+	public static final Logger logger = LogManager.getLogger(Relation.class);
 
 	public Relation(String category, short slot, short jslot) {
 		this.category = category;
@@ -25,9 +30,9 @@ public class Relation {
 
 	public void printSlot(boolean juliaSlots) {
 		if ( juliaSlots ) {
-			System.out.print(category + " " + jslot);
+			logger.info(category + " " + jslot);
 		} else {
-			System.out.print(category + " " + slot);
+			logger.info(category + " " + slot);
 		}
 	}
 }

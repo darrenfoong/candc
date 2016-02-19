@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import lexicon.Categories;
 import lexicon.Category;
 
@@ -17,6 +20,8 @@ public class Sentences implements Iterator<Sentence> {
 	private Sentence next;
 
 	private boolean sentenceRead = false;
+
+	public static final Logger logger = LogManager.getLogger(Sentences.class);
 
 	public Sentences(BufferedReader in,
 			BufferedReader stagsIn,
@@ -120,7 +125,7 @@ public class Sentences implements Iterator<Sentence> {
 				sentence.addSupertags(supertags);
 			}
 		} catch ( IOException e ) {
-			System.err.println(e);
+			logger.error(e);
 			next = null;
 		}
 	}

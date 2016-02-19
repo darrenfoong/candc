@@ -1,7 +1,5 @@
 package lexicon;
 
-import io.Preface;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -9,6 +7,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import io.Preface;
 import utils.ByteWrapper;
 import utils.ShortWrapper;
 
@@ -37,6 +39,8 @@ public class Categories {
 	public ArrayList<TypeRaisedCategory> trPPs;
 	public ArrayList<TypeRaisedCategory> trAPs;
 	public ArrayList<TypeRaisedCategory> trVP_TOs;
+
+	public static final Logger logger = LogManager.getLogger(Categories.class);
 
 	// ALT_MARKEDUP signals to use the alternative lines in the markedup file (marked ! in the file)
 	public Categories(String grammarDir, boolean ALT_MARKEDUP) {
@@ -187,7 +191,7 @@ public class Categories {
 				}
 			}
 		} catch ( IOException e ) {
-			System.err.println(e);
+			logger.error(e);
 		}
 	}
 
@@ -449,7 +453,7 @@ public class Categories {
 				trList.add(trCat);
 			}
 		} catch ( IOException e ) {
-			System.err.println(e);
+			logger.error(e);
 		}
 	}
 

@@ -1,6 +1,3 @@
-import io.Preface;
-import io.Sentences;
-
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -8,12 +5,19 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.io.IoBuilder;
+
 import cat_combination.RuleInstancesParams;
 import cat_combination.Rules;
 import chart_parser.ChartParser;
 import chart_parser.OracleDecoder;
 import chart_parser.OracleDepsSumDecoder;
 import chart_parser.OracleFscoreDecoder;
+import io.Preface;
+import io.Sentences;
 
 /*
  * this gets used for a number of tasks:
@@ -29,13 +33,14 @@ import chart_parser.OracleFscoreDecoder;
  */
 
 public class OracleParser {
+	public static final Logger logger = LogManager.getLogger(OracleParser.class);
+
 	public static void main(String[] args) {
 		int MAX_WORDS = 250;
 		int MAX_SUPERCATS = 2000000;
 
 		boolean altMarkedup = false;
 		boolean eisnerNormalForm = true;
-		boolean detailedOutput = false;
 
 		boolean depsSumDecoder = false;
 		// if false then uses the F-score decoder
@@ -69,6 +74,8 @@ public class OracleParser {
 		String fromSent = args[6];
 		String toSent = args[7];
 
+		System.setProperty("logFile", logFile);
+
 		int fromSentence = Integer.parseInt(fromSent);
 		int toSentence = Integer.parseInt(toSent);
 
@@ -76,11 +83,11 @@ public class OracleParser {
 
 		try {
 			parser = new ChartParser(grammarDir, altMarkedup,
-					eisnerNormalForm, MAX_WORDS, MAX_SUPERCATS, detailedOutput,
+					eisnerNormalForm, MAX_WORDS, MAX_SUPERCATS,
 					oracleFscore, adaptiveSupertagging, ruleInstancesParams, null,
 					null, null, false, false);
 		} catch ( IOException e ) {
-			System.err.println(e);
+			logger.error(e);
 			return;
 		}
 
@@ -98,7 +105,7 @@ public class OracleParser {
 				BufferedReader roots = new BufferedReader(new FileReader(rootCatsFile));
 				PrintWriter out = new PrintWriter(new FileWriter(outputFile));
 				PrintWriter out2 = new PrintWriter(new FileWriter(outputFile + ".per_cell"));
-				PrintWriter log = new PrintWriter(new FileWriter(logFile));
+				PrintWriter log = IoBuilder.forLogger(logger).setLevel(Level.INFO).buildPrintWriter();
 				PrintWriter rules = extractRuleInstances ? new PrintWriter(new FileWriter(oracleRuleInstancesFile)) : null ) {
 
 			Preface.readPreface(in);
@@ -115,10 +122,9 @@ public class OracleParser {
 			sentences.skip(fromSentence - 1);
 
 			for ( int numSentence = fromSentence; numSentence <= toSentence && sentences.hasNext(); numSentence++ ) {
-				System.out.println("Parsing sentence " + numSentence);
-				log.println("Parsing sentence " + numSentence);
+				logger.info("Parsing sentence " + numSentence);
 
-				parser.parseSentence(sentences.next(), log, betas);
+				parser.parseSentence(sentences.next(), betas);
 
 				oracleDecoder.readDeps(gold, parser.categories);
 
@@ -129,15 +135,15 @@ public class OracleParser {
 				if ( !parser.maxWordsExceeded && !parser.maxSuperCatsExceeded ) {
 					double maxScore = oracleDecoder.decode(parser.chart, parser.sentence);
 
-					log.println("Max score: " + maxScore);
-					log.println("Num gold deps: " + oracleDecoder.numGoldDeps());
+					logger.info("Max score: " + maxScore);
+					logger.info("Num gold deps: " + oracleDecoder.numGoldDeps());
 					if ( maxScore == Double.NEGATIVE_INFINITY ) {
-						log.println("NO SPAN!");
+						logger.info("NO SPAN!");
 					}
 
 					boolean checkRoot = true;
 					if ( oracleDecoder.getParserDeps(parser.chart, maxScore, parser.sentence, ignoreDepsFlag, checkRoot) ) {
-						log.println("Num parser deps: " + oracleDecoder.numParserDeps());
+						logger.info("Num parser deps: " + oracleDecoder.numParserDeps());
 						oracleDecoder.printMissingDeps(log, parser.categories.dependencyRelations, parser.sentence);
 
 						if ( !training ) {
@@ -168,27 +174,27 @@ public class OracleParser {
 				oracleDecoder.printRuleInstances(rules);
 			}
 
-			log.println("Rule counts:");
-			log.println("Forward application: " + Rules.forwardAppCount);
-			log.println("Backward application: " + Rules.backwardAppCount);
-			log.println("Forward Composition: " + Rules.forwardCompCount);
-			log.println("Backward Composition: " + Rules.backwardCompCount);
-			log.println("Backward Cross Composition: " + Rules.backwardCrossCount);
-			log.println("Generalised Forward Composition: " + Rules.genForwardCompCount);
-			log.println("Generalised Backward Composition: " + Rules.genBackwardCompCount);
-			log.println("Generalised Backward Cross Composition: " + Rules.genBackwardCrossCount);
-			log.println("Apposition: " + Rules.appositionCount);
-			log.println("Right punct: " + Rules.rightPunctCount);
-			log.println("Left punct: " + Rules.leftPunctCount);
-			log.println("Left punct conj: " + Rules.leftPunctConjCount);
-			log.println("Left comma type-change: " + Rules.leftCommaTCCount);
-			log.println("Right comma type-change: " + Rules.rightCommaTCCount);
-			log.println("Conj count: " + Rules.conjCount);
-			log.println("Funny conj count: " + Rules.funnyConjCount);
+			logger.info("Rule counts:");
+			logger.info("Forward application: " + Rules.forwardAppCount);
+			logger.info("Backward application: " + Rules.backwardAppCount);
+			logger.info("Forward Composition: " + Rules.forwardCompCount);
+			logger.info("Backward Composition: " + Rules.backwardCompCount);
+			logger.info("Backward Cross Composition: " + Rules.backwardCrossCount);
+			logger.info("Generalised Forward Composition: " + Rules.genForwardCompCount);
+			logger.info("Generalised Backward Composition: " + Rules.genBackwardCompCount);
+			logger.info("Generalised Backward Cross Composition: " + Rules.genBackwardCrossCount);
+			logger.info("Apposition: " + Rules.appositionCount);
+			logger.info("Right punct: " + Rules.rightPunctCount);
+			logger.info("Left punct: " + Rules.leftPunctCount);
+			logger.info("Left punct conj: " + Rules.leftPunctConjCount);
+			logger.info("Left comma type-change: " + Rules.leftCommaTCCount);
+			logger.info("Right comma type-change: " + Rules.rightCommaTCCount);
+			logger.info("Conj count: " + Rules.conjCount);
+			logger.info("Funny conj count: " + Rules.funnyConjCount);
 		} catch ( FileNotFoundException e ) {
-			System.err.println(e);
+			logger.error(e);
 		} catch ( IOException e ) {
-			System.err.println(e);
+			logger.error(e);
 		}
 	}
 }

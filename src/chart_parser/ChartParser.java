@@ -1,25 +1,26 @@
 package chart_parser;
 
-import io.Sentence;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-import lexicon.Categories;
-import model.Features;
-import model.Lexicon;
-import model.Weights;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import cat_combination.FilledDependency;
 import cat_combination.RuleInstancesParams;
 import cat_combination.Rules;
 import cat_combination.SuperCategory;
+import io.Sentence;
+import lexicon.Categories;
+import model.Features;
+import model.Lexicon;
+import model.Weights;
 
 public class ChartParser {
 	public final int MAX_SUPERCATS;
 
-	public boolean printDetailedOutput;
 	public boolean oracleFscore;
 	public boolean adaptiveSupertagging;
 	public boolean maxSuperCatsExceeded = false;
@@ -35,13 +36,14 @@ public class ChartParser {
 	public ArrayList<SuperCategory> results;
 	public ArrayList<Integer> featureIDs;
 
+	public static final Logger logger = LogManager.getLogger(ChartParser.class);
+
 	public ChartParser(
 					String grammarDir,
 					boolean altMarkedup,
 					boolean eisnerNormalForm,
 					int MAX_WORDS,
 					int MAX_SUPERCATS,
-					boolean output,
 					boolean oracleFscore,
 					boolean adaptiveSupertagging,
 					RuleInstancesParams ruleInstancesParams,
@@ -51,7 +53,6 @@ public class ChartParser {
 					boolean newFeatures,
 					boolean compactWeights) throws IOException {
 		this.MAX_SUPERCATS = MAX_SUPERCATS;
-		this.printDetailedOutput = output;
 		this.oracleFscore = oracleFscore;
 		this.adaptiveSupertagging = adaptiveSupertagging;
 		this.categories = new Categories(grammarDir, altMarkedup);
@@ -70,18 +71,18 @@ public class ChartParser {
 		this.results = new ArrayList<SuperCategory>();
 		this.featureIDs = new ArrayList<Integer>();
 
-		this.chart = new Chart(MAX_WORDS, output, categories.dependencyRelations, oracleFscore, false);
+		this.chart = new Chart(MAX_WORDS, categories.dependencyRelations, oracleFscore, false);
 		this.chart.setWeights(this.weights);
 	}
 
-	public boolean parseSentence(Sentence sentence, PrintWriter log, double[] betas) {
+	public boolean parseSentence(Sentence sentence, double[] betas) {
 		int betaLevel;
 
 		if (adaptiveSupertagging) {
 			betaLevel = 0;
 		} else {
 			if (betas.length < 3) {
-				System.err.println("Need at least 3 beta values for reverse adaptive supertagging.");
+				logger.error("Need at least 3 beta values for reverse adaptive supertagging.");
 				return true;
 			}
 			betaLevel = 2;
@@ -92,13 +93,11 @@ public class ChartParser {
 		maxWordsExceeded = false;
 		int numWords = sentence.words.size();
 		if ( numWords > chart.MAX_WORDS ) {
-			System.out.println(" Sentence has " + numWords + " words; MAX_WORDS exceeded.");
-			log.println(" Sentence has " + numWords + " words; MAX_WORDS exceeded.");
+			logger.info(" Sentence has " + numWords + " words; MAX_WORDS exceeded.");
 			maxWordsExceeded = true;
 			return true;
 		} else {
-			System.out.println(" Sentence has " + numWords + " words.");
-			log.println(" Sentence has " + numWords + " words.");
+			logger.info(" Sentence has " + numWords + " words.");
 		}
 
 		if (lexicon != null) {
@@ -106,8 +105,7 @@ public class ChartParser {
 		}
 
 		while (betaLevel < betas.length) {
-			System.out.println("Trying beta level " + betaLevel + " with beta value " + betas[betaLevel]);
-			log.println("Trying beta level " + betaLevel + " with beta value " + betas[betaLevel]);
+			logger.info("Trying beta level " + betaLevel + " with beta value " + betas[betaLevel]);
 
 			maxSuperCatsExceeded = false;
 			chart.clear();
@@ -129,14 +127,11 @@ public class ChartParser {
 					for (int k = 1; k < j; k++) {
 						if (Chart.getNumSuperCategories() > MAX_SUPERCATS) {
 							maxSuperCatsExceeded = true;
-							System.out.println("MAX_SUPERCATS exceeded. (" + Chart.getNumSuperCategories() + " > " + MAX_SUPERCATS + ")");
-							log.println("MAX_SUPERCATS exceeded. (" + Chart.getNumSuperCategories() + " > " + MAX_SUPERCATS + ")");
+							logger.info("MAX_SUPERCATS exceeded. (" + Chart.getNumSuperCategories() + " > " + MAX_SUPERCATS + ")");
 							break jloop;
 						}
 
-						if (printDetailedOutput) {
-							System.out.println("Combining cells: (" + i + "," + k + ") (" + (i+k) + "," + (j-k) + ")");
-						}
+						logger.trace("Combining cells: (" + i + "," + k + ") (" + (i+k) + "," + (j-k) + ")");
 
 						combine(chart.cell(i, k), chart.cell(i+k, j-k), i, j);
 					}
@@ -179,14 +174,12 @@ public class ChartParser {
 
 		for (SuperCategory leftSuperCat : leftCell.getSuperCategories()) {
 			for (SuperCategory rightSuperCat : rightCell.getSuperCategories()) {
-				boolean success = rules.combine(leftSuperCat, rightSuperCat, results, printDetailedOutput, sentence);
-				if (printDetailedOutput) {
+				boolean success = rules.combine(leftSuperCat, rightSuperCat, results, sentence);
 					if (success) {
-						System.out.println("success!: " + results.get(results.size() - 1).cat);
+						logger.trace("success!: " + results.get(results.size() - 1).cat);
 					} else {
-						System.out.println("failed to combine");
+						logger.trace("failed to combine");
 					}
-				}
 			}
 		}
 
@@ -405,20 +398,7 @@ public class ChartParser {
 		}
 
 		if (!foundGold) {
-			System.out.println("Didn't find any oracle deps.");
-		}
-	}
-
-	public void printChart() {
-		int numWords = sentence.words.size();
-
-		for (int span = numWords; span > 0; span--) {
-			for (int pos = 0; pos <= numWords-span; pos++) {
-				System.out.println("Cell (" + pos + "," + span + ") contains:");
-				for (SuperCategory superCat : chart.cell(pos, span).getSuperCategories()) {
-					System.out.println(" " + superCat.cat.toStringNoOuterBrackets() + " " + superCat.score);
-				}
-			}
+			logger.info("Didn't find any oracle deps.");
 		}
 	}
 }

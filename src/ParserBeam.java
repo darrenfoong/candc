@@ -1,6 +1,3 @@
-import io.Preface;
-import io.Sentences;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
@@ -9,18 +6,24 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import model.Lexicon;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import cat_combination.RuleInstancesParams;
 import chart_parser.ChartParserBeam;
+import io.Preface;
+import io.Sentences;
+import model.Lexicon;
 
 public class ParserBeam {
+	public static final Logger logger = LogManager.getLogger(ParserBeam.class);
+
 	public static void main(String[] args) {
 		int MAX_WORDS = 150;
 		int MAX_SUPERCATS = 500000;
 
 		boolean altMarkedup = false;
 		boolean eisnerNormalForm = true;
-		boolean detailedOutput = false;
 		boolean newFeatures = false;
 		boolean compactWeights = true;
 		boolean cubePruning = false;
@@ -53,6 +56,8 @@ public class ParserBeam {
 		String fromSent = args[4];
 		String toSent = args[5];
 
+		System.setProperty("logFile", logFile);
+
 		int fromSentence = Integer.parseInt(fromSent);
 		int toSentence = Integer.parseInt(toSent);
 
@@ -61,7 +66,7 @@ public class ParserBeam {
 		try {
 			lexicon = new Lexicon(lexiconFile);
 		} catch ( IOException e ) {
-			System.err.println(e);
+			logger.error(e);
 			return;
 		}
 
@@ -69,17 +74,16 @@ public class ParserBeam {
 
 		try {
 			parser = new ChartParserBeam(grammarDir, altMarkedup,
-					eisnerNormalForm, MAX_WORDS, MAX_SUPERCATS, detailedOutput,
+					eisnerNormalForm, MAX_WORDS, MAX_SUPERCATS,
 					ruleInstancesParams, lexicon, featuresFile, weightsFile,
 					newFeatures, compactWeights, cubePruning, beamSize, beta);
 		} catch ( IOException e ) {
-			System.err.println(e);
+			logger.error(e);
 			return;
 		}
 
 		try ( BufferedReader in = new BufferedReader(new FileReader(inputFile));
 				PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(outputFile)));
-				PrintWriter log = new PrintWriter(new BufferedWriter(new FileWriter(logFile)));
 				PrintWriter outChartDeps = printChartDeps ? new PrintWriter(new BufferedWriter(new FileWriter(outputFile + ".chartdeps"))) : null ) {
 
 			Preface.readPreface(in);
@@ -93,10 +97,9 @@ public class ParserBeam {
 			sentences.skip(fromSentence - 1);
 
 			for ( int numSentence = fromSentence; numSentence <= toSentence && sentences.hasNext(); numSentence++ ) {
-				System.out.println("Parsing sentence " + numSentence);
-				log.println("Parsing sentence " + numSentence);
+				logger.info("Parsing sentence " + numSentence);
 
-				parser.parseSentence(sentences.next(), log, betas);
+				parser.parseSentence(sentences.next(), betas);
 
 				if ( !parser.maxWordsExceeded && !parser.maxSuperCatsExceeded ) {
 					boolean success = parser.root();
@@ -105,8 +108,7 @@ public class ParserBeam {
 						parser.printDeps(out, parser.categories.dependencyRelations, parser.sentence);
 						parser.sentence.printC_line(out);
 					} else {
-						System.out.println("No root category.");
-						log.println("No root category.");
+						logger.info("No root category.");
 					}
 				}
 
@@ -118,9 +120,9 @@ public class ParserBeam {
 				}
 			}
 		} catch ( FileNotFoundException e ) {
-			System.err.println(e);
+			logger.error(e);
 		} catch ( IOException e ) {
-			System.err.println(e);
+			logger.error(e);
 		}
 	}
 }

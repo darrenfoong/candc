@@ -5,6 +5,10 @@ import io.Supertag;
 
 import java.util.ArrayList;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import lexicon.Category;
 import lexicon.Relations;
 import model.Weights;
@@ -22,7 +26,7 @@ import cat_combination.SuperCategory;
  */
 
 public class Chart {
-	public final boolean printDetailedOutput;
+
 	public final int MAX_WORDS;
 	public final int MAX_CELLS;
 	public final int NUM_CATS_IN_CELL = 10;
@@ -40,6 +44,8 @@ public class Chart {
 
 	private static int numSuperCategories;
 
+	public static final Logger logger = LogManager.getLogger(Chart.class);
+
 	public static void setNumSuperCategories(int n) {
 		numSuperCategories = n;
 	}
@@ -48,8 +54,7 @@ public class Chart {
 		return numSuperCategories;
 	}
 
-	public Chart(int MAX_WORDS, boolean output, Relations relations, boolean oracleFscore, boolean trainingBeamParser) {
-		this.printDetailedOutput = output;
+	public Chart(int MAX_WORDS, Relations relations, boolean oracleFscore, boolean trainingBeamParser) {
 		this.MAX_WORDS = MAX_WORDS;
 		this.MAX_CELLS = (MAX_WORDS + 1) * MAX_WORDS / 2;
 
@@ -100,20 +105,17 @@ public class Chart {
 	}
 
 	public void add(int position, int span, SuperCategory superCat) {
-		if (printDetailedOutput) {
-			System.out.println("adding to chart: " + superCat.cat);
+		logger.trace("adding to chart: " + superCat.cat);
+
+		if ( logger.getLevel().isLessSpecificThan(Level.TRACE) ) {
 			superCat.printFilledDeps(relations);
 		}
 
 		if (equiv.add(position, span, superCat)) {
-			if (printDetailedOutput) {
-				System.out.println("no equivalent");
-			}
+			logger.trace("no equivalent");
 			cell(position, span).add(superCat);
 		} else {
-			if (printDetailedOutput) {
-				System.out.println("found equivalent category!");
-			}
+			logger.trace("found equivalent category!");
 			Chart.setNumSuperCategories(Chart.getNumSuperCategories()+1);
 		}
 	}

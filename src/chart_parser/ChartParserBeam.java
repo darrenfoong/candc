@@ -27,7 +27,6 @@ public class ChartParserBeam extends ChartParser {
 					boolean eisnerNormalForm,
 					int MAX_WORDS,
 					int MAX_SUPERCATS,
-					boolean output,
 					RuleInstancesParams ruleInstancesParams,
 					Lexicon lexicon,
 					String featuresFile,
@@ -38,10 +37,10 @@ public class ChartParserBeam extends ChartParser {
 					int beamSize,
 					double beta) throws IOException {
 		super(grammarDir, altMarkedup, eisnerNormalForm, MAX_WORDS,
-					MAX_SUPERCATS, output, false, false, ruleInstancesParams,
+					MAX_SUPERCATS, false, false, ruleInstancesParams,
 					lexicon, featuresFile, weightsFile, newFeatures, compactWeights);
 
-		this.chart = new Chart(MAX_WORDS, output, categories.dependencyRelations, false, false);
+		this.chart = new Chart(MAX_WORDS, categories.dependencyRelations, false, false);
 		this.chart.setWeights(this.weights);
 
 		this.cubePruning = cubePruning;
@@ -68,7 +67,7 @@ public class ChartParserBeam extends ChartParser {
 	 * sentences left
 	 */
 	@Override
-	public boolean parseSentence(Sentence sentence, PrintWriter log, double[] betas) {
+	public boolean parseSentence(Sentence sentence,  double[] betas) {
 		if (betas.length != 1) {
 			throw new IllegalArgumentException("Only need 1 beta value.");
 		}
@@ -78,13 +77,11 @@ public class ChartParserBeam extends ChartParser {
 		maxWordsExceeded = false;
 		int numWords = sentence.words.size();
 		if ( numWords > chart.MAX_WORDS ) {
-			System.out.println(" Sentence has " + numWords + " words; MAX_WORDS exceeded.");
-			log.println(" Sentence has " + numWords + " words; MAX_WORDS exceeded.");
+			logger.info(" Sentence has " + numWords + " words; MAX_WORDS exceeded.");
 			maxWordsExceeded = true;
 			return true;
 		} else {
-			System.out.println(" Sentence has " + numWords + " words; chart capacity: " + (beamSize*numWords*(numWords+1)/2));
-			log.println(" Sentence has " + numWords + " words; chart capacity: " + (beamSize*numWords*(numWords+1)/2));
+			logger.info(" Sentence has " + numWords + " words; chart capacity: " + (beamSize*numWords*(numWords+1)/2));
 		}
 
 		if (lexicon != null) {
@@ -137,14 +134,11 @@ public class ChartParserBeam extends ChartParser {
 				for (int k = 1; k < j; k++) {
 					if (Chart.getNumSuperCategories() > MAX_SUPERCATS) {
 						maxSuperCatsExceeded = true;
-						System.out.println("MAX_SUPERCATS exceeded. (" + Chart.getNumSuperCategories() + " > " + MAX_SUPERCATS + ")");
-						log.println("MAX_SUPERCATS exceeded. (" + Chart.getNumSuperCategories() + " > " + MAX_SUPERCATS + ")");
+						logger.info("MAX_SUPERCATS exceeded. (" + Chart.getNumSuperCategories() + " > " + MAX_SUPERCATS + ")");
 						break jloop;
 					}
 
-					if (printDetailedOutput) {
-						System.out.println("Combining cells: (" + i + "," + k + ") (" + (i+k) + "," + (j-k) + ")");
-					}
+					logger.trace("Combining cells: (" + i + "," + k + ") (" + (i+k) + "," + (j-k) + ")");
 
 					if (cubePruning) {
 						combineBetter(chart.cell(i, k), chart.cell(i+k, j-k), i, j, (j == numWords));
@@ -211,7 +205,7 @@ public class ChartParserBeam extends ChartParser {
 
 		for (SuperCategory leftSuperCat : leftCell.getSuperCategories()) {
 			for (SuperCategory rightSuperCat : rightCell.getSuperCategories()) {
-				rules.combine(leftSuperCat, rightSuperCat, results, printDetailedOutput, sentence);
+				rules.combine(leftSuperCat, rightSuperCat, results, sentence);
 			}
 		}
 
@@ -234,7 +228,7 @@ public class ChartParserBeam extends ChartParser {
 
 				for (SuperCategory leftSuperCat : leftCell.getSuperCategories()) {
 					for (SuperCategory rightSuperCat : rightCell.getSuperCategories()) {
-						rules.combine(leftSuperCat, rightSuperCat, results, printDetailedOutput, sentence);
+						rules.combine(leftSuperCat, rightSuperCat, results, sentence);
 					}
 				}
 
@@ -277,7 +271,7 @@ public class ChartParserBeam extends ChartParser {
 						SuperCategory leftSuperCat = leftCell.getSuperCategories().get(leftIndex);
 						SuperCategory rightSuperCat = rightCell.getSuperCategories().get(rightIndex);
 
-						rules.combine(leftSuperCat, rightSuperCat, results, printDetailedOutput, sentence);
+						rules.combine(leftSuperCat, rightSuperCat, results, sentence);
 
 						if ( !results.isEmpty() ) {
 							for (SuperCategory resultSuperCat : results) {

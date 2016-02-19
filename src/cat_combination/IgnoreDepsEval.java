@@ -1,13 +1,15 @@
 package cat_combination;
 
-import io.Sentence;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import io.Sentence;
 import lexicon.Relations;
 
 /*
@@ -32,6 +34,8 @@ public class IgnoreDepsEval {
 
 	String EMPTY_FILLER = "-EMPTY-";
 	// some string unlikely to occur in a filled dependency
+
+	public static final Logger logger = LogManager.getLogger(IgnoreDepsEval.class);
 
 	public IgnoreDepsEval(String ruleIDsFile, String relRuleIDsFile,
 			String relHeadFile, String relHeadFillerFile, Relations relations) {
@@ -135,7 +139,7 @@ public class IgnoreDepsEval {
 			}
 
 		} catch (IOException e) {
-			System.err.println(e);
+			logger.error(e);
 		}
 	}
 

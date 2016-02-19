@@ -113,8 +113,7 @@ public class OracleFscoreDecoder extends OracleDecoder {
 			}
 		}
 		if (bestEquivSuperCat == null) {
-			System.out.println("No best!\n");
-			// System.out.println("No best!\n");
+			logger.info("No best!\n");
 			return false;
 		}
 		getDeps(bestEquivSuperCat, sentence, ignoreDeps);
@@ -179,7 +178,7 @@ public class OracleFscoreDecoder extends OracleDecoder {
 			}
 		}
 		if (!foundMax) {
-			System.out.println("Not found a max in markOracleDeps!");
+			logger.info("Not found a max in markOracleDeps!");
 		}
 		return foundMax;
 	}

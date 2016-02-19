@@ -1,11 +1,13 @@
 package cat_combination;
 
-import io.Sentence;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import io.Sentence;
 import lexicon.Category;
 import lexicon.Relations;
 import lexicon.TypeRaisedCategory;
@@ -69,6 +71,8 @@ public class SuperCategory {
 	 * into account in the evaluation)
 	 */
 	private static IgnoreDepsEval ignoreDeps;
+
+	public static final Logger logger = LogManager.getLogger(SuperCategory.class);
 
 	public static void setIgnoreDepsEval(IgnoreDepsEval i) {
 		ignoreDeps = i;
@@ -620,9 +624,9 @@ public class SuperCategory {
 	}
 
 	public void printFilledDeps(Relations relations) {
-		System.out.println("printing deps:");
+		logger.info("printing deps:");
 		for ( FilledDependency dep : filledDeps ) {
-			System.out.println(dep);
+			logger.info(dep);
 		}
 	}
 

@@ -1,18 +1,22 @@
 package cat_combination;
 
-import io.Preface;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashSet;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import io.Preface;
 import lexicon.Categories;
 import lexicon.Category;
 
 public class RuleInstances {
 	HashSet<RuleCategoryPair> ruleInstances;
+
+	public static final Logger logger = LogManager.getLogger(RuleInstances.class);
 
 	public RuleInstances(String ruleInstancesFile, Categories categories) {
 		ruleInstances = new HashSet<RuleCategoryPair>();
@@ -52,7 +56,7 @@ public class RuleInstances {
 				ruleInstances.add(catPair);
 			}
 		} catch (IOException e) {
-			System.err.println(e);
+			logger.error(e);
 		}
 	}
 }

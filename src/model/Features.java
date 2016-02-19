@@ -1,16 +1,18 @@
 package model;
 
-import io.Preface;
-import io.Sentence;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
-import lexicon.Categories;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import cat_combination.SuperCategory;
+import io.Preface;
+import io.Sentence;
+import lexicon.Categories;
 
 public class Features {
 	// FeatureCat
@@ -129,6 +131,8 @@ public class Features {
 
 	private static boolean newFeatures;
 
+	public static final Logger logger = LogManager.getLogger(Features.class);
+
 	public static void setNewFeatures(boolean n) {
 		newFeatures = n;
 	}
@@ -183,7 +187,7 @@ public class Features {
 			numFeatures = ID;
 			// ID starts at 1 (because of logp)
 			// and gets incremented after each feature has been read
-			System.out.println("Total number of features read in: " + numFeatures);
+			logger.info("Total number of features read in: " + numFeatures);
 		}
 	}
 
@@ -240,7 +244,7 @@ public class Features {
 			numFeatures = ID;
 			// ID starts at 1 (because of logp)
 			// and gets incremented after each feature has been read
-			System.out.println("Total number of features read in: " + numFeatures);
+			logger.info("Total number of features read in: " + numFeatures);
 		}
 	}
 

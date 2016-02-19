@@ -1,6 +1,3 @@
-import io.Preface;
-import io.Sentences;
-
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -8,19 +5,25 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import model.Lexicon;
-import training.PrintForest;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import cat_combination.RuleInstancesParams;
 import chart_parser.ChartParser;
 import chart_parser.OracleDepsSumDecoder;
+import io.Preface;
+import io.Sentences;
+import model.Lexicon;
+import training.PrintForest;
 
 public class PrintForests {
+	public static final Logger logger = LogManager.getLogger(Parser.class);
+
 	public static void main(String[] args) {
 		int MAX_WORDS = 250;
 		int MAX_SUPERCATS = 1000000;
 		boolean altMarkedup = false;
 		boolean eisnerNormalForm = true;
-		boolean detailedOutput = false;
 		boolean newFeatures = false;
 		boolean oracleFscore = false;
 		// we only use the depsSumDecoder for printing forests;
@@ -56,6 +59,8 @@ public class PrintForests {
 		String fromSent = args[6];
 		String toSent = args[7];
 
+		System.setProperty("logFile", logFile);
+
 		int fromSentence = Integer.parseInt(fromSent);
 		int toSentence = Integer.parseInt(toSent);
 
@@ -64,7 +69,7 @@ public class PrintForests {
 		try {
 			lexicon = new Lexicon(lexiconFile);
 		} catch ( IOException e ) {
-			System.err.println(e);
+			logger.error(e);
 			return;
 		}
 
@@ -72,11 +77,11 @@ public class PrintForests {
 
 		try {
 			parser = new ChartParser(grammarDir, altMarkedup,
-					eisnerNormalForm, MAX_WORDS, MAX_SUPERCATS, detailedOutput,
+					eisnerNormalForm, MAX_WORDS, MAX_SUPERCATS,
 					oracleFscore, adaptiveSupertagging, ruleInstancesParams,
 					lexicon, featuresFile, null, newFeatures, false);
 		} catch ( IOException e ) {
-			System.err.println(e);
+			logger.error(e);
 			return;
 		}
 
@@ -88,8 +93,7 @@ public class PrintForests {
 				BufferedReader gold = new BufferedReader(new FileReader(goldDepsFile));
 				BufferedReader stagsIn = new BufferedReader(new FileReader(goldSupertagsFile));
 				BufferedReader roots = new BufferedReader(new FileReader(rootCatsFile));
-				PrintWriter out = new PrintWriter(new FileWriter(outputFile));
-				PrintWriter log = new PrintWriter(new FileWriter(logFile)) ) {
+				PrintWriter out = new PrintWriter(new FileWriter(outputFile)) ) {
 
 			Preface.readPreface(in);
 			Preface.readPreface(gold);
@@ -103,10 +107,9 @@ public class PrintForests {
 			sentences.skip(fromSentence - 1);
 
 			for ( int numSentence = fromSentence; numSentence <= toSentence && sentences.hasNext(); numSentence++ ) {
-				System.out.println("Parsing sentence " + numSentence);
-				log.println("Parsing sentence " + numSentence);
+				logger.info("Parsing sentence " + numSentence);
 
-				parser.parseSentence(sentences.next(), log, betas);
+				parser.parseSentence(sentences.next(), betas);
 
 				oracleDecoder.readDeps(gold, parser.categories);
 				// ugly - passing parser.categories?
@@ -121,9 +124,9 @@ public class PrintForests {
 				}
 			}
 		} catch ( FileNotFoundException e ) {
-			System.err.println(e);
+			logger.error(e);
 		} catch ( IOException e ) {
-			System.err.println(e);
+			logger.error(e);
 		}
 	}
 }

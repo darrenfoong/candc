@@ -4,6 +4,10 @@ import io.Sentence;
 
 import java.util.ArrayList;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import chart_parser.ChartParser;
 import lexicon.Atom;
 import lexicon.Categories;
 import lexicon.Category;
@@ -51,6 +55,8 @@ public class Rules {
 	private static final int BRACKET = 7;
 	private static final int NFLAGS = 8;
 
+	public static final Logger logger = LogManager.getLogger(Rules.class);
+
 	public Rules(boolean eisnerNormalForm, Categories categories, RuleInstancesParams ruleInstancesParams) {
 		if (ruleInstancesParams.getAllRules()) {
 			allRuleInstances = new RuleInstances(ruleInstancesParams.getDirectory() + "/all_rule_instances", categories);
@@ -63,12 +69,10 @@ public class Rules {
 		punctRules = new PunctRules(categories, ruleInstancesParams);
 	}
 
-	public boolean combine(SuperCategory leftSuperCat, SuperCategory rightSuperCat, ArrayList<SuperCategory> results, boolean printDetailedOutput, Sentence sentence) {
-		if (printDetailedOutput) {
-			System.out.println("trying to combine two cats: ");
-			System.out.println(leftSuperCat.cat);
-			System.out.println(rightSuperCat.cat);
-		}
+	public boolean combine(SuperCategory leftSuperCat, SuperCategory rightSuperCat, ArrayList<SuperCategory> results,  Sentence sentence) {
+		logger.trace("trying to combine two cats: ");
+		logger.trace(leftSuperCat.cat);
+		logger.trace(rightSuperCat.cat);
 
 		if (allRuleInstances != null && !allRuleInstances.contains(leftSuperCat.cat, rightSuperCat.cat)) {
 			/*

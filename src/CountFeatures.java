@@ -9,19 +9,23 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import model.Lexicon;
 import cat_combination.RuleInstancesParams;
 import chart_parser.ChartParserBeam;
 import chart_parser.CountFeaturesDecoder;
 
 public class CountFeatures {
+	public static final Logger logger = LogManager.getLogger(CountFeatures.class);
+
 	public static void main(String[] args) {
 		int MAX_WORDS = 150;
 		int MAX_SUPERCATS = 500000;
 
 		boolean altMarkedup = false;
 		boolean eisnerNormalForm = true;
-		boolean detailedOutput = false;
 		boolean newFeatures = true;
 		boolean cubePruning = false;
 
@@ -49,6 +53,8 @@ public class CountFeatures {
 		String fromSent = args[5];
 		String toSent = args[6];
 
+		System.setProperty("logFile", logFile);
+
 		int fromSentence = Integer.parseInt(fromSent);
 		int toSentence = Integer.parseInt(toSent);
 
@@ -57,7 +63,7 @@ public class CountFeatures {
 		try {
 			lexicon = new Lexicon(lexiconFile);
 		} catch ( IOException e ) {
-			System.err.println(e);
+			logger.error(e);
 			return;
 		}
 
@@ -65,11 +71,11 @@ public class CountFeatures {
 
 		try {
 			parser = new ChartParserBeam(grammarDir, altMarkedup,
-					eisnerNormalForm, MAX_WORDS, MAX_SUPERCATS, detailedOutput,
+					eisnerNormalForm, MAX_WORDS, MAX_SUPERCATS,
 					ruleInstancesParams, lexicon, featuresFile, weightsFile,
 					newFeatures, false, cubePruning, beamSize, beta);
 		} catch ( IOException e ) {
-			System.err.println(e);
+			logger.error(e);
 			return;
 		}
 
@@ -77,7 +83,6 @@ public class CountFeatures {
 
 		try ( BufferedReader in = new BufferedReader(new FileReader(inputFile));
 				PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(outputFile)));
-				PrintWriter log = new PrintWriter(new BufferedWriter(new FileWriter(logFile)));
 				PrintWriter weights = new PrintWriter(new BufferedWriter(new FileWriter(outputWeightsFile))) ) {
 
 			Preface.readPreface(in);
@@ -88,20 +93,17 @@ public class CountFeatures {
 			sentences.skip(fromSentence - 1);
 
 			for ( int numSentence = fromSentence; numSentence <= toSentence && sentences.hasNext(); numSentence++ ) {
-				System.out.println("Parsing sentence " + numSentence);
-				log.println("Parsing sentence " + numSentence);
+				logger.info("Parsing sentence " + numSentence);
 
-				parser.parseSentence(sentences.next(), log, betas);
+				parser.parseSentence(sentences.next(), betas);
 
 				if ( !parser.maxWordsExceeded && !parser.maxSuperCatsExceeded ) {
 					boolean success = countFeaturesDecoder.countFeatures(parser.chart, parser.sentence);
 
 					if ( success ) {
-						System.out.println("Success.");
-						log.println("Success.");
+						logger.info("Success.");
 					} else {
-						System.out.println("No root category.");
-						log.println("No root category.");
+						logger.info("No root category.");
 					}
 				}
 			}
@@ -110,9 +112,9 @@ public class CountFeatures {
 			parser.features.print(out);
 			parser.features.printWeights(parser.weights, weights);
 		} catch ( FileNotFoundException e ) {
-			System.err.println(e);
+			logger.error(e);
 		} catch ( IOException e ) {
-			System.err.println(e);
+			logger.error(e);
 		}
 	}
 }

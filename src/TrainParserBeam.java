@@ -1,6 +1,3 @@
-import io.Preface;
-import io.Sentences;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
@@ -9,21 +6,29 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import model.Lexicon;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.io.IoBuilder;
+
 import cat_combination.RuleInstancesParams;
 import cat_combination.SuperCategory;
 import chart_parser.ChartTrainParserBeam;
 import chart_parser.OracleDecoder;
 import chart_parser.OracleDepsSumDecoder;
+import io.Preface;
+import io.Sentences;
+import model.Lexicon;
 
 public class TrainParserBeam {
+	public static final Logger logger = LogManager.getLogger(TrainParserBeam.class);
+
 	public static void main(String[] args) {
 		int MAX_WORDS = 150;
 		int MAX_SUPERCATS = 500000;
 
 		boolean altMarkedup = false;
 		boolean eisnerNormalForm = true;
-		boolean detailedOutput = false;
 		boolean newFeatures = false;
 		boolean cubePruning = false;
 		boolean parallelUpdate = false;
@@ -58,6 +63,8 @@ public class TrainParserBeam {
 		String fromSent = args[7];
 		String toSent = args[8];
 
+		System.setProperty("logFile", logFile);
+
 		int fromSentence = Integer.parseInt(fromSent);
 		int toSentence = Integer.parseInt(toSent);
 		int numIterations = Integer.parseInt(numItersStr);
@@ -67,7 +74,7 @@ public class TrainParserBeam {
 		try {
 			lexicon = new Lexicon(lexiconFile);
 		} catch ( IOException e ) {
-			System.err.println(e);
+			logger.error(e);
 			return;
 		}
 
@@ -75,11 +82,11 @@ public class TrainParserBeam {
 
 		try {
 			parser = new ChartTrainParserBeam(grammarDir, altMarkedup,
-					eisnerNormalForm, MAX_WORDS, MAX_SUPERCATS, detailedOutput,
+					eisnerNormalForm, MAX_WORDS, MAX_SUPERCATS,
 					ruleInstancesParams, lexicon, featuresFile, weightsFile,
 					newFeatures, cubePruning, beamSize, beta, parallelUpdate, updateLogP);
 		} catch ( IOException e ) {
-			System.err.println(e);
+			logger.error(e);
 			return;
 		}
 
@@ -88,8 +95,7 @@ public class TrainParserBeam {
 		int numTrainInstances = 1;
 
 		try ( PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(outputWeightsFile)));
-				PrintWriter log = new PrintWriter(new BufferedWriter(new FileWriter(logFile)));
-				PrintWriter writer = new PrintWriter(System.out) ) {
+				PrintWriter writer = IoBuilder.forLogger(logger).setLevel(Level.INFO).buildPrintWriter() ) {
 
 			Preface.printPreface(out);
 
@@ -112,33 +118,28 @@ public class TrainParserBeam {
 					sentences.skip(fromSentence - 1);
 
 					for ( int numSentence = fromSentence; numSentence <= toSentence && sentences.hasNext(); numSentence++ ) {
-						System.out.println("Parsing sentence " + iteration + "/" + numSentence);
-						log.println("Parsing sentence " + iteration + "/" + numSentence);
+						logger.info("Parsing sentence " + iteration + "/" + numSentence);
 
-						parser.parseSentence(sentences.next(), log, betas, goldDepsPerCell, oracleDecoder);
+						parser.parseSentence(sentences.next(), betas, goldDepsPerCell, oracleDecoder);
 
 						oracleDecoder.readDeps(goldDeps, parser.categories);
 
 						if ( oracleDecoder.numGoldDeps() != 0 ) {
 							numTrainInstances++;
-							SuperCategory best = parser.updateWeights(log, numTrainInstances);
+							SuperCategory best = parser.updateWeights(numTrainInstances);
 
 							if ( best != null ) {
-								System.out.println("best category deps: ");
+								logger.info("best category deps: ");
 								parser.printDeps(writer, parser.categories.dependencyRelations, parser.sentence, best);
 								writer.flush();
-								System.out.println();
+								logger.info("");
 							} else {
-								System.out.println("No update took place!");
-								System.out.println();
-								log.println("No update took place!");
-								log.println();
+								logger.info("No update took place!");
+								logger.info("");
 							}
 						} else {
-							System.out.println("No gold dependencies for sentence " + iteration + "/" + numSentence);
-							System.out.println();
-							log.println("No gold dependencies for sentence " + iteration + "/" + numSentence);
-							log.println();
+							logger.info("No gold dependencies for sentence " + iteration + "/" + numSentence);
+							logger.info("");
 						}
 
 						if ( numSentence % 5000 == 0 ) {
@@ -149,8 +150,8 @@ public class TrainParserBeam {
 						}
 					}
 
-					System.out.println("# Statistics for iteration " + iteration + ": hasUpdate: " + parser.hasUpdateStatistics.calcHasUpdates() + "/" + parser.hasUpdateStatistics.getSize() + " (" + ((double) parser.hasUpdateStatistics.calcHasUpdates() / (double) parser.hasUpdateStatistics.getSize()) + ")");
-					System.out.println("# Statistics for iteration " + iteration + ": hypothesisSize: " + parser.hypothesisSizeStatistics.calcAverageProportion() + " (" + parser.hypothesisSizeStatistics.getSize() + ")");
+					logger.info("# Statistics for iteration " + iteration + ": hasUpdate: " + parser.hasUpdateStatistics.calcHasUpdates() + "/" + parser.hasUpdateStatistics.getSize() + " (" + ((double) parser.hasUpdateStatistics.calcHasUpdates() / (double) parser.hasUpdateStatistics.getSize()) + ")");
+					logger.info("# Statistics for iteration " + iteration + ": hypothesisSize: " + parser.hypothesisSizeStatistics.calcAverageProportion() + " (" + parser.hypothesisSizeStatistics.getSize() + ")");
 
 					Preface.printPreface(outIter);
 					parser.printWeights(outIter, numTrainInstances);
@@ -159,9 +160,9 @@ public class TrainParserBeam {
 
 			parser.printWeights(out, numTrainInstances);
 		} catch ( FileNotFoundException e ) {
-			System.err.println(e);
+			logger.error(e);
 		} catch ( IOException e ) {
-			System.err.println(e);
+			logger.error(e);
 		}
 	}
 }

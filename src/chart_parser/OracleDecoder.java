@@ -1,21 +1,23 @@
 package chart_parser;
 
-import io.Sentence;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.Iterator;
 
-import lexicon.Categories;
-import lexicon.Category;
-import lexicon.Relations;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import cat_combination.FilledDependency;
 import cat_combination.IgnoreDepsEval;
 import cat_combination.RuleCategoryPair;
 import cat_combination.RuleInstances;
 import cat_combination.SuperCategory;
+import io.Sentence;
+import lexicon.Categories;
+import lexicon.Category;
+import lexicon.Relations;
 
 public abstract class OracleDecoder {
 	public HashSet<FilledDependency> goldDeps;
@@ -36,6 +38,8 @@ public abstract class OracleDecoder {
 	private String relRuleIDsFile = "data/grammar/relsNoEval.txt";
 	private String relHeadFile = "data/grammar/relsHeadsNoEval.txt";
 	private String relHeadFillerFile = "data/grammar/relsHeadsFillersNoEval.txt";
+
+	public static final Logger logger = LogManager.getLogger(OracleDecoder.class);
 
 	public OracleDecoder(Categories categories, boolean extractRuleInstances) {
 		this.goldDeps = new HashSet<FilledDependency>();
@@ -172,7 +176,7 @@ public abstract class OracleDecoder {
 				throw new Error("Couldn't parse rootCat string.");
 			}
 		} catch (IOException e) {
-			System.err.println(e);
+			logger.error(e);
 		}
 	}
 
@@ -213,7 +217,7 @@ public abstract class OracleDecoder {
 				line = in.readLine();
 			}
 		} catch (IOException e) {
-			System.err.println(e);
+			logger.error(e);
 			return false;
 		}
 	}

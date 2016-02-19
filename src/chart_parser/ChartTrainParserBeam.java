@@ -44,7 +44,6 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 			boolean eisnerNormalForm,
 			int MAX_WORDS,
 			int MAX_SUPERCATS,
-			boolean output,
 			RuleInstancesParams ruleInstancesParams,
 			Lexicon lexicon,
 			String featuresFile,
@@ -56,11 +55,11 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 			boolean parallelUpdate,
 			boolean updateLogP) throws IOException {
 		super(grammarDir, altMarkedup, eisnerNormalForm, MAX_WORDS,
-				MAX_SUPERCATS, output, ruleInstancesParams,
+				MAX_SUPERCATS, ruleInstancesParams,
 				lexicon, featuresFile, weightsFile, newFeatures, false, cubePruning,
 				beamSize, beta);
 
-		this.chart = new Chart(MAX_WORDS, output, categories.dependencyRelations, false, true);
+		this.chart = new Chart(MAX_WORDS, categories.dependencyRelations, false, true);
 		this.chart.setWeights(this.weights);
 
 		int numFeatures = features.numFeatures;
@@ -88,10 +87,10 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 	 * @return true if sentence is parsed or skipped, false if there are no
 	 * sentences left
 	 */
-	public boolean parseSentence(Sentence sentence, PrintWriter log, double[] betas, BufferedReader goldDepsPerCell, OracleDecoder oracleDecoder) {
+	public boolean parseSentence(Sentence sentence, double[] betas, BufferedReader goldDepsPerCell, OracleDecoder oracleDecoder) {
 		this.goldDepsPerCell = goldDepsPerCell;
 		this.oracleDecoder = oracleDecoder;
-		return parseSentence(sentence, log, betas);
+		return parseSentence(sentence, betas);
 	}
 
 	/**
@@ -108,7 +107,7 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 			return false;
 		}
 
-		System.out.println("Gold dependencies per cell merged.");
+		logger.info("Gold dependencies per cell merged.");
 
 		return true;
 	}
@@ -130,16 +129,16 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 			if (violation > maxViolation) {
 				maxViolation = violation;
 				maxViolationCell = new CellCoords(pos, span);
-				System.out.println("New maxViolation found at (" + pos + "," + span + "); maxViolation: " + violation);
+				logger.info("New maxViolation found at (" + pos + "," + span + "); maxViolation: " + violation);
 			}
 		} else {
 			if ( violation > 0 ) {
 				violationCells.add(new CellCoords(pos, span, violation));
-				System.out.println("Adding (" + pos + "," + span + "); to violationCells; violation: " + violation);
+				logger.info("Adding (" + pos + "," + span + "); to violationCells; violation: " + violation);
 			}
 		}
 
-		System.out.println("cell (" + pos + "," + span + "); violation: " + violation + "; current maxViolation: " + maxViolation);
+		logger.info("cell (" + pos + "," + span + "); violation: " + violation + "; current maxViolation: " + maxViolation);
 	}
 
 	/**
@@ -155,7 +154,7 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 
 		while ( !violationCells.isEmpty() ) {
 			CellCoords top = violationCells.removeFirst();
-			System.out.println("Adding (" + top.pos + "," + top.span + "); violation: " + top.violation);
+			logger.info("Adding (" + top.pos + "," + top.span + "); violation: " + top.violation);
 			maxViolationCells.add(top);
 
 			int topLeft = top.pos;
@@ -254,7 +253,7 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 		while ( backTrack >= 0 ) {
 			if ( inclArray[backTrack] ) {
 				CellCoords top = violationCells.get(backTrack);
-				System.out.println("Adding (" + top.pos + "," + top.span + "); violation: " + top.violation);
+				logger.info("Adding (" + top.pos + "," + top.span + "); violation: " + top.violation);
 				maxViolationCells.add(top);
 			}
 
@@ -331,11 +330,10 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 	 * violation (last frontier in the case of parallel max violation update),
 	 * null if there is no non-zero violation in the chart.
 	 */
-	public SuperCategory updateWeights(PrintWriter log, int numTrainInstances) {
+	public SuperCategory updateWeights(int numTrainInstances) {
 		if ( !parallelUpdate ) {
 			if (maxViolationCell == null) {
-				System.out.println("No non-zero violation in the chart.");
-				log.println("No non-zero violation in the chart.");
+				logger.info("No non-zero violation in the chart.");
 
 				hasUpdateStatistics.addData(false);
 
@@ -343,27 +341,26 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 			} else {
 				CellTrainBeam cell = (CellTrainBeam) chart.cell(maxViolationCell.pos, maxViolationCell.span);
 
-				System.out.println("maxViolation exists in chart (score: " + cell.maxSuper.score + ", gold score: " + cell.goldSuperCat.score + ", violation: " + maxViolation + "); updating features.");
-				log.println("maxViolation exists in chart (score: " + cell.maxSuper.score + ", gold score: " + cell.goldSuperCat.score + ", violation: " + maxViolation + "); updating features.");
+				logger.info("maxViolation exists in chart (score: " + cell.maxSuper.score + ", gold score: " + cell.goldSuperCat.score + ", violation: " + maxViolation + "); updating features.");
 
 				boolean atRoot;
 
 				HashSet<Integer> featuresToUpdate = new HashSet<Integer>();
 
-				System.out.println("Updating features for (" + maxViolationCell.pos + "," + maxViolationCell.span + ")");
+				logger.info("Updating features for (" + maxViolationCell.pos + "," + maxViolationCell.span + ")");
 
 				if ( maxViolationCell.pos == 0 && maxViolationCell.span == sentence.words.size() ) {
 					atRoot = true;
-					System.out.println("maxViolation found at root");
+					logger.info("maxViolation found at root");
 				} else {
 					atRoot = false;
 				}
 
 				markCommonSuperCats(cell.goldSuperCat, cell.maxSuper);
 
-				System.out.println("Incrementing gold tree features");
+				logger.info("Incrementing gold tree features");
 				updateFeatureParams(cell.goldSuperCat, true, atRoot, featuresToUpdate);
-				System.out.println("Decrementing found tree features");
+				logger.info("Decrementing found tree features");
 				updateFeatureParams(cell.maxSuper, false, atRoot, featuresToUpdate);
 
 				updateAllWeights(featuresToUpdate, numTrainInstances);
@@ -377,8 +374,7 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 			findLocalMaxViolations();
 
 			if (maxViolationCells.isEmpty()) {
-				System.out.println("No non-zero violation in the chart.");
-				log.println("No non-zero violation in the chart.");
+				logger.info("No non-zero violation in the chart.");
 
 				hasUpdateStatistics.addData(false);
 
@@ -386,19 +382,18 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 			} else {
 				CellTrainBeam cell = null;
 
-				System.out.println("maxViolations exist in chart.");
-				log.println("maxViolations exist in chart.");
+				logger.info("maxViolations exist in chart.");
 
 				boolean atRoot;
 
 				HashSet<Integer> featuresToUpdate = new HashSet<Integer>();
 
 				for ( CellCoords pair : maxViolationCells ) {
-					System.out.println("Updating features for (" + pair.pos + "," + pair.span + ")");
+					logger.info("Updating features for (" + pair.pos + "," + pair.span + ")");
 					cell = (CellTrainBeam) chart.cell(pair.pos, pair.span);
 					if ( pair.pos == 0 && pair.span == sentence.words.size() ) {
 						atRoot = true;
-						System.out.println("maxViolation found at root");
+						logger.info("maxViolation found at root");
 					} else {
 						atRoot = false;
 					}
@@ -443,7 +438,7 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 		collectFeatures(superCat);
 
 		for ( int ID : featureIDs ) {
-			System.out.println(" Updating feature " + ID);
+			logger.info(" Updating feature " + ID);
 
 			if (positiveUpdate) {
 				trainingFeatures[ID].incrementLambdaUpdate();
@@ -455,7 +450,7 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 		}
 
 		if (updateLogP) {
-			System.out.println(" Finally updating feature 0");
+			logger.info(" Finally updating feature 0");
 	
 			if (positiveUpdate) {
 				trainingFeatures[0].setLambdaUpdate(trainingFeatures[0].getLambdaUpdate() + calcSumLeafInitialScore(superCat));
@@ -483,7 +478,7 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 			}
 		}
 
-		System.out.println("Feature 0 is now " + weights.getWeight(0));
+		logger.info("Feature 0 is now " + weights.getWeight(0));
 	}
 
 	/**
@@ -595,7 +590,7 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 				line = goldDepsPerCell.readLine();
 			}
 		} catch (IOException e) {
-			System.err.println(e);
+			logger.error(e);
 			return false;
 		}
 	}

@@ -1,9 +1,12 @@
 package chart_parser;
 
-import io.Sentence;
-import lexicon.Categories;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import cat_combination.FilledDependency;
 import cat_combination.SuperCategory;
+import io.Sentence;
+import lexicon.Categories;
 
 /*
  * two-stage process to get the dependencies on a max-parse: decode
@@ -16,6 +19,8 @@ import cat_combination.SuperCategory;
  * them all
  */
 public class OracleDepsSumDecoder extends OracleDecoder {
+	public static final Logger logger = LogManager.getLogger(OracleDepsSumDecoder.class);
+
 	public OracleDepsSumDecoder(Categories categories, boolean extractRuleInstances) {
 		super(categories, extractRuleInstances);
 	}
@@ -83,7 +88,7 @@ public class OracleDepsSumDecoder extends OracleDecoder {
 			}
 		}
 		if (bestEquivSuperCat == null) {
-			System.err.println("No best!\n");
+			logger.info("No best!\n");
 			return false;
 		}
 		getDeps(bestEquivSuperCat, sentence, ignoreDepsFlag);

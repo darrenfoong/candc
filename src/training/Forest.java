@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import utils.NumericalFunctions;
 
 public class Forest {
@@ -13,6 +16,8 @@ public class Forest {
 
 	double logZ;
 	double logZgold;
+
+	public static final Logger logger = LogManager.getLogger(Forest.class);
 
 	public Forest(BufferedReader in, Feature[] features, int numNodes) {
 		rootNodes = new ArrayList<DisjNode>();
@@ -36,7 +41,7 @@ public class Forest {
 				throw new Error("expecting new line at end of forest!");
 			}
 		} catch (IOException e) {
-			System.err.println(e);
+			logger.error(e);
 		}
 	}
 
@@ -147,7 +152,7 @@ public class Forest {
 			}
 
 		} catch (IOException e) {
-			System.err.println(e);
+			logger.error(e);
 		}
 	}
 
@@ -216,7 +221,7 @@ public class Forest {
 			}
 
 		} catch (IOException e) {
-			System.err.println(e);
+			logger.error(e);
 		}
 		return false; // should never get here
 	}
