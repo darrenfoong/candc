@@ -38,7 +38,7 @@ public class Forests implements Iterator<Forest> {
 	}
 
 	private void readForest() {
-			try {
+		try {
 			String line = in.readLine();
 
 			if ( line == null ) {

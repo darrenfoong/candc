@@ -1,9 +1,9 @@
 package cat_combination;
 
-import io.Sentence;
-
+import java.io.IOException;
 import java.util.ArrayList;
 
+import io.Sentence;
 import lexicon.Categories;
 import lexicon.Category;
 import lexicon.VarID;
@@ -15,7 +15,7 @@ public class Combinators {
 	RuleInstances coordinationRuleInstances;
 	RuleInstances backwardCompRuleInstances;
 
-	public Combinators(boolean eisnerNormalForm, Categories categories, RuleInstancesParams ruleInstancesParams) {
+	public Combinators(boolean eisnerNormalForm, Categories categories, RuleInstancesParams ruleInstancesParams) throws IOException {
 		this.ruleInstancesParams = ruleInstancesParams;
 		this.eisnerNormalForm = eisnerNormalForm;
 		unification = new Unify();

@@ -69,27 +69,20 @@ public class TrainParserBeam {
 		int numIterations = Integer.parseInt(numItersStr);
 
 		Lexicon lexicon = null;
+		ChartTrainParserBeam parser = null;
+		OracleDecoder oracleDecoder = null;
 
 		try {
 			lexicon = new Lexicon(lexiconFile);
-		} catch ( IOException e ) {
-			logger.error(e);
-			return;
-		}
-
-		ChartTrainParserBeam parser = null;
-
-		try {
 			parser = new ChartTrainParserBeam(grammarDir, altMarkedup,
 					eisnerNormalForm, MAX_WORDS, MAX_SUPERCATS,
 					ruleInstancesParams, lexicon, featuresFile, weightsFile,
 					newFeatures, cubePruning, beamSize, beta, parallelUpdate, updateLogP);
+			oracleDecoder = new OracleDepsSumDecoder(parser.categories, false);
 		} catch ( IOException e ) {
 			logger.error(e);
 			return;
 		}
-
-		OracleDecoder oracleDecoder = new OracleDepsSumDecoder(parser.categories, false);
 
 		int numTrainInstances = 1;
 

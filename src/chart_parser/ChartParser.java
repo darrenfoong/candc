@@ -75,7 +75,7 @@ public class ChartParser {
 		this.chart.setWeights(this.weights);
 	}
 
-	public boolean parseSentence(Sentence sentence, double[] betas) {
+	public boolean parseSentence(Sentence sentence, double[] betas) throws IOException {
 		int betaLevel;
 
 		if (adaptiveSupertagging) {

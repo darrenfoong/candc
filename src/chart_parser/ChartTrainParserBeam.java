@@ -87,7 +87,7 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 	 * @return true if sentence is parsed or skipped, false if there are no
 	 * sentences left
 	 */
-	public boolean parseSentence(Sentence sentence, double[] betas, BufferedReader goldDepsPerCell, OracleDecoder oracleDecoder) {
+	public boolean parseSentence(Sentence sentence, double[] betas, BufferedReader goldDepsPerCell, OracleDecoder oracleDecoder) throws IOException {
 		this.goldDepsPerCell = goldDepsPerCell;
 		this.oracleDecoder = oracleDecoder;
 		return parseSentence(sentence, betas);
@@ -97,7 +97,7 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 	 * Clears max violation fields and reads in gold dependencies per cell.
 	 */
 	@Override
-	protected boolean preParse() {
+	protected boolean preParse() throws IOException {
 		maxViolation = 0;
 		maxViolationCell = null;
 		maxViolationCells.clear();
@@ -502,96 +502,91 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 	 * @return true if success, false if failure or there are no gold 
 	 * dependencies left.
 	 */
-	private boolean readDepsPerCell(BufferedReader goldDepsPerCell) {
-		try {
-			String line = goldDepsPerCell.readLine();
-			boolean readStags = false;
+	private boolean readDepsPerCell(BufferedReader goldDepsPerCell) throws IOException {
+		String line = goldDepsPerCell.readLine();
+		boolean readStags = false;
 
+		if (line == null) {
+			return false;
+		}
+
+		if (line.isEmpty()) {
+			return false;
+		}
+
+		while (true) {
 			if (line == null) {
 				return false;
 			}
 
 			if (line.isEmpty()) {
-				return false;
+				return true;
 			}
 
-			while (true) {
-				if (line == null) {
-					return false;
+			String[] tokens;
+
+			if (!readStags) {
+				oracleSupertags.clear();
+				tokens = line.split("\\s");
+				for ( String token : tokens ) {
+					Category lexicalCategory = categories.getCategory(token);
+					if ( lexicalCategory == null ) {
+						throw new Error("can't find oracle supertag! " + token);
+					}
+					oracleSupertags.add(lexicalCategory);
+				}
+
+				readStags = true;
+				line = goldDepsPerCell.readLine();
+
+				if ( line == null ) {
+					throw new IllegalArgumentException("Unexpected end of stream");
 				}
 
 				if (line.isEmpty()) {
-					return true;
+					return false;
 				}
-
-				String[] tokens;
-
-				if (!readStags) {
-					oracleSupertags.clear();
-					tokens = line.split("\\s");
-					for ( String token : tokens ) {
-						Category lexicalCategory = categories.getCategory(token);
-						if ( lexicalCategory == null ) {
-							throw new Error("can't find oracle supertag! " + token);
-						}
-						oracleSupertags.add(lexicalCategory);
-					}
-
-					readStags = true;
-					line = goldDepsPerCell.readLine();
-
-					if ( line == null ) {
-						throw new IllegalArgumentException("Unexpected end of stream");
-					}
-
-					if (line.isEmpty()) {
-						return false;
-					}
-				}
-
-				tokens = line.split("\\s");
-				if ( tokens.length != 3 ) {
-					throw new Error("expecting 3 fields");
-				}
-
-				int start = Integer.parseInt(tokens[0]);
-				int span = Integer.parseInt(tokens[1]);
-				int numDeps = Integer.parseInt(tokens[2]);
-
-				for (int i = 0; i < numDeps; i++) {
-					line = goldDepsPerCell.readLine();
-
-					if ( line != null ) {
-						tokens = line.split("\\s");
-					} else {
-						throw new IllegalArgumentException("Unexpected end of stream");
-					}
-
-					short headIndex = Short.parseShort(tokens[0]);
-					short slot = Short.parseShort(tokens[2]);
-					short fillerIndex = Short.parseShort(tokens[3]);
-					short unaryRuleID = (short) (0);
-					short lrange = (short) (0);
-					short relID;
-
-					String markedupString = categories.getString(tokens[1]);
-
-					if (markedupString == null) {
-						relID = 0;
-					} else {
-						relID = categories.dependencyRelations.getRelID_II(markedupString, slot);
-					}
-
-					FilledDependency dep = new FilledDependency(relID, headIndex, fillerIndex, unaryRuleID, lrange);
-					CellTrainBeam cell = (CellTrainBeam) (chart.cell(start, span));
-					cell.addDep(dep);
-				}
-
-				line = goldDepsPerCell.readLine();
 			}
-		} catch (IOException e) {
-			logger.error(e);
-			return false;
+
+			tokens = line.split("\\s");
+			if ( tokens.length != 3 ) {
+				throw new Error("expecting 3 fields");
+			}
+
+			int start = Integer.parseInt(tokens[0]);
+			int span = Integer.parseInt(tokens[1]);
+			int numDeps = Integer.parseInt(tokens[2]);
+
+			for (int i = 0; i < numDeps; i++) {
+				line = goldDepsPerCell.readLine();
+
+				if ( line != null ) {
+					tokens = line.split("\\s");
+				} else {
+					throw new IllegalArgumentException("Unexpected end of stream");
+				}
+
+				short headIndex = Short.parseShort(tokens[0]);
+				short slot = Short.parseShort(tokens[2]);
+				short fillerIndex = Short.parseShort(tokens[3]);
+				short unaryRuleID = (short) (0);
+				short lrange = (short) (0);
+				short relID;
+
+				String markedupString = categories.getString(tokens[1]);
+
+				if (markedupString == null) {
+					relID = 0;
+				} else {
+					relID = categories.dependencyRelations.getRelID_II(markedupString, slot);
+				}
+
+				FilledDependency dep = new FilledDependency(relID, headIndex, fillerIndex, unaryRuleID, lrange);
+				CellTrainBeam cell = (CellTrainBeam) (chart.cell(start, span));
+				cell.addDep(dep);
+			}
+
+			line = goldDepsPerCell.readLine();
 		}
 	}
 }

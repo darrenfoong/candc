@@ -58,17 +58,10 @@ public class CountFeatures {
 		int toSentence = Integer.parseInt(toSent);
 
 		Lexicon lexicon = null;
-
-		try {
-			lexicon = new Lexicon(lexiconFile);
-		} catch ( IOException e ) {
-			logger.error(e);
-			return;
-		}
-
 		ChartParserBeam parser = null;
 
 		try {
+			lexicon = new Lexicon(lexiconFile);
 			parser = new ChartParserBeam(grammarDir, altMarkedup,
 					eisnerNormalForm, MAX_WORDS, MAX_SUPERCATS,
 					ruleInstancesParams, lexicon, featuresFile, weightsFile,

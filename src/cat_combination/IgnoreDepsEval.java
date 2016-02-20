@@ -6,9 +6,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import io.Sentence;
 import lexicon.Relations;
 
@@ -35,10 +32,8 @@ public class IgnoreDepsEval {
 	String EMPTY_FILLER = "-EMPTY-";
 	// some string unlikely to occur in a filled dependency
 
-	public static final Logger logger = LogManager.getLogger(IgnoreDepsEval.class);
-
 	public IgnoreDepsEval(String ruleIDsFile, String relRuleIDsFile,
-			String relHeadFile, String relHeadFillerFile, Relations relations) {
+			String relHeadFile, String relHeadFillerFile, Relations relations) throws IOException {
 		ruleIDs = new HashSet<Short>();
 		relRuleIDs = new HashMap<Short, HashSet<Short>>();
 		unfilledDeps = new HashSet<DependencyStringWords>();
@@ -139,7 +134,7 @@ public class IgnoreDepsEval {
 			}
 
 		} catch (IOException e) {
-			logger.error(e);
+			throw e;
 		}
 	}
 

@@ -6,9 +6,6 @@ import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.Iterator;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import cat_combination.FilledDependency;
 import cat_combination.IgnoreDepsEval;
 import cat_combination.RuleCategoryPair;
@@ -39,9 +36,7 @@ public abstract class OracleDecoder {
 	private String relHeadFile = "data/grammar/relsHeadsNoEval.txt";
 	private String relHeadFillerFile = "data/grammar/relsHeadsFillersNoEval.txt";
 
-	public static final Logger logger = LogManager.getLogger(OracleDecoder.class);
-
-	public OracleDecoder(Categories categories, boolean extractRuleInstances) {
+	public OracleDecoder(Categories categories, boolean extractRuleInstances) throws IOException {
 		this.goldDeps = new HashSet<FilledDependency>();
 		this.parserDeps = new HashSet<FilledDependency>();
 		this.rootCat = null;
@@ -160,65 +155,54 @@ public abstract class OracleDecoder {
 		getDeps(bestEquivSuperCat, sentence, ignoreDeps);
 	}
 
-	public void readRootCat(BufferedReader roots, Categories categories) {
-		newRootCat = null;
+	public void readRootCat(BufferedReader roots, Categories categories) throws IOException {
+		String line = roots.readLine();
 
-		try {
-			String line = roots.readLine();
+		if (line == null) {
+			throw new IllegalArgumentException("Run out of roots to read.");
+		}
 
-			if (line == null) {
-				throw new IllegalArgumentException("Run out of roots to read.");
-			}
+		rootCat = categories.canonize(line);
 
-			rootCat = categories.canonize(line);
-
-			if (rootCat == null) {
-				throw new Error("Couldn't parse rootCat string.");
-			}
-		} catch (IOException e) {
-			logger.error(e);
+		if (rootCat == null) {
+			throw new Error("Couldn't parse rootCat string.");
 		}
 	}
 
-	public boolean readDeps(BufferedReader in, Categories categories) {
-		try {
-			goldDeps.clear();
+	public boolean readDeps(BufferedReader in, Categories categories) throws IOException {
+		goldDeps.clear();
 
-			String line = in.readLine();
+		String line = in.readLine();
 
-			while (true) {
-				if (line == null) {
-					return false;
-				} else if (line.isEmpty()) {
-					return true;
-				}
-
-				String[] tokens = line.split("\\s");
-				short headIndex = Short.parseShort(tokens[0]);
-				short slot = Short.parseShort(tokens[2]);
-				short fillerIndex = Short.parseShort(tokens[3]);
-				short unaryRuleID = (short) (0);
-				short lrange = (short) (0);
-				short relID;
-
-				String markedupString = categories.getString(tokens[1]);
-				// we're relying on this case being picked up elsewhere:
-				if (markedupString == null) {
-					relID = 0;
-				} else {
-					// note the relID below could be zero if getRelID_II returns null from the hashMap
-					relID = categories.dependencyRelations.getRelID_II(markedupString, slot);
-				}
-
-				// keep the relID = 0 cases; these are rels in the gold we can't get (?)
-				FilledDependency dep = new FilledDependency(relID, headIndex, fillerIndex, unaryRuleID, lrange);
-				goldDeps.add(dep);
-
-				line = in.readLine();
+		while (true) {
+			if (line == null) {
+				return false;
+			} else if (line.isEmpty()) {
+				return true;
 			}
-		} catch (IOException e) {
-			logger.error(e);
-			return false;
+
+			String[] tokens = line.split("\\s");
+			short headIndex = Short.parseShort(tokens[0]);
+			short slot = Short.parseShort(tokens[2]);
+			short fillerIndex = Short.parseShort(tokens[3]);
+			short unaryRuleID = (short) (0);
+			short lrange = (short) (0);
+			short relID;
+
+			String markedupString = categories.getString(tokens[1]);
+			// we're relying on this case being picked up elsewhere:
+			if (markedupString == null) {
+				relID = 0;
+			} else {
+				// note the relID below could be zero if getRelID_II returns null from the hashMap
+				relID = categories.dependencyRelations.getRelID_II(markedupString, slot);
+			}
+
+			// keep the relID = 0 cases; these are rels in the gold we can't get (?)
+			FilledDependency dep = new FilledDependency(relID, headIndex, fillerIndex, unaryRuleID, lrange);
+			goldDeps.add(dep);
+
+			line = in.readLine();
 		}
 	}
 

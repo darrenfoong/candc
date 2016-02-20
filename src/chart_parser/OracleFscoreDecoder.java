@@ -1,14 +1,17 @@
 package chart_parser;
 
-import io.Sentence;
-
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Iterator;
 
-import lexicon.Categories;
-import lexicon.Relations;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import cat_combination.FilledDependency;
 import cat_combination.SuperCategory;
+import io.Sentence;
+import lexicon.Categories;
+import lexicon.Relations;
 
 /*
  * This decoder assumes that the chart has an equivalence class method
@@ -18,8 +21,10 @@ import cat_combination.SuperCategory;
  * correct)).
  */
 public class OracleFscoreDecoder extends OracleDecoder {
+	public static final Logger logger = LogManager.getLogger(OracleFscoreDecoder.class);
+
 	public OracleFscoreDecoder(Categories categories,
-			boolean extractRuleInstances) {
+			boolean extractRuleInstances) throws IOException {
 		super(categories, extractRuleInstances);
 		/*
 		 * this is ugly, but this seems like the obvious place to set this

@@ -15,8 +15,6 @@ import training.Feature;
 import training.Forest;
 
 public class TrainViterbi {
-	public static final Logger logger = LogManager.getLogger(Parser.class);
-
 	public static void main(String[] args) {
 		if ( args.length < 6 ) {
 			System.err.println("TrainViterbi requires 6 arguments: <forestFile> <weightsFile> <logFile> <numIters> <fromSentence> <toSentence>");
@@ -31,6 +29,7 @@ public class TrainViterbi {
 		String toSent = args[5];
 
 		System.setProperty("logFile", logFile);
+		final Logger logger = LogManager.getLogger(TrainViterbi.class);
 
 		int fromSentence = Integer.parseInt(fromSent);
 		int toSentence = Integer.parseInt(toSent);

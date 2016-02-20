@@ -79,23 +79,22 @@ public class OracleParser {
 		int toSentence = Integer.parseInt(toSent);
 
 		ChartParser parser = null;
+		OracleDecoder oracleDecoder = null;
 
 		try {
 			parser = new ChartParser(grammarDir, altMarkedup,
 					eisnerNormalForm, MAX_WORDS, MAX_SUPERCATS,
 					oracleFscore, adaptiveSupertagging, ruleInstancesParams, null,
 					null, null, false, false);
+
+			if ( depsSumDecoder ) {
+				oracleDecoder = new OracleDepsSumDecoder(parser.categories, extractRuleInstances);
+			} else {
+				oracleDecoder = new OracleFscoreDecoder(parser.categories, extractRuleInstances);
+			}
 		} catch ( IOException e ) {
 			logger.error(e);
 			return;
-		}
-
-		OracleDecoder oracleDecoder = null;
-
-		if ( depsSumDecoder ) {
-			oracleDecoder = new OracleDepsSumDecoder(parser.categories, extractRuleInstances);
-		} else {
-			oracleDecoder = new OracleFscoreDecoder(parser.categories, extractRuleInstances);
 		}
 
 		try ( BufferedReader in = new BufferedReader(new FileReader(inputFile));

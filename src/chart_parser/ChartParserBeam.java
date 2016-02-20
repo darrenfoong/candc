@@ -67,7 +67,7 @@ public class ChartParserBeam extends ChartParser {
 	 * sentences left
 	 */
 	@Override
-	public boolean parseSentence(Sentence sentence,  double[] betas) {
+	public boolean parseSentence(Sentence sentence,  double[] betas) throws IOException {
 		if (betas.length != 1) {
 			throw new IllegalArgumentException("Only need 1 beta value.");
 		}
@@ -169,8 +169,9 @@ public class ChartParserBeam extends ChartParser {
 	 * Dummy function for extensions to parseSentence() by subclasses.
 	 * 
 	 * @return true if pre-parsing succeeds, false if pre-parsing fails
+	 * @throws IOException 
 	 */
-	protected boolean preParse() {
+	protected boolean preParse() throws IOException {
 		return true;
 	}
 

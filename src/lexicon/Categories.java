@@ -7,9 +7,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import io.Preface;
 import utils.ByteWrapper;
 import utils.ShortWrapper;
@@ -40,10 +37,8 @@ public class Categories {
 	public ArrayList<TypeRaisedCategory> trAPs;
 	public ArrayList<TypeRaisedCategory> trVP_TOs;
 
-	public static final Logger logger = LogManager.getLogger(Categories.class);
-
 	// ALT_MARKEDUP signals to use the alternative lines in the markedup file (marked ! in the file)
-	public Categories(String grammarDir, boolean ALT_MARKEDUP) {
+	public Categories(String grammarDir, boolean ALT_MARKEDUP) throws IOException {
 		dependencyRelations = new Relations();
 		readMarkedupFile(grammarDir, ALT_MARKEDUP);
 		seenCategories = new HashMap<String, Category>();
@@ -79,7 +74,7 @@ public class Categories {
 		CAT, MARKEDUP, GRS
 	}
 
-	private void readMarkedupFile(String grammarDir, boolean ALT_MARKEDUP) {
+	private void readMarkedupFile(String grammarDir, boolean ALT_MARKEDUP) throws IOException {
 		markedupStrings = new HashMap<String, String>();
 		plainCategoryStrings = new HashMap<String, String>();
 		markedupCategories = new HashMap<String, Category>();
@@ -191,7 +186,7 @@ public class Categories {
 				}
 			}
 		} catch ( IOException e ) {
-			logger.error(e);
+			throw e;
 		}
 	}
 
@@ -414,7 +409,7 @@ public class Categories {
 	 * indicates what the variable is associated with the dependency, which
 	 * needs carrying over
 	 */
-	private void readTRcategories(String trFile, ArrayList<TypeRaisedCategory> trList) {
+	private void readTRcategories(String trFile, ArrayList<TypeRaisedCategory> trList) throws IOException {
 		try ( BufferedReader in = new BufferedReader(new FileReader(trFile)) ) {
 
 			String markedupCatString = "";
@@ -453,7 +448,7 @@ public class Categories {
 				trList.add(trCat);
 			}
 		} catch ( IOException e ) {
-			logger.error(e);
+			throw e;
 		}
 	}
 

@@ -1,13 +1,12 @@
 package cat_combination;
 
-import io.Sentence;
-
+import java.io.IOException;
 import java.util.ArrayList;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import chart_parser.ChartParser;
+import io.Sentence;
 import lexicon.Atom;
 import lexicon.Categories;
 import lexicon.Category;
@@ -57,7 +56,7 @@ public class Rules {
 
 	public static final Logger logger = LogManager.getLogger(Rules.class);
 
-	public Rules(boolean eisnerNormalForm, Categories categories, RuleInstancesParams ruleInstancesParams) {
+	public Rules(boolean eisnerNormalForm, Categories categories, RuleInstancesParams ruleInstancesParams) throws IOException {
 		if (ruleInstancesParams.getAllRules()) {
 			allRuleInstances = new RuleInstances(ruleInstancesParams.getDirectory() + "/all_rule_instances", categories);
 		} else {

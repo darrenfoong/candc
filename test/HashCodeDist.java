@@ -11,10 +11,10 @@ public class HashCodeDist {
 
 		String weightsFile = args[0];
 
-		Categories categories = new Categories(grammarDir, false);
-		Weights weights = new Weights();
-
 		try {
+			Categories categories = new Categories(grammarDir, false);
+			Weights weights = new Weights();
+
 			FeaturesHashCode features = new FeaturesHashCode(featuresFile, weightsFile, weights, categories);
 			features.countAllHashes();
 			features.printAllHashCounts();

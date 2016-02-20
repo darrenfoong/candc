@@ -1,5 +1,7 @@
 package chart_parser;
 
+import java.io.IOException;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -21,7 +23,7 @@ import lexicon.Categories;
 public class OracleDepsSumDecoder extends OracleDecoder {
 	public static final Logger logger = LogManager.getLogger(OracleDepsSumDecoder.class);
 
-	public OracleDepsSumDecoder(Categories categories, boolean extractRuleInstances) {
+	public OracleDepsSumDecoder(Categories categories, boolean extractRuleInstances) throws IOException {
 		super(categories, extractRuleInstances);
 	}
 

@@ -58,35 +58,28 @@ public class PrintForests {
 		String toSent = args[7];
 
 		System.setProperty("logFile", logFile);
-		final Logger logger = LogManager.getLogger(Parser.class);
+		final Logger logger = LogManager.getLogger(PrintForests.class);
 
 		int fromSentence = Integer.parseInt(fromSent);
 		int toSentence = Integer.parseInt(toSent);
 
 		Lexicon lexicon = null;
+		ChartParser parser = null;
+		OracleDepsSumDecoder oracleDecoder = null;
 
 		try {
 			lexicon = new Lexicon(lexiconFile);
-		} catch ( IOException e ) {
-			logger.error(e);
-			return;
-		}
-
-		ChartParser parser = null;
-
-		try {
 			parser = new ChartParser(grammarDir, altMarkedup,
 					eisnerNormalForm, MAX_WORDS, MAX_SUPERCATS,
 					oracleFscore, adaptiveSupertagging, ruleInstancesParams,
 					lexicon, featuresFile, null, newFeatures, false);
+			oracleDecoder = new OracleDepsSumDecoder(parser.categories, false);
 		} catch ( IOException e ) {
 			logger.error(e);
 			return;
 		}
 
 		PrintForest forest = new PrintForest(parser.features);
-
-		OracleDepsSumDecoder oracleDecoder = new OracleDepsSumDecoder(parser.categories, false);
 
 		try ( BufferedReader in = new BufferedReader(new FileReader(inputFile));
 				BufferedReader gold = new BufferedReader(new FileReader(goldDepsFile));

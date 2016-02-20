@@ -55,17 +55,10 @@ public class Parser {
 		int toSentence = Integer.parseInt(toSent);
 
 		Lexicon lexicon = null;
-
-		try {
-			lexicon = new Lexicon(lexiconFile);
-		} catch ( IOException e ) {
-			logger.error(e);
-			return;
-		}
-
 		ChartParser parser = null;
 
 		try {
+			lexicon = new Lexicon(lexiconFile);
 			parser = new ChartParser(grammarDir, altMarkedup,
 					eisnerNormalForm, MAX_WORDS, MAX_SUPERCATS,
 					oracleFscore, adaptiveSupertagging, ruleInstancesParams,

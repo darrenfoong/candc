@@ -6,9 +6,6 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import cat_combination.FilledDependency;
 import cat_combination.SuperCategory;
 import chart_parser.Cell;
@@ -25,8 +22,6 @@ public class PrintForest {
 
 	HashSet<FilledDependency> goldDeps;
 	Category rootCat;
-
-	public static final Logger logger = LogManager.getLogger(PrintForest.class);
 
 	public PrintForest(Features features) {
 		featureIDs = new ArrayList<Integer>();
@@ -224,54 +219,48 @@ public class PrintForest {
 		return score;
 	}
 
-	public boolean readGoldDeps(BufferedReader in, Categories categories) {
-		try {
-			goldDeps.clear();
+	public boolean readGoldDeps(BufferedReader in, Categories categories) throws IOException {
+		goldDeps.clear();
 
-			String line = in.readLine();
-			if (line == null) {
-				return false;
-			} else if (line.isEmpty()) {
+		String line = in.readLine();
+		if (line == null) {
+			return false;
+		} else if (line.isEmpty()) {
+			return true;
+		}
+
+		// read the two rootCats, the first of which is the automatically
+		// generated "gold"
+		String[] rootCats = line.split("\\s");
+		if (rootCats.length != 2) {
+			throw new Error(
+					"should be 2 root cats before each set of gold deps!");
+		}
+		rootCat = categories.canonize(rootCats[0]);
+
+		line = in.readLine();
+		while (true) {
+			if (line.isEmpty()) {
 				return true;
 			}
 
-			// read the two rootCats, the first of which is the automatically
-			// generated "gold"
-			String[] rootCats = line.split("\\s");
-			if (rootCats.length != 2) {
-				throw new Error(
-						"should be 2 root cats before each set of gold deps!");
+			String[] tokens = line.split("\\s");
+			if (tokens.length != 4) {
+				throw new Error("gold deps should always have 4 fields!");
 			}
-			rootCat = categories.canonize(rootCats[0]);
+
+			short headIndex = Short.parseShort(tokens[0]);
+			short relID = Short.parseShort(tokens[1]);
+			short fillerIndex = Short.parseShort(tokens[2]);
+			short unaryRuleID = Short.parseShort(tokens[3]);
+			short lrange = (short) (0); // assuming lrange is not part of
+			// the data
+
+			FilledDependency dep = new FilledDependency(relID, headIndex,
+					fillerIndex, unaryRuleID, lrange);
+			goldDeps.add(dep);
 
 			line = in.readLine();
-			while (true) {
-				if (line.isEmpty()) {
-					return true;
-				}
-
-				String[] tokens = line.split("\\s");
-				if (tokens.length != 4) {
-					throw new Error("gold deps should always have 4 fields!");
-				}
-
-				short headIndex = Short.parseShort(tokens[0]);
-				short relID = Short.parseShort(tokens[1]);
-				short fillerIndex = Short.parseShort(tokens[2]);
-				short unaryRuleID = Short.parseShort(tokens[3]);
-				short lrange = (short) (0); // assuming lrange is not part of
-				// the data
-
-				FilledDependency dep = new FilledDependency(relID, headIndex,
-						fillerIndex, unaryRuleID, lrange);
-				goldDeps.add(dep);
-
-				line = in.readLine();
-			}
-		} catch (IOException e) {
-			logger.error(e);
-			return false;
 		}
 	}
-
 }

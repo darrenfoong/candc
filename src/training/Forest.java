@@ -5,9 +5,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import utils.NumericalFunctions;
 
 public class Forest {
@@ -17,31 +14,25 @@ public class Forest {
 	double logZ;
 	double logZgold;
 
-	public static final Logger logger = LogManager.getLogger(Forest.class);
-
-	public Forest(BufferedReader in, Feature[] features, int numNodes) {
+	public Forest(BufferedReader in, Feature[] features, int numNodes) throws IOException {
 		rootNodes = new ArrayList<DisjNode>();
 		String line;
 
-		try {
-			disjNodes = new DisjNode[numNodes];
+		disjNodes = new DisjNode[numNodes];
 
-			for (int i = 0; i < numNodes; i++) {
-				line = in.readLine();
-				int nodeID = Integer.parseInt(line);
-				if (nodeID != i) {
-					throw new Error(
-							"disj node id does not match expected value! "
-									+ line);
-				}
-				readDisjNode(in, i, features);
-			}
+		for (int i = 0; i < numNodes; i++) {
 			line = in.readLine();
-			if (!line.isEmpty()) {
-				throw new Error("expecting new line at end of forest!");
+			int nodeID = Integer.parseInt(line);
+			if (nodeID != i) {
+				throw new Error(
+						"disj node id does not match expected value! "
+								+ line);
 			}
-		} catch (IOException e) {
-			logger.error(e);
+			readDisjNode(in, i, features);
+		}
+		line = in.readLine();
+		if (!line.isEmpty()) {
+			throw new Error("expecting new line at end of forest!");
 		}
 	}
 
@@ -135,95 +126,84 @@ public class Forest {
 		}
 	}
 
-	private void readDisjNode(BufferedReader in, int nodeID, Feature[] features) {
-		try {
-			String line = in.readLine();
-			int numConjs = Integer.parseInt(line);
+	private void readDisjNode(BufferedReader in, int nodeID, Feature[] features) throws IOException{
+		String line = in.readLine();
+		int numConjs = Integer.parseInt(line);
 
-			DisjNode disjNode = new DisjNode(numConjs);
-			disjNodes[nodeID] = disjNode;
+		DisjNode disjNode = new DisjNode(numConjs);
+		disjNodes[nodeID] = disjNode;
 
-			boolean atRoot = false;
-			for (int i = 0; i < numConjs; i++) {
-				atRoot = readConjNode(in, i, disjNode, features);
-			}
-			if (atRoot) {
-				rootNodes.add(disjNode);
-			}
-
-		} catch (IOException e) {
-			logger.error(e);
+		boolean atRoot = false;
+		for (int i = 0; i < numConjs; i++) {
+			atRoot = readConjNode(in, i, disjNode, features);
+		}
+		if (atRoot) {
+			rootNodes.add(disjNode);
 		}
 	}
 
 	private boolean readConjNode(BufferedReader in, int nodeNum,
-			DisjNode disjNode, Feature[] features) {
-		try {
-			String line = in.readLine();
-			String[] tokens = line.split("\\s");
-			int nodeType = Integer.parseInt(tokens[0]);
-			int nextTokenIndex;
-			int leftChildID = -1;
-			int rightChildID = -1;
-			boolean goldMarker;
-			double supertagScore = 0.0;
+			DisjNode disjNode, Feature[] features) throws IOException{
+		String line = in.readLine();
+		String[] tokens = line.split("\\s");
+		int nodeType = Integer.parseInt(tokens[0]);
+		int nextTokenIndex;
+		int leftChildID = -1;
+		int rightChildID = -1;
+		boolean goldMarker;
+		double supertagScore = 0.0;
 
-			switch (nodeType) { // reading the children
-			case 0: // leaf node
-				supertagScore = Double.parseDouble(tokens[1]);
-				nextTokenIndex = 2;
-				break;
-			case 1: // unary node
-				leftChildID = Integer.parseInt(tokens[1]);
-				nextTokenIndex = 2;
-				break;
-			case 2: // binary (non-root) node - fall through
-			case 3: // root node
-				leftChildID = Integer.parseInt(tokens[1]);
-				rightChildID = Integer.parseInt(tokens[2]);
-				nextTokenIndex = 3;
-				break;
-			default:
-				throw new Error(
-						"expecting 0, 1, 2 or 3 for conj node type in forests!");
-			}
-			if (tokens[nextTokenIndex].equals("0")) {
-				goldMarker = false;
-			} else if (tokens[nextTokenIndex].equals("1")) {
-				goldMarker = true;
-			} else {
-				throw new Error("gold marker has to be 0 or 1!");
-			}
-			nextTokenIndex++;
-
-			int numFeatures = Integer.parseInt(tokens[nextTokenIndex]);
-			nextTokenIndex++;
-
-			// assumes forests are printed bottom up, ie we already have
-			// children nodes on disjNodes
-			DisjNode leftChild = leftChildID == -1 ? null
-					: disjNodes[leftChildID];
-			DisjNode rightChild = rightChildID == -1 ? null
-					: disjNodes[rightChildID];
-
-			ConjNode conj = new ConjNode(leftChild, rightChild, numFeatures,
-					goldMarker, supertagScore);
-			disjNode.add(conj, nodeNum);
-
-			for (int i = 0; i < numFeatures; i++) {
-				int featureID = Integer.parseInt(tokens[nextTokenIndex + i]);
-				conj.features[i] = features[featureID];
-			}
-			if (nodeType == 3) {
-				return true;
-			} else {
-				return false;
-			}
-
-		} catch (IOException e) {
-			logger.error(e);
+		switch (nodeType) { // reading the children
+		case 0: // leaf node
+			supertagScore = Double.parseDouble(tokens[1]);
+			nextTokenIndex = 2;
+			break;
+		case 1: // unary node
+			leftChildID = Integer.parseInt(tokens[1]);
+			nextTokenIndex = 2;
+			break;
+		case 2: // binary (non-root) node - fall through
+		case 3: // root node
+			leftChildID = Integer.parseInt(tokens[1]);
+			rightChildID = Integer.parseInt(tokens[2]);
+			nextTokenIndex = 3;
+			break;
+		default:
+			throw new Error(
+					"expecting 0, 1, 2 or 3 for conj node type in forests!");
 		}
-		return false; // should never get here
+		if (tokens[nextTokenIndex].equals("0")) {
+			goldMarker = false;
+		} else if (tokens[nextTokenIndex].equals("1")) {
+			goldMarker = true;
+		} else {
+			throw new Error("gold marker has to be 0 or 1!");
+		}
+		nextTokenIndex++;
+
+		int numFeatures = Integer.parseInt(tokens[nextTokenIndex]);
+		nextTokenIndex++;
+
+		// assumes forests are printed bottom up, ie we already have
+		// children nodes on disjNodes
+		DisjNode leftChild = leftChildID == -1 ? null
+				: disjNodes[leftChildID];
+		DisjNode rightChild = rightChildID == -1 ? null
+				: disjNodes[rightChildID];
+
+		ConjNode conj = new ConjNode(leftChild, rightChild, numFeatures,
+				goldMarker, supertagScore);
+		disjNode.add(conj, nodeNum);
+
+		for (int i = 0; i < numFeatures; i++) {
+			int featureID = Integer.parseInt(tokens[nextTokenIndex + i]);
+			conj.features[i] = features[featureID];
+		}
+		if (nodeType == 3) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 }

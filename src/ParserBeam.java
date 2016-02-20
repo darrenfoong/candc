@@ -61,17 +61,10 @@ public class ParserBeam {
 		int toSentence = Integer.parseInt(toSent);
 
 		Lexicon lexicon = null;
+		ChartParserBeam parser = null;;
 
 		try {
 			lexicon = new Lexicon(lexiconFile);
-		} catch ( IOException e ) {
-			logger.error(e);
-			return;
-		}
-
-		ChartParserBeam parser = null;
-
-		try {
 			parser = new ChartParserBeam(grammarDir, altMarkedup,
 					eisnerNormalForm, MAX_WORDS, MAX_SUPERCATS,
 					ruleInstancesParams, lexicon, featuresFile, weightsFile,

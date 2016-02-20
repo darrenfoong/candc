@@ -6,9 +6,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashSet;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import io.Preface;
 import lexicon.Categories;
 import lexicon.Category;
@@ -16,9 +13,7 @@ import lexicon.Category;
 public class RuleInstances {
 	HashSet<RuleCategoryPair> ruleInstances;
 
-	public static final Logger logger = LogManager.getLogger(RuleInstances.class);
-
-	public RuleInstances(String ruleInstancesFile, Categories categories) {
+	public RuleInstances(String ruleInstancesFile, Categories categories) throws IOException {
 		ruleInstances = new HashSet<RuleCategoryPair>();
 		if (ruleInstancesFile != null) {
 			readRuleInstances(ruleInstancesFile, categories);
@@ -40,7 +35,7 @@ public class RuleInstances {
 		}
 	}
 
-	private void readRuleInstances(String ruleInstancesFile, Categories categories) {
+	private void readRuleInstances(String ruleInstancesFile, Categories categories) throws IOException {
 		try ( BufferedReader in = new BufferedReader(new FileReader(ruleInstancesFile)) ) {
 			Preface.readPreface(in);
 
@@ -56,7 +51,7 @@ public class RuleInstances {
 				ruleInstances.add(catPair);
 			}
 		} catch (IOException e) {
-			logger.error(e);
+			throw e;
 		}
 	}
 }

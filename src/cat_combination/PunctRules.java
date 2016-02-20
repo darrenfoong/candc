@@ -1,5 +1,6 @@
 package cat_combination;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import lexicon.Categories;
@@ -31,7 +32,7 @@ public class PunctRules {
 	private final Category NPbNP;
 
 	public PunctRules(Categories categories,
-			RuleInstancesParams ruleInstancesParams) {
+			RuleInstancesParams ruleInstancesParams) throws IOException {
 		this.ruleInstancesParams = ruleInstancesParams;
 
 		if (ruleInstancesParams.getRightPunct()) {
