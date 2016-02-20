@@ -21,8 +21,6 @@ import io.Sentences;
 import model.Lexicon;
 
 public class TrainParserBeam {
-	public static final Logger logger = LogManager.getLogger(TrainParserBeam.class);
-
 	public static void main(String[] args) {
 		int MAX_WORDS = 150;
 		int MAX_SUPERCATS = 500000;
@@ -64,6 +62,7 @@ public class TrainParserBeam {
 		String toSent = args[8];
 
 		System.setProperty("logFile", logFile);
+		final Logger logger = LogManager.getLogger(TrainParserBeam.class);
 
 		int fromSentence = Integer.parseInt(fromSent);
 		int toSentence = Integer.parseInt(toSent);

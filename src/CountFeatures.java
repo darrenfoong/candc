@@ -18,8 +18,6 @@ import chart_parser.ChartParserBeam;
 import chart_parser.CountFeaturesDecoder;
 
 public class CountFeatures {
-	public static final Logger logger = LogManager.getLogger(CountFeatures.class);
-
 	public static void main(String[] args) {
 		int MAX_WORDS = 150;
 		int MAX_SUPERCATS = 500000;
@@ -54,6 +52,7 @@ public class CountFeatures {
 		String toSent = args[6];
 
 		System.setProperty("logFile", logFile);
+		final Logger logger = LogManager.getLogger(CountFeatures.class);
 
 		int fromSentence = Integer.parseInt(fromSent);
 		int toSentence = Integer.parseInt(toSent);

@@ -17,8 +17,6 @@ import model.Lexicon;
 import training.PrintForest;
 
 public class PrintForests {
-	public static final Logger logger = LogManager.getLogger(Parser.class);
-
 	public static void main(String[] args) {
 		int MAX_WORDS = 250;
 		int MAX_SUPERCATS = 1000000;
@@ -60,6 +58,7 @@ public class PrintForests {
 		String toSent = args[7];
 
 		System.setProperty("logFile", logFile);
+		final Logger logger = LogManager.getLogger(Parser.class);
 
 		int fromSentence = Integer.parseInt(fromSent);
 		int toSentence = Integer.parseInt(toSent);

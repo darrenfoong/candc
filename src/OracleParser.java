@@ -33,8 +33,6 @@ import io.Sentences;
  */
 
 public class OracleParser {
-	public static final Logger logger = LogManager.getLogger(OracleParser.class);
-
 	public static void main(String[] args) {
 		int MAX_WORDS = 250;
 		int MAX_SUPERCATS = 2000000;
@@ -75,6 +73,7 @@ public class OracleParser {
 		String toSent = args[7];
 
 		System.setProperty("logFile", logFile);
+		final Logger logger = LogManager.getLogger(OracleParser.class);
 
 		int fromSentence = Integer.parseInt(fromSent);
 		int toSentence = Integer.parseInt(toSent);

@@ -14,8 +14,6 @@ import training.Feature;
 import training.Forest;
 
 public class TrainLogLinear {
-	public static final Logger logger = LogManager.getLogger(TrainLogLinear.class);
-
 	public static void main(String[] args) {
 		double LEARNING_RATE = 0.5;
 
@@ -32,6 +30,7 @@ public class TrainLogLinear {
 		String toSent = args[5];
 
 		System.setProperty("logFile", logFile);
+		final Logger logger = LogManager.getLogger(TrainLogLinear.class);
 
 		int fromSentence = Integer.parseInt(fromSent);
 		int toSentence = Integer.parseInt(toSent);

@@ -17,8 +17,6 @@ import io.Sentences;
 import model.Lexicon;
 
 public class Parser {
-	public static final Logger logger = LogManager.getLogger(Parser.class);
-
 	public static void main(String[] args) {
 		int MAX_WORDS = 250;
 		int MAX_SUPERCATS = 300000;
@@ -51,6 +49,7 @@ public class Parser {
 		String toSent = args[5];
 
 		System.setProperty("logFile", logFile);
+		final Logger logger = LogManager.getLogger(Parser.class);
 
 		int fromSentence = Integer.parseInt(fromSent);
 		int toSentence = Integer.parseInt(toSent);
