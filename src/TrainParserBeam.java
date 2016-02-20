@@ -18,6 +18,9 @@ import chart_parser.OracleDecoder;
 import chart_parser.OracleDepsSumDecoder;
 import io.Preface;
 import io.Sentences;
+import joptsimple.OptionException;
+import joptsimple.OptionParser;
+import joptsimple.OptionSet;
 import model.Lexicon;
 
 public class TrainParserBeam {
@@ -46,27 +49,56 @@ public class TrainParserBeam {
 		// this is the beta used by the parser, in a second beam
 		// the closer to zero the more aggressive the beam
 
-		if ( args.length < 9 ) {
-			System.err.println("TrainParserBeam requires 9 arguments: <inputFile> <outputWeightsFile> <logFile> <weightsFile> <goldDepsFile> <rootCatsFile> <numIters> <fromSentence> <toSentence>");
+		OptionParser optionParser = new OptionParser();
+		optionParser.accepts("help").forHelp();
+		optionParser.accepts("verbose");
+		optionParser.accepts("input").withRequiredArg().ofType(String.class).required();
+		optionParser.accepts("outputWeights").withRequiredArg().ofType(String.class).required();
+		optionParser.accepts("log").withRequiredArg().ofType(String.class).required();
+		optionParser.accepts("weights").withRequiredArg().ofType(String.class).required();
+		optionParser.accepts("goldDeps").withRequiredArg().ofType(String.class).required();
+		optionParser.accepts("rootCats").withRequiredArg().ofType(String.class).required();
+		optionParser.accepts("numIterations").withRequiredArg().ofType(Integer.class).required();
+		optionParser.accepts("from").withRequiredArg().ofType(Integer.class).defaultsTo(1);
+		optionParser.accepts("to").withRequiredArg().ofType(Integer.class).defaultsTo(Integer.MAX_VALUE);
+
+		OptionSet options = null;
+
+		try {
+			options = optionParser.parse(args);
+		} catch ( OptionException e ) {
+			System.err.println(e.getMessage());
 			return;
 		}
 
-		String inputFile = args[0];
-		String outputWeightsFile = args[1];
-		String logFile = args[2];
-		String weightsFile = args[3];
-		String goldDepsFile = args[4];
-		String rootCatsFile = args[5];
-		String numItersStr = args[6];
-		String fromSent = args[7];
-		String toSent = args[8];
+		try {
+			if ( options.has("help") ) {
+				optionParser.printHelpOn(System.out);
+				return;
+			}
+		} catch ( IOException e ) {
+			System.err.println(e);
+			return;
+		}
+
+		if ( options.has("verbose") ) {
+			System.setProperty("logLevel", "trace");
+		} else {
+			System.setProperty("logLevel", "info");
+		}
+
+		String inputFile = (String) options.valueOf("input");
+		String outputWeightsFile = (String) options.valueOf("outputWeights");
+		String logFile = (String) options.valueOf("log");
+		String weightsFile = (String) options.valueOf("weights");
+		String goldDepsFile = (String) options.valueOf("goldDeps");
+		String rootCatsFile = (String) options.valueOf("rootCats");
+		int numIterations = (Integer) options.valueOf("numIterations");
+		int fromSentence = (Integer) options.valueOf("from");
+		int toSentence = (Integer) options.valueOf("to");
 
 		System.setProperty("logFile", logFile);
 		final Logger logger = LogManager.getLogger(TrainParserBeam.class);
-
-		int fromSentence = Integer.parseInt(fromSent);
-		int toSentence = Integer.parseInt(toSent);
-		int numIterations = Integer.parseInt(numItersStr);
 
 		Lexicon lexicon = null;
 		ChartTrainParserBeam parser = null;

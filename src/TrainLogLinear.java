@@ -10,6 +10,9 @@ import org.apache.logging.log4j.Logger;
 
 import io.Forests;
 import io.Preface;
+import joptsimple.OptionException;
+import joptsimple.OptionParser;
+import joptsimple.OptionSet;
 import training.Feature;
 import training.Forest;
 
@@ -17,24 +20,50 @@ public class TrainLogLinear {
 	public static void main(String[] args) {
 		double LEARNING_RATE = 0.5;
 
-		if ( args.length < 6 ) {
-			System.err.println("TrainLogLinear requires 6 arguments: <forestFile> <weightsFile> <logFile> <numIters> <fromSentence> <toSentence>");
+		OptionParser optionParser = new OptionParser();
+		optionParser.accepts("help").forHelp();
+		optionParser.accepts("verbose");
+		optionParser.accepts("forest").withRequiredArg().ofType(String.class).required();
+		optionParser.accepts("weights").withRequiredArg().ofType(String.class).required();
+		optionParser.accepts("log").withRequiredArg().ofType(String.class).required();
+		optionParser.accepts("numIterations").withRequiredArg().ofType(Integer.class).required();
+		optionParser.accepts("from").withRequiredArg().ofType(Integer.class).defaultsTo(1);
+		optionParser.accepts("to").withRequiredArg().ofType(Integer.class).defaultsTo(Integer.MAX_VALUE);
+
+		OptionSet options = null;
+
+		try {
+			options = optionParser.parse(args);
+		} catch ( OptionException e ) {
+			System.err.println(e.getMessage());
 			return;
 		}
 
-		String forestFile = args[0];
-		String weightsFile = args[1];
-		String logFile = args[2];
-		String numItersStr = args[3];
-		String fromSent = args[4];
-		String toSent = args[5];
+		try {
+			if ( options.has("help") ) {
+				optionParser.printHelpOn(System.out);
+				return;
+			}
+		} catch ( IOException e ) {
+			System.err.println(e);
+			return;
+		}
+
+		if ( options.has("verbose") ) {
+			System.setProperty("logLevel", "trace");
+		} else {
+			System.setProperty("logLevel", "info");
+		}
+
+		String forestFile = (String) options.valueOf("forest");
+		String weightsFile = (String) options.valueOf("weights");
+		String logFile = (String) options.valueOf("log");
+		int numIterations = (Integer) options.valueOf("numIterations");
+		int fromSentence = (Integer) options.valueOf("from");
+		int toSentence = (Integer) options.valueOf("to");
 
 		System.setProperty("logFile", logFile);
 		final Logger logger = LogManager.getLogger(TrainLogLinear.class);
-
-		int fromSentence = Integer.parseInt(fromSent);
-		int toSentence = Integer.parseInt(toSent);
-		int numIterations = Integer.parseInt(numItersStr);
 
 		try ( BufferedReader in = new BufferedReader(new FileReader(forestFile));
 				PrintWriter out = new PrintWriter(new FileWriter(weightsFile)) ) {

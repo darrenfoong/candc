@@ -18,6 +18,9 @@ import chart_parser.OracleDepsSumDecoder;
 import chart_parser.OracleFscoreDecoder;
 import io.Preface;
 import io.Sentences;
+import joptsimple.OptionException;
+import joptsimple.OptionParser;
+import joptsimple.OptionSet;
 
 /*
  * this gets used for a number of tasks:
@@ -58,25 +61,54 @@ public class OracleParser {
 		boolean training = true;
 		// set to false if the string category and slot are needed for evaluation; true gives deps used for training
 
-		if ( args.length < 8 ) {
-			System.err.println("OracleParser requires 8 arguments: <inputFile> <goldSupertagsFile> <outputFile> <logFile> <goldDepsFile> <rootCatsFile> <fromSentence> <toSentence>");
+		OptionParser optionParser = new OptionParser();
+		optionParser.accepts("help").forHelp();
+		optionParser.accepts("verbose");
+		optionParser.accepts("input").withRequiredArg().ofType(String.class).required();
+		optionParser.accepts("goldSupertags").withRequiredArg().ofType(String.class).defaultsTo(null);
+		optionParser.accepts("output").withRequiredArg().ofType(String.class).required();
+		optionParser.accepts("log").withRequiredArg().ofType(String.class).required();
+		optionParser.accepts("goldDeps").withRequiredArg().ofType(String.class).required();
+		optionParser.accepts("rootCats").withRequiredArg().ofType(String.class).defaultsTo(null);
+		optionParser.accepts("from").withRequiredArg().ofType(Integer.class).defaultsTo(1);
+		optionParser.accepts("to").withRequiredArg().ofType(Integer.class).defaultsTo(Integer.MAX_VALUE);
+
+		OptionSet options = null;
+
+		try {
+			options = optionParser.parse(args);
+		} catch ( OptionException e ) {
+			System.err.println(e.getMessage());
 			return;
 		}
 
-		String inputFile = args[0];
-		String goldSupertagsFile = args[1]; // could be "null"
-		String outputFile = args[2];
-		String logFile = args[3];
-		String goldDepsFile = args[4];
-		String rootCatsFile = args[5]; // could be "null"
-		String fromSent = args[6];
-		String toSent = args[7];
+		try {
+			if ( options.has("help") ) {
+				optionParser.printHelpOn(System.out);
+				return;
+			}
+		} catch ( IOException e ) {
+			System.err.println(e);
+			return;
+		}
+
+		if ( options.has("verbose") ) {
+			System.setProperty("logLevel", "trace");
+		} else {
+			System.setProperty("logLevel", "info");
+		}
+
+		String inputFile = (String) options.valueOf("input");
+		String goldSupertagsFile = (String) options.valueOf("goldSupertags");
+		String outputFile = (String) options.valueOf("output");
+		String logFile = (String) options.valueOf("log");
+		String goldDepsFile = (String) options.valueOf("goldDeps");
+		String rootCatsFile = (String) options.valueOf("rootCats");
+		int fromSentence = (Integer) options.valueOf("from");
+		int toSentence = (Integer) options.valueOf("to");
 
 		System.setProperty("logFile", logFile);
 		final Logger logger = LogManager.getLogger(OracleParser.class);
-
-		int fromSentence = Integer.parseInt(fromSent);
-		int toSentence = Integer.parseInt(toSent);
 
 		ChartParser parser = null;
 		OracleDecoder oracleDecoder = null;

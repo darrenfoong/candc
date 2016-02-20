@@ -13,6 +13,9 @@ import cat_combination.RuleInstancesParams;
 import chart_parser.ChartParserBeam;
 import io.Preface;
 import io.Sentences;
+import joptsimple.OptionException;
+import joptsimple.OptionParser;
+import joptsimple.OptionSet;
 import model.Lexicon;
 
 public class ParserBeam {
@@ -42,23 +45,50 @@ public class ParserBeam {
 		// this is the beta used by the parser, in a second beam
 		// the closer to zero the more aggressive the beam
 
-		if ( args.length < 6 ) {
-			System.err.println("ParserBeam requires 6 arguments: <inputFile> <outputFile> <logFile> <weightsFile> <fromSentence> <toSentence>");
+		OptionParser optionParser = new OptionParser();
+		optionParser.accepts("help").forHelp();
+		optionParser.accepts("verbose");
+		optionParser.accepts("input").withRequiredArg().ofType(String.class).required();
+		optionParser.accepts("output").withRequiredArg().ofType(String.class).required();
+		optionParser.accepts("log").withRequiredArg().ofType(String.class).required();
+		optionParser.accepts("weights").withRequiredArg().ofType(String.class).required();
+		optionParser.accepts("from").withRequiredArg().ofType(Integer.class).defaultsTo(1);
+		optionParser.accepts("to").withRequiredArg().ofType(Integer.class).defaultsTo(Integer.MAX_VALUE);
+
+		OptionSet options = null;
+
+		try {
+			options = optionParser.parse(args);
+		} catch ( OptionException e ) {
+			System.err.println(e.getMessage());
 			return;
 		}
 
-		String inputFile = args[0];
-		String outputFile = args[1];
-		String logFile = args[2];
-		String weightsFile = args[3];
-		String fromSent = args[4];
-		String toSent = args[5];
+		try {
+			if ( options.has("help") ) {
+				optionParser.printHelpOn(System.out);
+				return;
+			}
+		} catch ( IOException e ) {
+			System.err.println(e);
+			return;
+		}
+
+		if ( options.has("verbose") ) {
+			System.setProperty("logLevel", "trace");
+		} else {
+			System.setProperty("logLevel", "info");
+		}
+
+		String inputFile = (String) options.valueOf("input");
+		String outputFile = (String) options.valueOf("output");
+		String logFile = (String) options.valueOf("log");
+		String weightsFile = (String) options.valueOf("weights");
+		int fromSentence = (Integer) options.valueOf("from");
+		int toSentence = (Integer) options.valueOf("to");
 
 		System.setProperty("logFile", logFile);
 		final Logger logger = LogManager.getLogger(ParserBeam.class);
-
-		int fromSentence = Integer.parseInt(fromSent);
-		int toSentence = Integer.parseInt(toSent);
 
 		Lexicon lexicon = null;
 		ChartParserBeam parser = null;;
