@@ -9,6 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import io.Forests;
+import io.Params;
 import io.Preface;
 import joptsimple.OptionException;
 import joptsimple.OptionParser;
@@ -19,39 +20,21 @@ import training.Forest;
 
 public class TrainViterbi {
 	public static void main(String[] args) {
-		OptionParser optionParser = new OptionParser();
-		optionParser.accepts("help").forHelp();
-		optionParser.accepts("verbose");
-		optionParser.accepts("forest").withRequiredArg().ofType(String.class).required();
-		optionParser.accepts("weights").withRequiredArg().ofType(String.class).required();
-		optionParser.accepts("log").withRequiredArg().ofType(String.class).required();
-		optionParser.accepts("numIterations").withRequiredArg().ofType(Integer.class).required();
-		optionParser.accepts("from").withRequiredArg().ofType(Integer.class).defaultsTo(1);
-		optionParser.accepts("to").withRequiredArg().ofType(Integer.class).defaultsTo(Integer.MAX_VALUE);
-
+		OptionParser optionParser = Params.getTrainViterbiOptionParser();
 		OptionSet options = null;
 
 		try {
 			options = optionParser.parse(args);
-		} catch ( OptionException e ) {
-			System.err.println(e.getMessage());
-			return;
-		}
-
-		try {
 			if ( options.has("help") ) {
 				optionParser.printHelpOn(System.out);
 				return;
 			}
+		} catch ( OptionException e ) {
+			System.err.println(e.getMessage());
+			return;
 		} catch ( IOException e ) {
 			System.err.println(e);
 			return;
-		}
-
-		if ( options.has("verbose") ) {
-			System.setProperty("logLevel", "trace");
-		} else {
-			System.setProperty("logLevel", "info");
 		}
 
 		String forestFile = (String) options.valueOf("forest");
@@ -61,6 +44,7 @@ public class TrainViterbi {
 		int fromSentence = (Integer) options.valueOf("from");
 		int toSentence = (Integer) options.valueOf("to");
 
+		System.setProperty("logLevel", options.has("verbose") ? "trace" : "info");
 		System.setProperty("logFile", logFile);
 		final Logger logger = LogManager.getLogger(TrainViterbi.class);
 

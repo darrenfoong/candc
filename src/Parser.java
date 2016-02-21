@@ -12,6 +12,7 @@ import org.apache.logging.log4j.Logger;
 import cat_combination.RuleInstancesParams;
 import chart_parser.ChartParser;
 import chart_parser.ViterbiDecoder;
+import io.Params;
 import io.Preface;
 import io.Sentences;
 import joptsimple.OptionException;
@@ -21,58 +22,39 @@ import model.Lexicon;
 
 public class Parser {
 	public static void main(String[] args) {
-		int MAX_WORDS = 250;
-		int MAX_SUPERCATS = 300000;
-
-		boolean altMarkedup = false;
-		boolean eisnerNormalForm = true;
-		boolean newFeatures = false;
-		boolean compactWeights = true;
-		boolean oracleFscore = false;
-
-		String grammarDir = "grammar";
-		String lexiconFile = "words_feats/wsj02-21.wordsPos";
-		String featuresFile = "words_feats/wsj02-21.feats.1-22";
-
-		RuleInstancesParams ruleInstancesParams = new RuleInstancesParams(true, false, false, false, false, false, grammarDir);
-
-		boolean adaptiveSupertagging = false;
 		double[] betas = { 0.0001, 0.001, 0.01, 0.03, 0.075 };
 
-		OptionParser optionParser = new OptionParser();
-		optionParser.accepts("help").forHelp();
-		optionParser.accepts("verbose");
-		optionParser.accepts("input").withRequiredArg().ofType(String.class).required();
-		optionParser.accepts("output").withRequiredArg().ofType(String.class).required();
-		optionParser.accepts("log").withRequiredArg().ofType(String.class).required();
-		optionParser.accepts("weights").withRequiredArg().ofType(String.class).required();
-		optionParser.accepts("from").withRequiredArg().ofType(Integer.class).defaultsTo(1);
-		optionParser.accepts("to").withRequiredArg().ofType(Integer.class).defaultsTo(Integer.MAX_VALUE);
-
+		OptionParser optionParser = Params.getParserOptionParser();
 		OptionSet options = null;
 
 		try {
 			options = optionParser.parse(args);
-		} catch ( OptionException e ) {
-			System.err.println(e.getMessage());
-			return;
-		}
-
-		try {
 			if ( options.has("help") ) {
 				optionParser.printHelpOn(System.out);
 				return;
 			}
+		} catch ( OptionException e ) {
+			System.err.println(e.getMessage());
+			return;
 		} catch ( IOException e ) {
 			System.err.println(e);
 			return;
 		}
 
-		if ( options.has("verbose") ) {
-			System.setProperty("logLevel", "trace");
-		} else {
-			System.setProperty("logLevel", "info");
-		}
+		int MAX_WORDS = (Integer) options.valueOf("maxWords");
+		int MAX_SUPERCATS = (Integer) options.valueOf("maxSupercats");
+
+		String grammarDir = (String) options.valueOf("grammarDir");
+		String lexiconFile = (String) options.valueOf("lexiconFile");
+		String featuresFile = (String) options.valueOf("featuresFile");
+
+		RuleInstancesParams ruleInstancesParams = new RuleInstancesParams(true, false, false, false, false, false, grammarDir);
+
+		boolean altMarkedup = (Boolean) options.valueOf("altMarkedup");
+		boolean eisnerNormalForm = (Boolean) options.valueOf("eisnerNormalForm");
+		boolean compactWeights = (Boolean) options.valueOf("compactWeights");
+		boolean oracleFscore = (Boolean) options.valueOf("oracleFscore");
+		boolean adaptiveSupertagging = (Boolean) options.valueOf("adaptiveSupertagging");
 
 		String inputFile = (String) options.valueOf("input");
 		String outputFile = (String) options.valueOf("output");
@@ -81,6 +63,7 @@ public class Parser {
 		int fromSentence = (Integer) options.valueOf("from");
 		int toSentence = (Integer) options.valueOf("to");
 
+		System.setProperty("logLevel", options.has("verbose") ? "trace" : "info");
 		System.setProperty("logFile", logFile);
 		final Logger logger = LogManager.getLogger(Parser.class);
 
@@ -92,7 +75,7 @@ public class Parser {
 			parser = new ChartParser(grammarDir, altMarkedup,
 					eisnerNormalForm, MAX_WORDS, MAX_SUPERCATS,
 					oracleFscore, adaptiveSupertagging, ruleInstancesParams,
-					lexicon, featuresFile, weightsFile, newFeatures, compactWeights);
+					lexicon, featuresFile, weightsFile, false, compactWeights);
 		} catch ( IOException e ) {
 			logger.error(e);
 			return;

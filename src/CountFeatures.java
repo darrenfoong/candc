@@ -12,6 +12,7 @@ import org.apache.logging.log4j.Logger;
 import cat_combination.RuleInstancesParams;
 import chart_parser.ChartParserBeam;
 import chart_parser.CountFeaturesDecoder;
+import io.Params;
 import io.Preface;
 import io.Sentences;
 import joptsimple.OptionException;
@@ -21,60 +22,40 @@ import model.Lexicon;
 
 public class CountFeatures {
 	public static void main(String[] args) {
-		int MAX_WORDS = 150;
-		int MAX_SUPERCATS = 500000;
-
-		boolean altMarkedup = false;
-		boolean eisnerNormalForm = true;
-		boolean newFeatures = true;
-		boolean cubePruning = false;
-
-		String grammarDir = "grammar";
-		String lexiconFile = "words_feats/wsj02-21.wordsPos";
-		String featuresFile = "words_feats/wsj02-21.feats.1-22";
-
-		RuleInstancesParams ruleInstancesParams = new RuleInstancesParams(true, false, false, false, false, false, grammarDir);
-
 		double[] betas = { 0.0001 };
 
-		int beamSize = 32;
-		double beta = Double.NEGATIVE_INFINITY;
-
-		OptionParser optionParser = new OptionParser();
-		optionParser.accepts("help").forHelp();
-		optionParser.accepts("verbose");
-		optionParser.accepts("input").withRequiredArg().ofType(String.class).required();
-		optionParser.accepts("output").withRequiredArg().ofType(String.class).required();
-		optionParser.accepts("outputWeights").withRequiredArg().ofType(String.class).required();
-		optionParser.accepts("log").withRequiredArg().ofType(String.class).required();
-		optionParser.accepts("weights").withRequiredArg().ofType(String.class).required();
-		optionParser.accepts("from").withRequiredArg().ofType(Integer.class).defaultsTo(1);
-		optionParser.accepts("to").withRequiredArg().ofType(Integer.class).defaultsTo(Integer.MAX_VALUE);
-
+		OptionParser optionParser = Params.getCountFeaturesOptionParser();
 		OptionSet options = null;
 
 		try {
 			options = optionParser.parse(args);
-		} catch ( OptionException e ) {
-			System.err.println(e.getMessage());
-			return;
-		}
-
-		try {
 			if ( options.has("help") ) {
 				optionParser.printHelpOn(System.out);
 				return;
 			}
+		} catch ( OptionException e ) {
+			System.err.println(e.getMessage());
+			return;
 		} catch ( IOException e ) {
 			System.err.println(e);
 			return;
 		}
 
-		if ( options.has("verbose") ) {
-			System.setProperty("logLevel", "trace");
-		} else {
-			System.setProperty("logLevel", "info");
-		}
+		int MAX_WORDS = (Integer) options.valueOf("maxWords");
+		int MAX_SUPERCATS = (Integer) options.valueOf("maxSupercats");
+
+		String grammarDir = (String) options.valueOf("grammarDir");
+		String lexiconFile = (String) options.valueOf("lexiconFile");
+		String featuresFile = (String) options.valueOf("featuresFile");
+
+		RuleInstancesParams ruleInstancesParams = new RuleInstancesParams(true, false, false, false, false, false, grammarDir);
+
+		boolean altMarkedup = (Boolean) options.valueOf("altMarkedup");
+		boolean eisnerNormalForm = (Boolean) options.valueOf("eisnerNormalForm");
+		boolean newFeatures = (Boolean) options.valueOf("newFeatures");
+		boolean cubePruning = (Boolean) options.valueOf("cubePruning");
+		int beamSize = (Integer) options.valueOf("beamSize");
+		double beta = (Double) options.valueOf("beta");
 
 		String inputFile = (String) options.valueOf("input");
 		String outputFile = (String) options.valueOf("output");
@@ -84,6 +65,7 @@ public class CountFeatures {
 		int fromSentence = (Integer) options.valueOf("from");
 		int toSentence = (Integer) options.valueOf("to");
 
+		System.setProperty("logLevel", options.has("verbose") ? "trace" : "info");
 		System.setProperty("logFile", logFile);
 		final Logger logger = LogManager.getLogger(CountFeatures.class);
 

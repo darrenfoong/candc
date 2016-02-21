@@ -16,6 +16,7 @@ import chart_parser.ChartParser;
 import chart_parser.OracleDecoder;
 import chart_parser.OracleDepsSumDecoder;
 import chart_parser.OracleFscoreDecoder;
+import io.Params;
 import io.Preface;
 import io.Sentences;
 import joptsimple.OptionException;
@@ -37,66 +38,40 @@ import joptsimple.OptionSet;
 
 public class OracleParser {
 	public static void main(String[] args) {
-		int MAX_WORDS = 250;
-		int MAX_SUPERCATS = 2000000;
-
-		boolean altMarkedup = false;
-		boolean eisnerNormalForm = true;
-
-		boolean depsSumDecoder = false;
-		// if false then uses the F-score decoder
-		boolean oracleFscore = !depsSumDecoder;
-
-		String grammarDir = "grammar";
-
-		RuleInstancesParams ruleInstancesParams = new RuleInstancesParams(true, false, false, false, false, false, grammarDir);
-
-		boolean extractRuleInstances = false;
-		String oracleRuleInstancesFile = "data/baseline_expts/working/oracleRuleInstances";
-		// not currently used (but can be used to get rules files above)
-
-		boolean adaptiveSupertagging = false;
 		double[] betas = { 0.01, 0.01, 0.01, 0.03, 0.075 };
 
-		boolean training = true;
-		// set to false if the string category and slot are needed for evaluation; true gives deps used for training
-
-		OptionParser optionParser = new OptionParser();
-		optionParser.accepts("help").forHelp();
-		optionParser.accepts("verbose");
-		optionParser.accepts("input").withRequiredArg().ofType(String.class).required();
-		optionParser.accepts("goldSupertags").withRequiredArg().ofType(String.class).defaultsTo(null);
-		optionParser.accepts("output").withRequiredArg().ofType(String.class).required();
-		optionParser.accepts("log").withRequiredArg().ofType(String.class).required();
-		optionParser.accepts("goldDeps").withRequiredArg().ofType(String.class).required();
-		optionParser.accepts("rootCats").withRequiredArg().ofType(String.class).defaultsTo(null);
-		optionParser.accepts("from").withRequiredArg().ofType(Integer.class).defaultsTo(1);
-		optionParser.accepts("to").withRequiredArg().ofType(Integer.class).defaultsTo(Integer.MAX_VALUE);
-
+		OptionParser optionParser = Params.getOracleParserOptionParser();
 		OptionSet options = null;
 
 		try {
 			options = optionParser.parse(args);
-		} catch ( OptionException e ) {
-			System.err.println(e.getMessage());
-			return;
-		}
-
-		try {
 			if ( options.has("help") ) {
 				optionParser.printHelpOn(System.out);
 				return;
 			}
+		} catch ( OptionException e ) {
+			System.err.println(e.getMessage());
+			return;
 		} catch ( IOException e ) {
 			System.err.println(e);
 			return;
 		}
 
-		if ( options.has("verbose") ) {
-			System.setProperty("logLevel", "trace");
-		} else {
-			System.setProperty("logLevel", "info");
-		}
+		int MAX_WORDS = (Integer) options.valueOf("maxWords");
+		int MAX_SUPERCATS = (Integer) options.valueOf("maxSupercats");
+
+		String grammarDir = (String) options.valueOf("grammarDir");
+
+		RuleInstancesParams ruleInstancesParams = new RuleInstancesParams(true, false, false, false, false, false, grammarDir);
+
+		boolean altMarkedup = (Boolean) options.valueOf("altMarkedup");
+		boolean eisnerNormalForm = (Boolean) options.valueOf("eisnerNormalForm");
+		boolean adaptiveSupertagging = (Boolean) options.valueOf("adaptiveSupertagging");
+		boolean depsSumDecoder = (Boolean) options.valueOf("depsSumDecoder");
+		boolean oracleFscore = !depsSumDecoder;
+		boolean extractRuleInstances = (Boolean) options.valueOf("extractRuleInstances");
+		String oracleRuleInstancesFile = (String) options.valueOf("oracleRuleInstancesFile");
+		boolean training = (Boolean) options.valueOf("training");
 
 		String inputFile = (String) options.valueOf("input");
 		String goldSupertagsFile = (String) options.valueOf("goldSupertags");
@@ -107,6 +82,7 @@ public class OracleParser {
 		int fromSentence = (Integer) options.valueOf("from");
 		int toSentence = (Integer) options.valueOf("to");
 
+		System.setProperty("logLevel", options.has("verbose") ? "trace" : "info");
 		System.setProperty("logFile", logFile);
 		final Logger logger = LogManager.getLogger(OracleParser.class);
 
@@ -132,7 +108,7 @@ public class OracleParser {
 		try ( BufferedReader in = new BufferedReader(new FileReader(inputFile));
 				BufferedReader gold = new BufferedReader(new FileReader(goldDepsFile));
 				BufferedReader stagsIn = !goldSupertagsFile.equals("null") ? new BufferedReader(new FileReader(goldSupertagsFile)) : null;
-				BufferedReader roots = new BufferedReader(new FileReader(rootCatsFile));
+				BufferedReader roots = !rootCatsFile.equals("null") ? new BufferedReader(new FileReader(rootCatsFile)) : null;
 				PrintWriter out = new PrintWriter(new FileWriter(outputFile));
 				PrintWriter out2 = new PrintWriter(new FileWriter(outputFile + ".per_cell"));
 				PrintWriter log = IoBuilder.forLogger(logger).setLevel(Level.INFO).buildPrintWriter();
