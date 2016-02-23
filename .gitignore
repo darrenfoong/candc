@@ -21,6 +21,7 @@ evaluatebeam
 hashcodedist
 incorrectdeps
 Makefile
+oracle
 parse
 parsebeam
 printforests
