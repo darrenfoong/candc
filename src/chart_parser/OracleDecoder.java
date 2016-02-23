@@ -31,10 +31,10 @@ public abstract class OracleDecoder {
 	public RuleInstances allRules = null;
 	// stores the extracted rules if oracle decoder used to extract rules
 
-	private String ruleIDsFile = "data/grammar/ruleIDsNoEval.txt";
-	private String relRuleIDsFile = "data/grammar/relsNoEval.txt";
-	private String relHeadFile = "data/grammar/relsHeadsNoEval.txt";
-	private String relHeadFillerFile = "data/grammar/relsHeadsFillersNoEval.txt";
+	private String ruleIDsFile = "grammar/ruleIDsNoEval.txt";
+	private String relRuleIDsFile = "grammar/relsNoEval.txt";
+	private String relHeadFile = "grammar/relsHeadsNoEval.txt";
+	private String relHeadFillerFile = "grammar/relsHeadsFillersNoEval.txt";
 
 	public OracleDecoder(Categories categories, boolean extractRuleInstances) throws IOException {
 		this.goldDeps = new HashSet<FilledDependency>();
