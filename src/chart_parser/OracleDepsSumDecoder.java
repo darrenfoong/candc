@@ -32,9 +32,11 @@ public class OracleDepsSumDecoder extends OracleDecoder {
 		double score = 0.0;
 
 		if (superCat.leftChild != null) {
+			bestEquiv(superCat.leftChild, sentence);
 			score += superCat.leftChild.maxEquivScore;
 
 			if (superCat.rightChild != null) {
+				bestEquiv(superCat.rightChild, sentence);
 				score += superCat.rightChild.maxEquivScore;
 			}
 		}

@@ -124,7 +124,7 @@ public class OracleParser {
 
 			boolean ignoreDepsFlag = true;
 
-			Sentences sentences = new Sentences(in, null, parser.categories, MAX_WORDS);
+			Sentences sentences = new Sentences(in, stagsIn, parser.categories, MAX_WORDS);
 			sentences.skip(fromSentence - 1);
 
 			for ( int numSentence = fromSentence; numSentence <= toSentence && sentences.hasNext(); numSentence++ ) {
