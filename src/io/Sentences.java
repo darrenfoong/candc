@@ -45,6 +45,10 @@ public class Sentences implements Iterator<Sentence> {
 		try {
 			while ( true ) {
 				String line = in.readLine();
+				String stagsLine = null;
+				if ( stagsIn != null ) {
+					stagsLine = stagsIn.readLine();
+				}
 
 				if ( line == null ) {
 					// no valid sentence
@@ -65,15 +69,12 @@ public class Sentences implements Iterator<Sentence> {
 
 				String supertagString = null;
 				String goldSupertagString = null;
-				String stagsLine = null;
 				String[] stagTokens;
 
 				boolean seenGold = false;
 				double lowestProb = 1.0;
 
 				if ( stagsIn != null ) {
-					stagsLine = stagsIn.readLine();
-
 					if ( stagsLine != null ) {
 						stagTokens = stagsLine.split("\\s");
 					} else {
