@@ -118,7 +118,6 @@ public class ParserBeam {
 
 				if ( printChartDeps ) {
 					parser.printChartDeps(outChartDeps, parser.categories.dependencyRelations, parser.sentence);
-					outChartDeps.println();
 				}
 			}
 		} catch ( FileNotFoundException e ) {
