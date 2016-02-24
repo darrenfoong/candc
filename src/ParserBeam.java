@@ -55,6 +55,7 @@ public class ParserBeam {
 		boolean newFeatures = (Boolean) options.valueOf("newFeatures");
 		boolean compactWeights = (Boolean) options.valueOf("compactWeights");
 		boolean cubePruning = (Boolean) options.valueOf("cubePruning");
+		boolean skimmer = (Boolean) options.valueOf("skimmer");
 		boolean printChartDeps = (Boolean) options.valueOf("printChartDeps");
 		int beamSize = (Integer) options.valueOf("beamSize");
 		double beta = (Double) options.valueOf("beta");
@@ -111,6 +112,12 @@ public class ParserBeam {
 						parser.sentence.printC_line(out);
 					} else {
 						logger.info("No root category.");
+
+						if ( skimmer ) {
+							logger.info("Calling skimmer");
+							parser.skimmer(out, parser.categories.dependencyRelations, parser.sentence);
+							parser.sentence.printC_line(out);
+						}
 					}
 				}
 

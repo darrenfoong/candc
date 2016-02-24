@@ -26,7 +26,6 @@ import cat_combination.SuperCategory;
  */
 
 public class Chart {
-
 	public final int MAX_WORDS;
 	public final int MAX_CELLS;
 	public final int NUM_CATS_IN_CELL = 10;

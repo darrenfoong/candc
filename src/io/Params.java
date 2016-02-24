@@ -142,6 +142,7 @@ public class Params {
 		optionParser.accepts("newFeatures").withRequiredArg().ofType(Boolean.class).defaultsTo(true);
 		optionParser.accepts("cubePruning").withRequiredArg().ofType(Boolean.class).defaultsTo(false);
 		optionParser.accepts("compactWeights").withRequiredArg().ofType(Boolean.class).defaultsTo(true);
+		optionParser.accepts("skimmer").withRequiredArg().ofType(Boolean.class).defaultsTo(false);
 		optionParser.accepts("printChartDeps").withRequiredArg().ofType(Boolean.class).defaultsTo(false);
 		addBeamBeta(optionParser);
 

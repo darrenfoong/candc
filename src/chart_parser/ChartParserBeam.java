@@ -4,8 +4,10 @@ import io.Sentence;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
 
@@ -505,6 +507,60 @@ public class ChartParserBeam extends ChartParser {
 		}
 	}
 
+	public void skimmer(PrintWriter out, Relations relations, Sentence sentence) {
+		int numWords = sentence.words.size();
+
+		skimmer(out, relations, sentence, 0, numWords);
+	}
+
+	private void skimmer(PrintWriter out, Relations relations, Sentence sentence, int pos, int span) {
+		int maxPos = 0;
+		int maxSpan = 0;
+
+		SuperCategory maxCat = null;
+		double maxScore = Double.NEGATIVE_INFINITY;
+
+		jloop:
+		for ( int j = span; j > 0; j-- ) {
+			for ( int i = pos; i <= pos + span - j; i++ ) {
+				Cell cell = chart.cell(i, j);
+				if ( !cell.isEmpty() ) {
+					for ( SuperCategory superCat : cell.getSuperCategories() ) {
+						double currentScore = superCat.score;
+						if ( currentScore > maxScore ) {
+							maxScore = currentScore;
+							maxCat = superCat;
+
+							maxPos = i;
+							maxSpan = j;
+						}
+					}
+				}
+			}
+
+			if ( maxCat != null ) {
+				break jloop;
+			}
+		}
+
+		if ( maxCat == null ) {
+			throw new Error("maxCat should not be null");
+		}
+
+		// left
+		if ( maxPos > pos) {
+			skimmer(out, relations, sentence, pos, maxPos - pos);
+		}
+
+		// centre
+		printDeps(out, relations, sentence, maxCat);
+
+		// right
+		if ( pos + span > maxPos + maxSpan ) {
+			skimmer(out, relations, sentence, maxPos + maxSpan, pos + span - maxPos - maxSpan);
+		}
+	}
+
 	public void printDeps(PrintWriter out, Relations relations, Sentence sentence) {
 		double maxScore = Double.NEGATIVE_INFINITY;
 		SuperCategory maxRoot = null;
@@ -548,6 +604,7 @@ public class ChartParserBeam extends ChartParser {
 				}
 			}
 		}
+
 		outChartDeps.println();
 	}
 }
