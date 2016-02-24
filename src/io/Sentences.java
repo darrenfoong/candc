@@ -69,17 +69,9 @@ public class Sentences implements Iterator<Sentence> {
 
 				String supertagString = null;
 				String goldSupertagString = null;
-				String[] stagTokens;
-
-				boolean seenGold = false;
-				double lowestProb = 1.0;
 
 				if ( stagsIn != null ) {
-					if ( stagsLine != null ) {
-						stagTokens = stagsLine.split("\\s");
-					} else {
-						throw new IllegalArgumentException("Unexpected end of stream");
-					}
+					String[] stagTokens = stagsLine.split("\\s");
 
 					if ( stagTokens.length != 3 || !stagTokens[0].equals(tokens[0]) || !stagTokens[1].equals(tokens[1]) ) {
 						throw new IllegalArgumentException("Mismatch between input and gold supertags: " + tokens[0] + " " + tokens[1] + " " + stagTokens[0] + " " + stagTokens[1]);
@@ -91,14 +83,9 @@ public class Sentences implements Iterator<Sentence> {
 				for ( int i = 0; i < numSupertags; i++ ) {
 					supertagString = tokens[2 * i + 3];
 					double probability = Double.parseDouble(tokens[2 * i + 4]);
-					lowestProb = probability;
-					// assumes supertags are ordered by probability (highest first)
-					// TODO: bad assumption
-					// further more lowestProb gets assigned prob at every iteration
-					// if assumption holds, can optimise by assuming lowestProb = probability after loop
 
-					if ( supertagString.equals(goldSupertagString) ) {
-						seenGold = true;
+					if ( stagsIn != null && supertagString.equals(goldSupertagString) ) {
+						continue;
 					}
 
 					Category lexicalCategory = categories.getCategory(supertagString);
@@ -107,20 +94,17 @@ public class Sentences implements Iterator<Sentence> {
 						throw new IllegalArgumentException("No such supertag: " + supertagString);
 					}
 
-					Supertag supertag = new Supertag(supertagString, lexicalCategory, probability);
-					supertags.add(supertag);
+					supertags.add(new Supertag(supertagString, lexicalCategory, probability));
 				}
 
-				if ( stagsIn != null && seenGold == false ) {
+				if ( stagsIn != null ) {
 					Category goldLexicalCategory = categories.getCategory(goldSupertagString);
 
 					if ( goldLexicalCategory == null ) {
 						throw new IllegalArgumentException("No such gold supertag: " + goldSupertagString);
 					}
 
-					Supertag goldSupertag = new Supertag(goldSupertagString, goldLexicalCategory, lowestProb);
-					// use the lowest probability
-					supertags.add(goldSupertag);
+					supertags.add(0, new Supertag(goldSupertagString, goldLexicalCategory, 1.0));
 				}
 
 				sentence.addSupertags(supertags);
