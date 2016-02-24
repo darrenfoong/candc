@@ -416,7 +416,7 @@ public class Categories {
 			String varString = "";
 			byte[] seenVariables = new byte[VarID.NUM_VARS];
 
-			Preface.readPreface(in);
+			// Preface.readPreface(in);
 
 			String line = "";
 			while ( (line = in.readLine()) != null ) {
