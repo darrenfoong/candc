@@ -396,39 +396,6 @@ public class ChartParserBeam extends ChartParser {
 	}
 
 	/**
-	 * Calculates the score of a supercategory.
-	 * 
-	 * The method assumes that the scores of its children (if any) have not been
-	 * calculated.
-	 * 
-	 * The method also assumes if the supercategory is a leaf, only its initial
-	 * score has been calculated.
-	 * 
-	 * @param superCat supercategory
-	 * @param atRoot if the supercategory is a root supercategory
-	 */
-	public void calcScoreRecursive(SuperCategory superCat, boolean atRoot) {
-		SuperCategory leftChild = superCat.leftChild;
-		SuperCategory rightChild = superCat.rightChild;
-
-		if (leftChild != null) {
-			calcScoreRecursive(leftChild, false);
-			if (rightChild != null) {
-				calcScoreRecursive(rightChild, false);
-				calcScoreBinary(superCat, leftChild.score + rightChild.score);
-				if (atRoot) {
-					calcScoreRoot(superCat);
-				}
-			} else {
-				// assumes no unary rules applied at the root
-				calcScoreUnary(superCat, leftChild.score);
-			}
-		} else {
-			calcScoreLeaf(superCat);
-		}
-	}
-
-	/**
 	 * Calculates the score of a root supercategory i.e. initial score + root
 	 * feature scores.
 	 * 
