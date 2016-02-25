@@ -60,6 +60,7 @@ public class TrainParserBeam {
 		boolean cubePruning = (Boolean) options.valueOf("cubePruning");
 		boolean parallelUpdate = (Boolean) options.valueOf("parallelUpdate");
 		boolean updateLogP = (Boolean) options.valueOf("updateLogP");
+		boolean updateDepNN = (Boolean) options.valueOf("updateDepNN");
 		int beamSize = (Integer) options.valueOf("beamSize");
 		double beta = (Double) options.valueOf("beta");
 
@@ -86,7 +87,8 @@ public class TrainParserBeam {
 			parser = new ChartTrainParserBeam(grammarDir, altMarkedup,
 					eisnerNormalForm, MAX_WORDS, MAX_SUPERCATS,
 					ruleInstancesParams, lexicon, featuresFile, weightsFile,
-					newFeatures, cubePruning, beamSize, beta, parallelUpdate, updateLogP);
+					newFeatures, cubePruning, beamSize, beta, parallelUpdate,
+					updateLogP, updateDepNN);
 			oracleDecoder = new OracleDepsSumDecoder(parser.categories, false);
 		} catch ( IOException e ) {
 			logger.error(e);

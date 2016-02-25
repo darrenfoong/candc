@@ -26,7 +26,11 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 
 	protected boolean parallelUpdate;
 	protected boolean updateLogP;
+	protected boolean updateDepNN;
 	protected double maxViolation;
+
+	protected Feature logPFeature;
+	protected Feature depNNFeature;
 
 	protected CellCoords maxViolationCell;
 	protected LinkedList<CellCoords> violationCells = new LinkedList<CellCoords>();
@@ -52,7 +56,8 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 			int beamSize,
 			double beta,
 			boolean parallelUpdate,
-			boolean updateLogP) throws IOException {
+			boolean updateLogP,
+			boolean updateDepNN) throws IOException {
 		super(grammarDir, altMarkedup, eisnerNormalForm, MAX_WORDS,
 				MAX_SUPERCATS, ruleInstancesParams,
 				lexicon, featuresFile, weightsFile, newFeatures, false, cubePruning,
@@ -70,6 +75,16 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 
 		this.parallelUpdate = parallelUpdate;
 		this.updateLogP = updateLogP;
+		this.updateDepNN = updateDepNN;
+
+		if ( updateLogP ) {
+			logPFeature = new Feature(-1, weights.getLogP());
+		}
+
+		if ( updateDepNN ) {
+			depNNFeature = new Feature(-2, weights.getDepNN());
+		}
+
 		this.oracleSupertags = new ArrayList<Category>();
 	}
 
@@ -449,15 +464,23 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 		}
 
 		if (updateLogP) {
-			logger.info(" Finally updating feature 0");
-	
-			if (positiveUpdate) {
-				trainingFeatures[0].setLambdaUpdate(trainingFeatures[0].getLambdaUpdate() + calcSumLeafInitialScore(superCat));
-			} else {
-				trainingFeatures[0].setLambdaUpdate(trainingFeatures[0].getLambdaUpdate() - calcSumLeafInitialScore(superCat));
-			}
+			logger.info(" Finally updating feature logp");
 
-			featuresToUpdate.add(0);
+			if (positiveUpdate) {
+				logPFeature.setLambdaUpdate(logPFeature.getLambdaUpdate() + calcSumLeafInitialScore(superCat));
+			} else {
+				logPFeature.setLambdaUpdate(logPFeature.getLambdaUpdate() - calcSumLeafInitialScore(superCat));
+			}
+		}
+
+		if (updateDepNN) {
+			logger.info(" Finally updating feature depnn");
+
+			if (positiveUpdate) {
+				//trainingFeatures[0].setLambdaUpdate(trainingFeatures[0].getLambdaUpdate() + calcSumLeafInitialScore(superCat));
+			} else {
+				//trainingFeatures[0].setLambdaUpdate(trainingFeatures[0].getLambdaUpdate() - calcSumLeafInitialScore(superCat));
+			}
 		}
 	}
 
@@ -477,7 +500,13 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 			}
 		}
 
-		logger.info("Feature 0 is now " + weights.getWeight(0));
+		logPFeature.perceptronUpdateFast(numTrainInstances);
+		weights.setLogP(logPFeature.getLambda());
+		depNNFeature.perceptronUpdateFast(numTrainInstances);
+		weights.setLogP(depNNFeature.getLambda());
+
+		logger.info("Feature logp is now " + weights.getLogP());
+		logger.info("Feature depnn is now " + weights.getDepNN());
 	}
 
 	/**
@@ -487,6 +516,12 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 	 * @param numTrainInstances averaging factor for fast averaged perceptron
 	 */
 	public void printWeights(PrintWriter out, int numTrainInstances) {
+		logPFeature.perceptronUpdateFast(numTrainInstances);
+		out.println("logp:" + logPFeature.getCumulativeLambda()/numTrainInstances);
+
+		depNNFeature.perceptronUpdateFast(numTrainInstances);
+		out.println("depnn:" + logPFeature.getCumulativeLambda()/numTrainInstances);
+
 		for (int i = 0; i < trainingFeatures.length; i++) {
 			trainingFeatures[i].perceptronUpdateFast(numTrainInstances);
 			out.println(trainingFeatures[i].getCumulativeLambda()/numTrainInstances);

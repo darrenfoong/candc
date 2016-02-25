@@ -13,12 +13,15 @@ import cat_combination.SuperCategory;
 import io.Sentence;
 import lexicon.Relations;
 import model.Lexicon;
+import uk.ac.cam.cl.depnn.DependencyNeuralNetwork;
 import utils.Pair;
 
 public class ChartParserBeam extends ChartParser {
 	private boolean cubePruning;
 	private int beamSize;
 	private double beta;
+
+	private DependencyNeuralNetwork depnn;
 
 	public ChartParserBeam(
 					String grammarDir,
@@ -367,6 +370,10 @@ public class ChartParserBeam extends ChartParser {
 		} else {
 			calcScoreLeaf(superCat);
 		}
+
+		if ( depnn != null ) {
+			superCat.score += weights.getDepNN() * depnn.predict("", "");
+		}
 	}
 
 	/**
@@ -387,8 +394,8 @@ public class ChartParserBeam extends ChartParser {
 			}
 			sum += calcSumLeafInitialScore(superCat.leftChild);
 		} else {
-			if ( weights.getWeight(0) != 0.0 ) {
-				sum += superCat.inside/weights.getWeight(0);
+			if ( weights.getLogP() != 0.0 ) {
+				sum += superCat.inside/weights.getLogP();
 			}
 		}
 
@@ -468,6 +475,12 @@ public class ChartParserBeam extends ChartParser {
 
 		for ( int featureID : featureIDs ) {
 			superCat.score += weights.getWeight(featureID);
+		}
+	}
+
+	public void initDepNN(String modelFile, String configJsonFile, String coefficientsFile) throws IOException {
+		if ( depnn != null ) {
+			depnn = new DependencyNeuralNetwork(modelFile, configJsonFile, coefficientsFile);
 		}
 	}
 

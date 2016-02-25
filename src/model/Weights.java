@@ -8,6 +8,8 @@ import io.Preface;
 
 public class Weights {
 	private double[] weights;
+	private double logp;
+	private double depnn;
 
 	public Weights() {
 	}
@@ -32,10 +34,17 @@ public class Weights {
 			Preface.readPreface(in);
 
 			String line = null;
+
 			while ((line = in.readLine()) != null) {
-				double weight = Double.parseDouble(line);
-				weights[ID] = weight;
-				ID++;
+				if ( line.startsWith("logp") ) {
+					logp = Double.parseDouble(line.split(":")[1]);
+				} else if ( line.startsWith("depnn") ) {
+					depnn = Double.parseDouble(line.split(":")[1]);
+				} else {
+					double weight = Double.parseDouble(line);
+					weights[ID] = weight;
+					ID++;
+				}
 			}
 
 			if (ID != weights.length) {
@@ -50,5 +59,21 @@ public class Weights {
 
 	public void setWeight(int ID, double weight) {
 		weights[ID] = weight;
+	}
+
+	public double getLogP() {
+		return logp;
+	}
+
+	public void setLogP(double logp) {
+		this.logp = logp;
+	}
+
+	public double getDepNN() {
+		return depnn;
+	}
+
+	public void setDepNN(double depnn) {
+		this.depnn = depnn;
 	}
 }

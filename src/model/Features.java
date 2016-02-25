@@ -177,7 +177,7 @@ public class Features {
 			Preface.readPreface(featuresIn);
 
 			String featuresLine = null;
-			int ID = 1;
+			int ID = 0;
 
 			while ((featuresLine = featuresIn.readLine()) != null) {
 				readFeature(featuresLine, ID, categories);
@@ -185,8 +185,6 @@ public class Features {
 			}
 
 			numFeatures = ID;
-			// ID starts at 1 (because of logp)
-			// and gets incremented after each feature has been read
 			logger.info("Total number of features read in: " + numFeatures);
 		}
 	}
@@ -201,27 +199,23 @@ public class Features {
 			Preface.readPreface(weightsIn);
 
 			String featuresLine = null;
+			String weightsLine = null;
 
-			// first line in weights is for logp
-			String weightsLine = weightsIn.readLine();
-
-			if ( weightsLine != null ) {
-				weightsList.add(Double.valueOf(weightsLine));
-			} else {
-				throw new IllegalArgumentException("Unexpected end of stream");
-			}
-
-			int ID = 1;
+			int ID = 0;
 			Double weight;
 
-			while ((featuresLine = featuresIn.readLine()) != null) {
-				weightsLine = weightsIn.readLine();
-
-				if ( weightsLine != null ) {
-					weight = Double.valueOf(weightsLine);
+			while ((weightsLine = weightsIn.readLine()) != null) {
+				if ( weightsLine.startsWith("logp") ) {
+					weights.setLogP(Double.parseDouble(weightsLine.split(":")[1]));
+					continue;
+				} else if ( weightsLine.startsWith("depnn") ) {
+					weights.setDepNN(Double.parseDouble(weightsLine.split(":")[1]));
+					continue;
 				} else {
-					throw new IllegalArgumentException("Unexpected end of stream");
+					weight = Double.parseDouble(weightsLine);
 				}
+
+				featuresLine = featuresIn.readLine();
 
 				if ( weight == 0.0 ) {
 					continue;
@@ -242,8 +236,6 @@ public class Features {
 			weights.setWeights(weightsListArray);
 
 			numFeatures = ID;
-			// ID starts at 1 (because of logp)
-			// and gets incremented after each feature has been read
 			logger.info("Total number of features read in: " + numFeatures);
 		}
 	}
@@ -570,7 +562,8 @@ public class Features {
 	}
 
 	public void printWeights(Weights weights, PrintWriter out) {
-		out.println(weights.getWeight(0));
+		out.println("logp:" + weights.getLogP());
+		out.println("depnn:" + weights.getDepNN());
 		featureCatIDs.printWeights(weights, out);
 		featureCatHeadIDs.printWeights(weights, out);
 		featureRuleIDs.printWeights(weights, out);

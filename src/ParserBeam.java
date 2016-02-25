@@ -55,6 +55,18 @@ public class ParserBeam {
 		boolean newFeatures = (Boolean) options.valueOf("newFeatures");
 		boolean compactWeights = (Boolean) options.valueOf("compactWeights");
 		boolean cubePruning = (Boolean) options.valueOf("cubePruning");
+		boolean depnn = options.has("depnn");
+
+		String modelFile = null;
+		String configJsonFile = null;
+		String coefficientsFile = null;
+
+		if ( depnn ) {
+			modelFile = (String) options.valueOf("modelFile");
+			configJsonFile = (String) options.valueOf("configJsonFile");
+			coefficientsFile = (String) options.valueOf("coefficientsFile");
+		}
+
 		boolean skimmer = (Boolean) options.valueOf("skimmer");
 		boolean printChartDeps = (Boolean) options.valueOf("printChartDeps");
 		int beamSize = (Integer) options.valueOf("beamSize");
@@ -80,6 +92,9 @@ public class ParserBeam {
 					eisnerNormalForm, MAX_WORDS, MAX_SUPERCATS,
 					ruleInstancesParams, lexicon, featuresFile, weightsFile,
 					newFeatures, compactWeights, cubePruning, beamSize, beta);
+			if ( depnn ) {
+				parser.initDepNN(modelFile, configJsonFile, coefficientsFile);
+			}
 		} catch ( IOException e ) {
 			logger.error(e);
 			return;
