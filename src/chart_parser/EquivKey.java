@@ -1,7 +1,7 @@
 package chart_parser;
 
-import utils.Hash;
 import cat_combination.SuperCategory;
+import utils.Hash;
 
 public class EquivKey {
 	/*

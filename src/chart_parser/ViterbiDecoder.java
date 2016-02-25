@@ -1,11 +1,10 @@
 package chart_parser;
 
-import io.Sentence;
-
 import java.util.HashSet;
 
 import cat_combination.FilledDependency;
 import cat_combination.SuperCategory;
+import io.Sentence;
 
 public class ViterbiDecoder extends Decoder {
 	public ViterbiDecoder() {

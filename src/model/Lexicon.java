@@ -1,11 +1,11 @@
 package model;
 
-import io.Preface;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
+
+import io.Preface;
 
 public class Lexicon {
 	private HashMap<String,Integer> lexicon;

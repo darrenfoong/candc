@@ -1,10 +1,10 @@
 package model;
 
-import io.Preface;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+
+import io.Preface;
 
 public class Weights {
 	private double[] weights;

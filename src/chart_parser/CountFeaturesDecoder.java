@@ -1,10 +1,10 @@
 package chart_parser;
 
-import io.Sentence;
-
 import java.io.PrintWriter;
 import java.util.Map;
 
+import cat_combination.SuperCategory;
+import io.Sentence;
 import lexicon.Categories;
 import model.Feature;
 import model.FeatureCat;
@@ -18,7 +18,6 @@ import model.FeatureRuleHeadHead;
 import model.FeatureRuleRuleHead;
 import model.FeatureRuleRuleHeadHead;
 import model.Features;
-import cat_combination.SuperCategory;
 
 public class CountFeaturesDecoder {
 	private FeatureCounts<FeatureCat> featureCatCounts;

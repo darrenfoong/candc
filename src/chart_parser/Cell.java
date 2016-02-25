@@ -7,8 +7,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
 
-import utils.Pair;
 import cat_combination.SuperCategory;
+import utils.Pair;
 
 public class Cell {
 	private ArrayList<SuperCategory> superCategories;

@@ -1,22 +1,19 @@
 package chart_parser;
 
-import io.Sentence;
-
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
 
-import lexicon.Relations;
-import model.Lexicon;
-import utils.Pair;
 import cat_combination.FilledDependency;
 import cat_combination.RuleInstancesParams;
 import cat_combination.SuperCategory;
+import io.Sentence;
+import lexicon.Relations;
+import model.Lexicon;
+import utils.Pair;
 
 public class ChartParserBeam extends ChartParser {
 	private boolean cubePruning;

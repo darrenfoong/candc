@@ -1,13 +1,12 @@
 package chart_parser;
 
-import io.Sentence;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 
-import lexicon.Category;
 import cat_combination.FilledDependency;
 import cat_combination.SuperCategory;
+import io.Sentence;
+import lexicon.Category;
 
 public class CellTrainBeam extends Cell {
 	public double violation;

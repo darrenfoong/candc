@@ -1,10 +1,9 @@
 package cat_combination;
 
-import io.Sentence;
-
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
+import io.Sentence;
 import lexicon.Categories;
 import lexicon.Relation;
 import lexicon.Relations;

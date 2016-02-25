@@ -1,18 +1,17 @@
 package chart_parser;
 
-import io.Sentence;
-import io.Supertag;
-
 import java.util.ArrayList;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import cat_combination.SuperCategory;
+import io.Sentence;
+import io.Supertag;
 import lexicon.Category;
 import lexicon.Relations;
 import model.Weights;
-import cat_combination.SuperCategory;
 
 /*
  * number of cells is n*(n+1)/2 where n is the number of words

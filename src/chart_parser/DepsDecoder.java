@@ -1,13 +1,12 @@
 package chart_parser;
 
-import io.Sentence;
-
 import java.io.PrintWriter;
 import java.util.HashSet;
 
-import lexicon.Relations;
 import cat_combination.FilledDependency;
 import cat_combination.SuperCategory;
+import io.Sentence;
+import lexicon.Relations;
 
 public class DepsDecoder extends Decoder {
 	InsideOutside insideOutside;

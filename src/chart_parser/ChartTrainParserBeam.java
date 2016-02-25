@@ -1,7 +1,5 @@
 package chart_parser;
 
-import io.Sentence;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -12,14 +10,15 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import cat_combination.FilledDependency;
+import cat_combination.RuleInstancesParams;
+import cat_combination.SuperCategory;
+import io.Sentence;
 import lexicon.Category;
 import model.Lexicon;
 import statistics.HasUpdateStatistics;
 import statistics.HypothesisSizeStatistics;
 import training.Feature;
-import cat_combination.FilledDependency;
-import cat_combination.RuleInstancesParams;
-import cat_combination.SuperCategory;
 
 public class ChartTrainParserBeam extends ChartParserBeam {
 	public HasUpdateStatistics hasUpdateStatistics = new HasUpdateStatistics();

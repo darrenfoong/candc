@@ -1,15 +1,14 @@
 package model;
 
-import io.Sentence;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import cat_combination.SuperCategory;
+import cat_combination.Variable;
+import io.Sentence;
 import lexicon.Categories;
 import lexicon.Category;
 import utils.Hash;
-import cat_combination.SuperCategory;
-import cat_combination.Variable;
 
 public class FeatureRuleRuleHead implements Feature<FeatureRuleRuleHead> {
 	final short featureType;

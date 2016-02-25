@@ -3,10 +3,10 @@ package model;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import cat_combination.SuperCategory;
 import lexicon.Categories;
 import lexicon.Category;
 import utils.Hash;
-import cat_combination.SuperCategory;
 
 public class FeatureCat implements Feature<FeatureCat> {
 	final short featureType;
