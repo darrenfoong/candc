@@ -77,13 +77,8 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 		this.updateLogP = updateLogP;
 		this.updateDepNN = updateDepNN;
 
-		if ( updateLogP ) {
-			logPFeature = new Feature(-1, weights.getLogP());
-		}
-
-		if ( updateDepNN ) {
-			depNNFeature = new Feature(-2, weights.getDepNN());
-		}
+		logPFeature = new Feature(-1, weights.getLogP());
+		depNNFeature = new Feature(-2, weights.getDepNN());
 
 		this.oracleSupertags = new ArrayList<Category>();
 	}
@@ -500,13 +495,17 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 			}
 		}
 
-		logPFeature.perceptronUpdateFast(numTrainInstances);
-		weights.setLogP(logPFeature.getLambda());
-		depNNFeature.perceptronUpdateFast(numTrainInstances);
-		weights.setLogP(depNNFeature.getLambda());
+		if ( updateLogP ) {
+			logPFeature.perceptronUpdateFast(numTrainInstances);
+			weights.setLogP(logPFeature.getLambda());
+			logger.info("Feature logp is now " + weights.getLogP());
+		}
 
-		logger.info("Feature logp is now " + weights.getLogP());
-		logger.info("Feature depnn is now " + weights.getDepNN());
+		if ( updateDepNN ) {
+			depNNFeature.perceptronUpdateFast(numTrainInstances);
+			weights.setLogP(depNNFeature.getLambda());
+			logger.info("Feature depnn is now " + weights.getDepNN());
+		}
 	}
 
 	/**
@@ -520,7 +519,7 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 		out.println("logp:" + logPFeature.getCumulativeLambda()/numTrainInstances);
 
 		depNNFeature.perceptronUpdateFast(numTrainInstances);
-		out.println("depnn:" + logPFeature.getCumulativeLambda()/numTrainInstances);
+		out.println("depnn:" + depNNFeature.getCumulativeLambda()/numTrainInstances);
 
 		for (int i = 0; i < trainingFeatures.length; i++) {
 			trainingFeatures[i].perceptronUpdateFast(numTrainInstances);
