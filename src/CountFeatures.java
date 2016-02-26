@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,8 +23,6 @@ import model.Lexicon;
 
 public class CountFeatures {
 	public static void main(String[] args) {
-		double[] betas = { 0.0001 };
-
 		OptionParser optionParser = Params.getCountFeaturesOptionParser();
 		OptionSet options = null;
 
@@ -56,6 +55,7 @@ public class CountFeatures {
 		boolean cubePruning = (Boolean) options.valueOf("cubePruning");
 		int beamSize = (Integer) options.valueOf("beamSize");
 		double beta = (Double) options.valueOf("beta");
+		double[] betas = Params.betasArray((String) options.valueOf("betas"));
 
 		String inputFile = (String) options.valueOf("input");
 		String outputFile = (String) options.valueOf("output");
@@ -68,6 +68,8 @@ public class CountFeatures {
 		System.setProperty("logLevel", options.has("verbose") ? "trace" : "info");
 		System.setProperty("logFile", logFile);
 		final Logger logger = LogManager.getLogger(CountFeatures.class);
+
+		logger.info(Params.printOptions(options));
 
 		Lexicon lexicon = null;
 		ChartParserBeam parser = null;

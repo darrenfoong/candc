@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -26,8 +27,6 @@ import model.Lexicon;
 
 public class TrainParserBeam {
 	public static void main(String[] args) {
-		double[] betas = { 0.0001 };
-
 		OptionParser optionParser = Params.getTrainParserBeamOptionParser();
 		OptionSet options = null;
 
@@ -63,6 +62,7 @@ public class TrainParserBeam {
 		boolean updateDepNN = (Boolean) options.valueOf("updateDepNN");
 		int beamSize = (Integer) options.valueOf("beamSize");
 		double beta = (Double) options.valueOf("beta");
+		double[] betas = Params.betasArray((String) options.valueOf("betas"));
 
 		String inputFile = (String) options.valueOf("input");
 		String outputWeightsFile = (String) options.valueOf("outputWeights");
@@ -77,6 +77,8 @@ public class TrainParserBeam {
 		System.setProperty("logLevel", options.has("verbose") ? "trace" : "info");
 		System.setProperty("logFile", logFile);
 		final Logger logger = LogManager.getLogger(TrainParserBeam.class);
+
+		logger.info(Params.printOptions(options));
 
 		Lexicon lexicon = null;
 		ChartTrainParserBeam parser = null;

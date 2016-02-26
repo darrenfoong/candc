@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,8 +23,6 @@ import model.Lexicon;
 
 public class Parser {
 	public static void main(String[] args) {
-		double[] betas = { 0.0001, 0.001, 0.01, 0.03, 0.075 };
-
 		OptionParser optionParser = Params.getParserOptionParser();
 		OptionSet options = null;
 
@@ -55,6 +54,7 @@ public class Parser {
 		boolean compactWeights = (Boolean) options.valueOf("compactWeights");
 		boolean oracleFscore = (Boolean) options.valueOf("oracleFscore");
 		boolean adaptiveSupertagging = (Boolean) options.valueOf("adaptiveSupertagging");
+		double[] betas = Params.betasArray((String) options.valueOf("betas"));
 
 		String inputFile = (String) options.valueOf("input");
 		String outputFile = (String) options.valueOf("output");
@@ -66,6 +66,8 @@ public class Parser {
 		System.setProperty("logLevel", options.has("verbose") ? "trace" : "info");
 		System.setProperty("logFile", logFile);
 		final Logger logger = LogManager.getLogger(Parser.class);
+
+		logger.info(Params.printOptions(options));
 
 		Lexicon lexicon = null;
 		ChartParser parser = null;

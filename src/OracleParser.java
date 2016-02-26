@@ -4,6 +4,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -38,8 +39,6 @@ import joptsimple.OptionSet;
 
 public class OracleParser {
 	public static void main(String[] args) {
-		double[] betas = { 0.01, 0.01, 0.01, 0.03, 0.075 };
-
 		OptionParser optionParser = Params.getOracleParserOptionParser();
 		OptionSet options = null;
 
@@ -72,6 +71,7 @@ public class OracleParser {
 		boolean extractRuleInstances = (Boolean) options.valueOf("extractRuleInstances");
 		String oracleRuleInstancesFile = (String) options.valueOf("oracleRuleInstancesFile");
 		boolean training = (Boolean) options.valueOf("training");
+		double[] betas = Params.betasArray((String) options.valueOf("betas"));
 
 		String inputFile = (String) options.valueOf("input");
 		String goldSupertagsFile = (String) options.valueOf("goldSupertags");
@@ -85,6 +85,8 @@ public class OracleParser {
 		System.setProperty("logLevel", options.has("verbose") ? "trace" : "info");
 		System.setProperty("logFile", logFile);
 		final Logger logger = LogManager.getLogger(OracleParser.class);
+
+		logger.info(Params.printOptions(options));
 
 		ChartParser parser = null;
 		OracleDecoder oracleDecoder = null;

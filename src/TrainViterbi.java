@@ -48,6 +48,8 @@ public class TrainViterbi {
 		System.setProperty("logFile", logFile);
 		final Logger logger = LogManager.getLogger(TrainViterbi.class);
 
+		logger.info(Params.printOptions(options));
+
 		try ( BufferedReader in = new BufferedReader(new FileReader(forestFile));
 				PrintWriter out = new PrintWriter(new FileWriter(weightsFile)) ) {
 
