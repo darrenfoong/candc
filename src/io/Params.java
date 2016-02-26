@@ -177,7 +177,7 @@ public class Params {
 
 		optionParser.accepts("altMarkedup").withRequiredArg().ofType(Boolean.class).defaultsTo(false);
 		optionParser.accepts("eisnerNormalForm").withRequiredArg().ofType(Boolean.class).defaultsTo(true);
-		optionParser.accepts("newFeatures").withRequiredArg().ofType(Boolean.class).defaultsTo(true);
+		optionParser.accepts("newFeatures").withRequiredArg().ofType(Boolean.class).defaultsTo(false);
 		optionParser.accepts("cubePruning").withRequiredArg().ofType(Boolean.class).defaultsTo(false);
 		optionParser.accepts("compactWeights").withRequiredArg().ofType(Boolean.class).defaultsTo(true);
 		optionParser.accepts("depnn");
