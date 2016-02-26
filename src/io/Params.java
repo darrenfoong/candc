@@ -1,5 +1,8 @@
 package io;
 
+import java.util.List;
+import java.util.Map;
+
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
@@ -41,15 +44,17 @@ public class Params {
 	}
 
 	public static String printOptions(OptionSet options) {
-		StringBuilder outputBuilder = new StringBuilder("Parameters:");
+		StringBuilder outputBuilder = new StringBuilder("Parameters:\n");
 
-		for ( OptionSpec<?> option : options.specs() ) {
-			String optionString = option.options().get(0);
-			String argumentString = option.value(options).toString();
-			outputBuilder.append(optionString);
-			outputBuilder.append(": ");
-			outputBuilder.append(argumentString);
-			outputBuilder.append("\n");
+		for ( Map.Entry<OptionSpec<?>, List<?>> entry: options.asMap().entrySet() ) {
+			if ( !entry.getValue().isEmpty() ) {
+				String optionString = entry.getKey().options().get(0);
+				String argumentString = entry.getValue().get(0).toString();
+				outputBuilder.append(optionString);
+				outputBuilder.append(": ");
+				outputBuilder.append(argumentString);
+				outputBuilder.append("\n");
+			}
 		}
 
 		return outputBuilder.toString();
