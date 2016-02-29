@@ -121,7 +121,9 @@ public class OracleParser {
 			if ( stagsIn != null ) {
 				Preface.readPreface(stagsIn);
 			}
-			Preface.readPreface(roots);
+			if ( roots != null ) {
+				Preface.readPreface(roots);
+			}
 			Preface.printPreface(out);
 
 			boolean ignoreDepsFlag = true;
