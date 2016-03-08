@@ -125,6 +125,8 @@ public class Params {
 		optionParser.accepts("eisnerNormalForm").withRequiredArg().ofType(Boolean.class).defaultsTo(true);
 		optionParser.accepts("newFeatures").withRequiredArg().ofType(Boolean.class).defaultsTo(false);
 		optionParser.accepts("cubePruning").withRequiredArg().ofType(Boolean.class).defaultsTo(false);
+		optionParser.accepts("depnn");
+		optionParser.accepts("modelDir").requiredIf("depnn").withRequiredArg().ofType(String.class);
 		optionParser.accepts("parallelUpdate").withRequiredArg().ofType(Boolean.class).defaultsTo(false);
 		optionParser.accepts("updateLogP").withRequiredArg().ofType(Boolean.class).defaultsTo(true);
 		optionParser.accepts("updateDepNN").withRequiredArg().ofType(Boolean.class).defaultsTo(false);
@@ -181,9 +183,7 @@ public class Params {
 		optionParser.accepts("cubePruning").withRequiredArg().ofType(Boolean.class).defaultsTo(false);
 		optionParser.accepts("compactWeights").withRequiredArg().ofType(Boolean.class).defaultsTo(true);
 		optionParser.accepts("depnn");
-		optionParser.accepts("modelFile").requiredIf("depnn").withRequiredArg().ofType(String.class);
-		optionParser.accepts("configJsonFile").requiredIf("depnn").withRequiredArg().ofType(String.class);
-		optionParser.accepts("coefficientsFile").requiredIf("depnn").withRequiredArg().ofType(String.class);
+		optionParser.accepts("modelDir").requiredIf("depnn").withRequiredArg().ofType(String.class);
 		optionParser.accepts("skimmer").withRequiredArg().ofType(Boolean.class).defaultsTo(false);
 		optionParser.accepts("printChartDeps").withRequiredArg().ofType(Boolean.class).defaultsTo(false);
 		optionParser.accepts("betas").withRequiredArg().ofType(String.class).defaultsTo("0.0001");

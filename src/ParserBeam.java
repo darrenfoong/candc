@@ -5,7 +5,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -55,14 +54,10 @@ public class ParserBeam {
 		boolean cubePruning = (Boolean) options.valueOf("cubePruning");
 		boolean depnn = options.has("depnn");
 
-		String modelFile = null;
-		String configJsonFile = null;
-		String coefficientsFile = null;
+		String modelDir = null;
 
 		if ( depnn ) {
-			modelFile = (String) options.valueOf("modelFile");
-			configJsonFile = (String) options.valueOf("configJsonFile");
-			coefficientsFile = (String) options.valueOf("coefficientsFile");
+			modelDir = (String) options.valueOf("modelDir");
 		}
 
 		boolean skimmer = (Boolean) options.valueOf("skimmer");
@@ -94,7 +89,7 @@ public class ParserBeam {
 					ruleInstancesParams, lexicon, featuresFile, weightsFile,
 					newFeatures, compactWeights, cubePruning, beamSize, beta);
 			if ( depnn ) {
-				parser.initDepNN(modelFile, configJsonFile, coefficientsFile);
+				parser.initDepNN(modelDir);
 			}
 		} catch ( IOException e ) {
 			logger.error(e);

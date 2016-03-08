@@ -372,7 +372,8 @@ public class ChartParserBeam extends ChartParser {
 		}
 
 		if ( depnn != null ) {
-			superCat.score += weights.getDepNN() * depnn.predict("", "");
+			superCat.logDepNNScore = Math.log(calcDepNNScore(superCat));
+			superCat.score += weights.getDepNN() * superCat.logDepNNScore;
 		}
 	}
 
@@ -394,12 +395,36 @@ public class ChartParserBeam extends ChartParser {
 			}
 			sum += calcSumLeafInitialScore(superCat.leftChild);
 		} else {
-			if ( weights.getLogP() != 0.0 ) {
-				sum += superCat.inside/weights.getLogP();
-			}
+			sum += superCat.logPScore;
 		}
 
 		return sum;
+	}
+
+	public double calcAverageSumDepNNScore(SuperCategory superCat) {
+		Pair<Double, Integer> result = calcSumDepNNScore(superCat, 0);
+		return result.x / result.y;
+	}
+
+	public Pair<Double, Integer> calcSumDepNNScore(SuperCategory superCat, int numCats) {
+		SuperCategory leftChild = superCat.leftChild;
+		SuperCategory rightChild = superCat.rightChild;
+
+		double sum = superCat.logDepNNScore;
+		numCats++;
+
+		if (leftChild != null) {
+			if (rightChild != null) {
+				Pair<Double, Integer> resultRight = calcSumDepNNScore(superCat.rightChild, numCats);
+				sum += resultRight.x;
+				numCats += resultRight.y;
+			}
+			Pair<Double, Integer> resultLeft = calcSumDepNNScore(superCat.leftChild, numCats);
+			sum += resultLeft.x;
+			numCats += resultLeft.y;
+		}
+
+		return new Pair<Double, Integer>(sum, numCats);
 	}
 
 	/**
@@ -478,9 +503,28 @@ public class ChartParserBeam extends ChartParser {
 		}
 	}
 
-	public void initDepNN(String modelFile, String configJsonFile, String coefficientsFile) throws IOException {
+	public double calcDepNNScore(SuperCategory superCat) {
+		double score = 0.0;
+
+		for ( FilledDependency dep :superCat.filledDeps ) {
+			if ( !SuperCategory.ignoreDeps.ignoreDependency(dep, sentence) ) {
+				String[] attributes = dep.getAttributes(categories.dependencyRelations, sentence);
+				score += depnn.predict(attributes[0],
+										attributes[1],
+										attributes[2],
+										attributes[3],
+										attributes[4],
+										attributes[5],
+										attributes[6]);
+			}
+		}
+
+		return score;
+	}
+
+	public void initDepNN(String modelDir) throws IOException {
 		if ( depnn != null ) {
-			depnn = new DependencyNeuralNetwork(modelFile, configJsonFile, coefficientsFile);
+			depnn = new DependencyNeuralNetwork(modelDir);
 		}
 	}
 

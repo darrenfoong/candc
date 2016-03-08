@@ -58,6 +58,9 @@ public class SuperCategory {
 	public double outside = 0.0;
 	public double disjInside = 0.0;
 
+	public double logPScore = 0.0;
+	public double logDepNNScore = 0.0;
+
 	// used to mark active nodes
 	public int marker = 0;
 	public int goldMarker = 0;
@@ -70,7 +73,7 @@ public class SuperCategory {
 	 * of dependencies (correct or incorrect, but need to ignore those not taken
 	 * into account in the evaluation)
 	 */
-	private static IgnoreDepsEval ignoreDeps;
+	public static IgnoreDepsEval ignoreDeps;
 
 	public static final Logger logger = LogManager.getLogger(SuperCategory.class);
 

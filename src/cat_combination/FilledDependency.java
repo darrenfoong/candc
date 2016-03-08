@@ -72,6 +72,20 @@ public class FilledDependency implements Comparable<FilledDependency> {
 		return headIndex + " " + relID + " " + fillerIndex + " " + unaryRuleID;
 	}
 
+	public String[] getAttributes(Relations relations, Sentence sentence) {
+		String[] output = new String[7];
+		Relation relation = relations.getRelation(relID);
+		output[0] = sentence.words.get(headIndex - 1);
+		output[1] = relation.category;
+		output[2] = sentence.words.get(fillerIndex - 1);
+		output[3] = String.valueOf(relation.jslot);
+		output[4] = String.valueOf(Math.abs(fillerIndex - headIndex));
+		output[5] = sentence.postags.get(headIndex);
+		output[6] = sentence.postags.get(fillerIndex);
+
+		return output;
+	}
+
 	public void printFull(PrintWriter out, Relations relations, Sentence sentence) {
 		String head = sentence.words.get(headIndex - 1);
 		String filler = sentence.words.get(fillerIndex - 1);

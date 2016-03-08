@@ -5,7 +5,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -57,6 +56,14 @@ public class TrainParserBeam {
 		boolean eisnerNormalForm = (Boolean) options.valueOf("eisnerNormalForm");
 		boolean newFeatures = (Boolean) options.valueOf("newFeatures");
 		boolean cubePruning = (Boolean) options.valueOf("cubePruning");
+		boolean depnn = options.has("depnn");
+
+		String modelDir = null;
+
+		if ( depnn ) {
+			modelDir = (String) options.valueOf("modelDir");
+		}
+
 		boolean parallelUpdate = (Boolean) options.valueOf("parallelUpdate");
 		boolean updateLogP = (Boolean) options.valueOf("updateLogP");
 		boolean updateDepNN = (Boolean) options.valueOf("updateDepNN");
@@ -92,6 +99,9 @@ public class TrainParserBeam {
 					newFeatures, cubePruning, beamSize, beta, parallelUpdate,
 					updateLogP, updateDepNN);
 			oracleDecoder = new OracleDepsSumDecoder(parser.categories, false);
+			if ( depnn ) {
+				parser.initDepNN(modelDir);
+			}
 		} catch ( IOException e ) {
 			logger.error(e);
 			return;
