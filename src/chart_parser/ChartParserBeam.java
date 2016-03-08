@@ -372,7 +372,7 @@ public class ChartParserBeam extends ChartParser {
 		}
 
 		if ( depnn != null ) {
-			superCat.logDepNNScore = Math.log(calcDepNNScore(superCat));
+			superCat.logDepNNScore = calcDepNNScore(superCat);
 			superCat.score += weights.getDepNN() * superCat.logDepNNScore;
 		}
 	}
@@ -509,13 +509,13 @@ public class ChartParserBeam extends ChartParser {
 		for ( FilledDependency dep :superCat.filledDeps ) {
 			if ( !SuperCategory.ignoreDeps.ignoreDependency(dep, sentence) ) {
 				String[] attributes = dep.getAttributes(categories.dependencyRelations, sentence);
-				score += depnn.predict(attributes[0],
+				score += Math.log(depnn.predictSoft(attributes[0],
 										attributes[1],
 										attributes[2],
 										attributes[3],
 										attributes[4],
 										attributes[5],
-										attributes[6]);
+										attributes[6]));
 			}
 		}
 
