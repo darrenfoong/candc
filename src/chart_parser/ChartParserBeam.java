@@ -651,8 +651,21 @@ public class ChartParserBeam extends ChartParser {
 	}
 
 	public void printFeature(PrintWriter outFeatures, Sentence sentence, SuperCategory superCat) {
-		ArrayList<String> features = new ArrayList<String>();
-		StringBuilder featureBuilder;
+		for ( ArrayList<String> feature : getFeature(sentence, superCat) ) {
+			StringBuilder featureBuilder = new StringBuilder();
+
+			for ( int i = 0; i < feature.size()-1; i++ ) {
+				featureBuilder.append(feature.get(i));
+				featureBuilder.append(" ");
+			}
+
+			featureBuilder.append(feature.get(feature.size()-1));
+			outFeatures.println(featureBuilder.toString());
+		}
+	}
+
+	public ArrayList<ArrayList<String>> getFeature(Sentence sentence, SuperCategory superCat) {
+		ArrayList<ArrayList<String>> features = new ArrayList<ArrayList<String>>();
 
 		String topCat = superCat.cat.toString();
 		String leftCat = "";
@@ -724,34 +737,32 @@ public class ChartParserBeam extends ChartParser {
 		for ( Integer leftRightCatPos : leftRightCatPoss ) {
 		for ( Integer rightLeftCatPos : rightLeftCatPoss ) {
 		for ( Integer rightRightCatPos : rightRightCatPoss ) {
-			featureBuilder = new StringBuilder();
-			featureBuilder.append(topCat); featureBuilder.append(" ");
-			featureBuilder.append(leftCat); featureBuilder.append(" ");
-			featureBuilder.append(rightCat); featureBuilder.append(" ");
-			featureBuilder.append(leftLeftCat); featureBuilder.append(" ");
-			featureBuilder.append(leftRightCat); featureBuilder.append(" ");
-			featureBuilder.append(rightLeftCat); featureBuilder.append(" ");
-			featureBuilder.append(rightRightCat); featureBuilder.append(" ");
-			featureBuilder.append(topCatWord); featureBuilder.append(" ");
-			featureBuilder.append(leftCatWord); featureBuilder.append(" ");
-			featureBuilder.append(rightCatWord); featureBuilder.append(" ");
-			featureBuilder.append(leftLeftCatWord); featureBuilder.append(" ");
-			featureBuilder.append(leftRightCatWord); featureBuilder.append(" ");
-			featureBuilder.append(rightLeftCatWord); featureBuilder.append(" ");
-			featureBuilder.append(rightRightCatWord); featureBuilder.append(" ");
-			featureBuilder.append(topCatPos); featureBuilder.append(" ");
-			featureBuilder.append(leftCatPos); featureBuilder.append(" ");
-			featureBuilder.append(rightCatPos); featureBuilder.append(" ");
-			featureBuilder.append(leftLeftCatPos); featureBuilder.append(" ");
-			featureBuilder.append(leftRightCatPos); featureBuilder.append(" ");
-			featureBuilder.append(rightLeftCatPos); featureBuilder.append(" ");
-			featureBuilder.append(rightRightCatPos); featureBuilder.append(" ");
-			features.add(featureBuilder.toString());
+			ArrayList<String> feature = new ArrayList<String>();
+			feature.add(topCat);
+			feature.add(leftCat);
+			feature.add(rightCat);
+			feature.add(leftLeftCat);
+			feature.add(leftRightCat);
+			feature.add(rightLeftCat);
+			feature.add(rightRightCat);
+			feature.add(topCatWord.toString());
+			feature.add(leftCatWord.toString());
+			feature.add(rightCatWord.toString());
+			feature.add(leftLeftCatWord.toString());
+			feature.add(leftRightCatWord.toString());
+			feature.add(rightLeftCatWord.toString());
+			feature.add(rightRightCatWord.toString());
+			feature.add(topCatPos.toString());
+			feature.add(leftCatPos.toString());
+			feature.add(rightCatPos.toString());
+			feature.add(leftLeftCatPos.toString());
+			feature.add(leftRightCatPos.toString());
+			feature.add(rightLeftCatPos.toString());
+			feature.add(rightRightCatPos.toString());
+			features.add(feature);
 		}}}}}}}}}}}}}}
 
-		for ( String feature : features ) {
-			outFeatures.println(feature);
-		}
+		return features;
 	}
 
 	private void getWordPos(Sentence sentence, SuperCategory superCat, ArrayList<Integer> words, ArrayList<Integer> poss) {
