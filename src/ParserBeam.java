@@ -62,6 +62,7 @@ public class ParserBeam {
 
 		boolean skimmer = (Boolean) options.valueOf("skimmer");
 		boolean printChartDeps = (Boolean) options.valueOf("printChartDeps");
+		boolean printChartFeatures = (Boolean) options.valueOf("printChartFeatures");
 		int beamSize = (Integer) options.valueOf("beamSize");
 		double beta = (Double) options.valueOf("beta");
 		double[] betas = Params.betasArray((String) options.valueOf("betas"));
@@ -98,7 +99,9 @@ public class ParserBeam {
 
 		try ( BufferedReader in = new BufferedReader(new FileReader(inputFile));
 				PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(outputFile)));
-				PrintWriter outChartDeps = printChartDeps ? new PrintWriter(new BufferedWriter(new FileWriter(outputFile + ".chartdeps"))) : null ) {
+				PrintWriter outChartDeps = printChartDeps ? new PrintWriter(new BufferedWriter(new FileWriter(outputFile + ".chartdeps"))) : null;
+				PrintWriter outFeatures = printChartFeatures ? new PrintWriter(new BufferedWriter(new FileWriter(outputFile + ".feats"))) : null;
+				PrintWriter outChartFeatures = printChartFeatures ? new PrintWriter(new BufferedWriter(new FileWriter(outputFile + ".chartfeats"))) : null ) {
 
 			Preface.readPreface(in);
 			Preface.printPreface(out);
@@ -136,6 +139,11 @@ public class ParserBeam {
 
 				if ( printChartDeps ) {
 					parser.printChartDeps(outChartDeps, parser.categories.dependencyRelations, parser.sentence);
+				}
+
+				if ( printChartFeatures ) {
+					parser.printFeatures(outFeatures, parser.sentence);
+					parser.printChartFeatures(outChartFeatures, parser.sentence);
 				}
 			}
 		} catch ( FileNotFoundException e ) {

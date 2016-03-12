@@ -2,6 +2,7 @@ package chart_parser;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -10,6 +11,7 @@ import java.util.PriorityQueue;
 import cat_combination.FilledDependency;
 import cat_combination.RuleInstancesParams;
 import cat_combination.SuperCategory;
+import cat_combination.Variable;
 import io.Sentence;
 import lexicon.Relations;
 import model.Lexicon;
@@ -617,6 +619,154 @@ public class ChartParserBeam extends ChartParser {
 		}
 	}
 
+	public void printFeatures(PrintWriter outFeatures, Sentence sentence) {
+		double maxScore = Double.NEGATIVE_INFINITY;
+		SuperCategory maxRoot = null;
+
+		Cell root = chart.root();
+
+		for (SuperCategory superCat : root.getSuperCategories()) {
+			double currentScore = superCat.score;
+			if (currentScore > maxScore) {
+				maxScore = currentScore;
+				maxRoot = superCat;
+			}
+		}
+
+		if (maxRoot != null) {
+			printFeatures(outFeatures, sentence, maxRoot);
+		}
+	}
+
+	public void printFeatures(PrintWriter outFeatures, Sentence sentence, SuperCategory superCat) {
+		printFeature(outFeatures, sentence, superCat);
+
+		if (superCat.leftChild != null) {
+			printFeatures(outFeatures, sentence, superCat.leftChild);
+
+			if (superCat.rightChild != null) {
+				printFeatures(outFeatures, sentence, superCat.rightChild);
+			}
+		}
+	}
+
+	public void printFeature(PrintWriter outFeatures, Sentence sentence, SuperCategory superCat) {
+		ArrayList<String> features = new ArrayList<String>();
+		StringBuilder featureBuilder;
+
+		String topCat = superCat.cat.toString();
+		String leftCat = "";
+		String rightCat = "";
+		String leftLeftCat = "";
+		String leftRightCat = "";
+		String rightLeftCat = "";
+		String rightRightCat = "";
+
+		ArrayList<Integer> topCatWords = new ArrayList<Integer>();
+		ArrayList<Integer> leftCatWords = new ArrayList<Integer>();
+		ArrayList<Integer> rightCatWords = new ArrayList<Integer>();
+		ArrayList<Integer> leftLeftCatWords = new ArrayList<Integer>();
+		ArrayList<Integer> leftRightCatWords = new ArrayList<Integer>();
+		ArrayList<Integer> rightLeftCatWords = new ArrayList<Integer>();
+		ArrayList<Integer> rightRightCatWords = new ArrayList<Integer>();
+
+		ArrayList<Integer> topCatPoss = new ArrayList<Integer>();
+		ArrayList<Integer> leftCatPoss = new ArrayList<Integer>();
+		ArrayList<Integer> rightCatPoss = new ArrayList<Integer>();
+		ArrayList<Integer> leftLeftCatPoss = new ArrayList<Integer>();
+		ArrayList<Integer> leftRightCatPoss = new ArrayList<Integer>();
+		ArrayList<Integer> rightLeftCatPoss = new ArrayList<Integer>();
+		ArrayList<Integer> rightRightCatPoss = new ArrayList<Integer>();
+
+		getWordPos(sentence, superCat, topCatWords, topCatPoss);
+
+		if ( superCat.leftChild != null ) {
+			leftCat = superCat.leftChild.cat.toString();
+			getWordPos(sentence, superCat.leftChild, leftCatWords, leftCatPoss);
+
+			if ( superCat.leftChild.leftChild != null ) {
+				leftLeftCat = superCat.leftChild.leftChild.cat.toString();
+				getWordPos(sentence, superCat.leftChild.leftChild, leftLeftCatWords, leftLeftCatPoss);
+			}
+
+			if ( superCat.leftChild.rightChild != null ) {
+				leftRightCat = superCat.leftChild.rightChild.cat.toString();
+				getWordPos(sentence, superCat.leftChild.rightChild, leftRightCatWords, leftRightCatPoss);
+			}
+
+			if ( superCat.rightChild != null ) {
+				rightCat = superCat.rightChild.cat.toString();
+				getWordPos(sentence, superCat.rightChild, rightCatWords, rightCatPoss);
+
+				if ( superCat.rightChild.leftChild != null ) {
+					rightLeftCat = superCat.rightChild.leftChild.cat.toString();
+					getWordPos(sentence, superCat.rightChild.leftChild, rightLeftCatWords, rightLeftCatPoss);
+				}
+
+				if ( superCat.rightChild.rightChild != null ) {
+					rightRightCat = superCat.rightChild.rightChild.cat.toString();
+					getWordPos(sentence, superCat.rightChild.rightChild, rightRightCatWords, rightRightCatPoss);
+				}
+			}
+		}
+
+		for ( Integer topCatWord : topCatWords ) {
+		for ( Integer leftCatWord : leftCatWords ) {
+		for ( Integer rightCatWord : rightCatWords ) {
+		for ( Integer leftLeftCatWord : leftLeftCatWords ) {
+		for ( Integer leftRightCatWord : leftRightCatWords ) {
+		for ( Integer rightLeftCatWord : rightLeftCatWords ) {
+		for ( Integer rightRightCatWord : rightRightCatWords ) {
+		for ( Integer topCatPos : topCatPoss ) {
+		for ( Integer leftCatPos : leftCatPoss ) {
+		for ( Integer rightCatPos : rightCatPoss ) {
+		for ( Integer leftLeftCatPos : leftLeftCatPoss ) {
+		for ( Integer leftRightCatPos : leftRightCatPoss ) {
+		for ( Integer rightLeftCatPos : rightLeftCatPoss ) {
+		for ( Integer rightRightCatPos : rightRightCatPoss ) {
+			featureBuilder = new StringBuilder();
+			featureBuilder.append(topCat); featureBuilder.append(" ");
+			featureBuilder.append(leftCat); featureBuilder.append(" ");
+			featureBuilder.append(rightCat); featureBuilder.append(" ");
+			featureBuilder.append(leftLeftCat); featureBuilder.append(" ");
+			featureBuilder.append(leftRightCat); featureBuilder.append(" ");
+			featureBuilder.append(rightLeftCat); featureBuilder.append(" ");
+			featureBuilder.append(rightRightCat); featureBuilder.append(" ");
+			featureBuilder.append(topCatWord); featureBuilder.append(" ");
+			featureBuilder.append(leftCatWord); featureBuilder.append(" ");
+			featureBuilder.append(rightCatWord); featureBuilder.append(" ");
+			featureBuilder.append(leftLeftCatWord); featureBuilder.append(" ");
+			featureBuilder.append(leftRightCatWord); featureBuilder.append(" ");
+			featureBuilder.append(rightLeftCatWord); featureBuilder.append(" ");
+			featureBuilder.append(rightRightCatWord); featureBuilder.append(" ");
+			featureBuilder.append(topCatPos); featureBuilder.append(" ");
+			featureBuilder.append(leftCatPos); featureBuilder.append(" ");
+			featureBuilder.append(rightCatPos); featureBuilder.append(" ");
+			featureBuilder.append(leftLeftCatPos); featureBuilder.append(" ");
+			featureBuilder.append(leftRightCatPos); featureBuilder.append(" ");
+			featureBuilder.append(rightLeftCatPos); featureBuilder.append(" ");
+			featureBuilder.append(rightRightCatPos); featureBuilder.append(" ");
+			features.add(featureBuilder.toString());
+		}}}}}}}}}}}}}}
+
+		for ( String feature : features ) {
+			outFeatures.println(feature);
+		}
+	}
+
+	private void getWordPos(Sentence sentence, SuperCategory superCat, ArrayList<Integer> words, ArrayList<Integer> poss) {
+		Variable var = superCat.vars[superCat.cat.var];
+
+		for ( int i = 0; i < var.fillers.length && var.fillers[i] != Variable.SENTINEL; i++ ) {
+			if ( var.fillers[i] == 0 ) {
+				continue;
+			}
+
+			words.add(sentence.wordIDs.get(var.fillers[i] - 1));
+			poss.add(sentence.postagIDs.get(var.fillers[i] - 1));
+		}
+	}
+
 	public void printChartDeps(PrintWriter outChartDeps, Relations relations, Sentence sentence) {
 		for ( Cell cell : chart.chart ) {
 			for ( SuperCategory superCat : cell.getSuperCategories() ) {
@@ -627,5 +777,15 @@ public class ChartParserBeam extends ChartParser {
 		}
 
 		outChartDeps.println();
+	}
+
+	public void printChartFeatures(PrintWriter outChartFeatures, Sentence sentence) {
+		for ( Cell cell : chart.chart ) {
+			for ( SuperCategory superCat : cell.getSuperCategories() ) {
+				printFeature(outChartFeatures, sentence, superCat);
+			}
+		}
+
+		outChartFeatures.println();
 	}
 }
