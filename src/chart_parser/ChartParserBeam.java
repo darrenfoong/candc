@@ -15,7 +15,9 @@ import cat_combination.Variable;
 import io.Sentence;
 import lexicon.Relations;
 import model.Lexicon;
-import uk.ac.cam.cl.depnn.DependencyNeuralNetwork;
+import uk.ac.cam.cl.depnn.NeuralNetwork;
+import uk.ac.cam.cl.depnn.io.Dependency;
+import uk.ac.cam.cl.depnn.io.Feature;
 import utils.Pair;
 
 public class ChartParserBeam extends ChartParser {
@@ -23,7 +25,7 @@ public class ChartParserBeam extends ChartParser {
 	private int beamSize;
 	private double beta;
 
-	private DependencyNeuralNetwork depnn;
+	private NeuralNetwork<Dependency> depnn;
 
 	public ChartParserBeam(
 					String grammarDir,
@@ -511,13 +513,15 @@ public class ChartParserBeam extends ChartParser {
 		for ( FilledDependency dep :superCat.filledDeps ) {
 			if ( !SuperCategory.ignoreDeps.ignoreDependency(dep, sentence) ) {
 				String[] attributes = dep.getAttributes(categories.dependencyRelations, sentence);
-				score += Math.log(depnn.predictSoft(attributes[0],
-										attributes[1],
-										attributes[2],
-										attributes[3],
-										attributes[4],
-										attributes[5],
-										attributes[6]));
+				Dependency dependency= new Dependency();
+				dependency.add(attributes[0]);
+				dependency.add(attributes[1]);
+				dependency.add(attributes[2]);
+				dependency.add(attributes[3]);
+				dependency.add(attributes[4]);
+				dependency.add(attributes[5]);
+				dependency.add(attributes[6]);
+				score += Math.log(depnn.predictSoft(dependency));
 			}
 		}
 
@@ -526,7 +530,7 @@ public class ChartParserBeam extends ChartParser {
 
 	public void initDepNN(String modelDir) throws IOException {
 		if ( depnn != null ) {
-			depnn = new DependencyNeuralNetwork(modelDir);
+			depnn = new NeuralNetwork<Dependency>(modelDir, new Dependency());
 		}
 	}
 
@@ -664,8 +668,8 @@ public class ChartParserBeam extends ChartParser {
 		}
 	}
 
-	public ArrayList<ArrayList<String>> getFeature(Sentence sentence, SuperCategory superCat) {
-		ArrayList<ArrayList<String>> features = new ArrayList<ArrayList<String>>();
+	public ArrayList<Feature> getFeature(Sentence sentence, SuperCategory superCat) {
+		ArrayList<Feature> features = new ArrayList<Feature>();
 
 		String topCat = superCat.cat.toString();
 		String leftCat = "";
@@ -737,7 +741,7 @@ public class ChartParserBeam extends ChartParser {
 		for ( Integer leftRightCatPos : leftRightCatPoss ) {
 		for ( Integer rightLeftCatPos : rightLeftCatPoss ) {
 		for ( Integer rightRightCatPos : rightRightCatPoss ) {
-			ArrayList<String> feature = new ArrayList<String>();
+			Feature feature = new Feature();
 			feature.add(topCat);
 			feature.add(leftCat);
 			feature.add(rightCat);

@@ -6,10 +6,11 @@ import java.util.ArrayList;
 import cat_combination.RuleInstancesParams;
 import cat_combination.SuperCategory;
 import model.Lexicon;
-import uk.ac.cam.cl.depnn.DependencyNeuralNetwork;
+import uk.ac.cam.cl.depnn.NeuralNetwork;
+import uk.ac.cam.cl.depnn.io.Feature;
 
 public class ChartParserBeamNN extends ChartParserBeam {
-	private DependencyNeuralNetwork nn;
+	private NeuralNetwork<Feature> nn;
 
 	public ChartParserBeamNN(String grammarDir,
 			boolean altMarkedup,
@@ -24,7 +25,7 @@ public class ChartParserBeamNN extends ChartParserBeam {
 			double beta) throws IOException {
 		super(grammarDir, altMarkedup, eisnerNormalForm, MAX_WORDS, MAX_SUPERCATS, ruleInstancesParams, lexicon, null, null, false, false, cubePruning, beamSize, beta);
 
-		nn = new DependencyNeuralNetwork(modelDir);
+		nn = new NeuralNetwork<Feature>(modelDir, new Feature());
 	}
 
 	@Override
@@ -32,11 +33,11 @@ public class ChartParserBeamNN extends ChartParserBeam {
 		SuperCategory leftChild = superCat.leftChild;
 		SuperCategory rightChild = superCat.rightChild;
 
-		ArrayList<ArrayList<String>> features = getFeature(sentence, superCat);
+		ArrayList<Feature> features = getFeature(sentence, superCat);
 
-		for ( ArrayList<String> feature : features ) {
-			// double score = nn.predict(feature)
-			// superCat.score += score;
+		for ( Feature feature : features ) {
+			double score = nn.predictSoft(feature);
+			superCat.score += score;
 		}
 
 		if (leftChild != null) {
