@@ -36,7 +36,6 @@ public abstract class OracleDecoder extends Decoder {
 
 	protected boolean ignoreDepsFlag;
 	protected boolean checkRoot;
-	protected double maxDeps;
 
 	public OracleDecoder(Categories categories, boolean extractRuleInstances, boolean ignoreDepsFlag, boolean checkRoot) throws IOException {
 		this.goldDeps = new HashSet<FilledDependency>();

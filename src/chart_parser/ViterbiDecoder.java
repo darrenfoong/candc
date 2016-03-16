@@ -63,6 +63,8 @@ public class ViterbiDecoder extends Decoder {
 			}
 		}
 
+		this.maxRoot = maxRoot;
+
 		if (maxRoot == null) {
 			logger.info("No best!");
 			return false;

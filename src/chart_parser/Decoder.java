@@ -13,7 +13,10 @@ import io.Sentence;
 import lexicon.Relations;
 
 public abstract class Decoder {
-	HashSet<FilledDependency> parserDeps;
+	public HashSet<FilledDependency> parserDeps;
+
+	public double maxDeps;
+	public SuperCategory maxRoot;
 
 	public static final Logger logger = LogManager.getLogger(Decoder.class);
 

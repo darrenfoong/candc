@@ -654,134 +654,7 @@ public class ChartParserBeam extends ChartParser {
 		}
 	}
 
-	public void printFeature(PrintWriter outFeatures, Sentence sentence, SuperCategory superCat) {
-		for ( ArrayList<String> feature : getFeature(sentence, superCat) ) {
-			StringBuilder featureBuilder = new StringBuilder();
-
-			for ( int i = 0; i < feature.size()-1; i++ ) {
-				featureBuilder.append(feature.get(i));
-				featureBuilder.append(" ");
-			}
-
-			featureBuilder.append(feature.get(feature.size()-1));
-			outFeatures.println(featureBuilder.toString());
-		}
-	}
-
-	public ArrayList<Feature> getFeature(Sentence sentence, SuperCategory superCat) {
-		ArrayList<Feature> features = new ArrayList<Feature>();
-
-		String topCat = superCat.cat.toString();
-		String leftCat = "";
-		String rightCat = "";
-		String leftLeftCat = "";
-		String leftRightCat = "";
-		String rightLeftCat = "";
-		String rightRightCat = "";
-
-		ArrayList<Integer> topCatWords = new ArrayList<Integer>();
-		ArrayList<Integer> leftCatWords = new ArrayList<Integer>();
-		ArrayList<Integer> rightCatWords = new ArrayList<Integer>();
-		ArrayList<Integer> leftLeftCatWords = new ArrayList<Integer>();
-		ArrayList<Integer> leftRightCatWords = new ArrayList<Integer>();
-		ArrayList<Integer> rightLeftCatWords = new ArrayList<Integer>();
-		ArrayList<Integer> rightRightCatWords = new ArrayList<Integer>();
-
-		ArrayList<Integer> topCatPoss = new ArrayList<Integer>();
-		ArrayList<Integer> leftCatPoss = new ArrayList<Integer>();
-		ArrayList<Integer> rightCatPoss = new ArrayList<Integer>();
-		ArrayList<Integer> leftLeftCatPoss = new ArrayList<Integer>();
-		ArrayList<Integer> leftRightCatPoss = new ArrayList<Integer>();
-		ArrayList<Integer> rightLeftCatPoss = new ArrayList<Integer>();
-		ArrayList<Integer> rightRightCatPoss = new ArrayList<Integer>();
-
-		getWordPos(sentence, superCat, topCatWords, topCatPoss);
-
-		if ( superCat.leftChild != null ) {
-			leftCat = superCat.leftChild.cat.toString();
-			getWordPos(sentence, superCat.leftChild, leftCatWords, leftCatPoss);
-
-			if ( superCat.leftChild.leftChild != null ) {
-				leftLeftCat = superCat.leftChild.leftChild.cat.toString();
-				getWordPos(sentence, superCat.leftChild.leftChild, leftLeftCatWords, leftLeftCatPoss);
-			}
-
-			if ( superCat.leftChild.rightChild != null ) {
-				leftRightCat = superCat.leftChild.rightChild.cat.toString();
-				getWordPos(sentence, superCat.leftChild.rightChild, leftRightCatWords, leftRightCatPoss);
-			}
-
-			if ( superCat.rightChild != null ) {
-				rightCat = superCat.rightChild.cat.toString();
-				getWordPos(sentence, superCat.rightChild, rightCatWords, rightCatPoss);
-
-				if ( superCat.rightChild.leftChild != null ) {
-					rightLeftCat = superCat.rightChild.leftChild.cat.toString();
-					getWordPos(sentence, superCat.rightChild.leftChild, rightLeftCatWords, rightLeftCatPoss);
-				}
-
-				if ( superCat.rightChild.rightChild != null ) {
-					rightRightCat = superCat.rightChild.rightChild.cat.toString();
-					getWordPos(sentence, superCat.rightChild.rightChild, rightRightCatWords, rightRightCatPoss);
-				}
-			}
-		}
-
-		for ( Integer topCatWord : topCatWords ) {
-		for ( Integer leftCatWord : leftCatWords ) {
-		for ( Integer rightCatWord : rightCatWords ) {
-		for ( Integer leftLeftCatWord : leftLeftCatWords ) {
-		for ( Integer leftRightCatWord : leftRightCatWords ) {
-		for ( Integer rightLeftCatWord : rightLeftCatWords ) {
-		for ( Integer rightRightCatWord : rightRightCatWords ) {
-		for ( Integer topCatPos : topCatPoss ) {
-		for ( Integer leftCatPos : leftCatPoss ) {
-		for ( Integer rightCatPos : rightCatPoss ) {
-		for ( Integer leftLeftCatPos : leftLeftCatPoss ) {
-		for ( Integer leftRightCatPos : leftRightCatPoss ) {
-		for ( Integer rightLeftCatPos : rightLeftCatPoss ) {
-		for ( Integer rightRightCatPos : rightRightCatPoss ) {
-			Feature feature = new Feature();
-			feature.add(topCat);
-			feature.add(leftCat);
-			feature.add(rightCat);
-			feature.add(leftLeftCat);
-			feature.add(leftRightCat);
-			feature.add(rightLeftCat);
-			feature.add(rightRightCat);
-			feature.add(topCatWord.toString());
-			feature.add(leftCatWord.toString());
-			feature.add(rightCatWord.toString());
-			feature.add(leftLeftCatWord.toString());
-			feature.add(leftRightCatWord.toString());
-			feature.add(rightLeftCatWord.toString());
-			feature.add(rightRightCatWord.toString());
-			feature.add(topCatPos.toString());
-			feature.add(leftCatPos.toString());
-			feature.add(rightCatPos.toString());
-			feature.add(leftLeftCatPos.toString());
-			feature.add(leftRightCatPos.toString());
-			feature.add(rightLeftCatPos.toString());
-			feature.add(rightRightCatPos.toString());
-			features.add(feature);
-		}}}}}}}}}}}}}}
-
-		return features;
-	}
-
-	private void getWordPos(Sentence sentence, SuperCategory superCat, ArrayList<Integer> words, ArrayList<Integer> poss) {
-		Variable var = superCat.vars[superCat.cat.var];
-
-		for ( int i = 0; i < var.fillers.length && var.fillers[i] != Variable.SENTINEL; i++ ) {
-			if ( var.fillers[i] == 0 ) {
-				continue;
-			}
-
-			words.add(sentence.wordIDs.get(var.fillers[i] - 1));
-			poss.add(sentence.postagIDs.get(var.fillers[i] - 1));
-		}
-	}
-
+	@Override
 	public void printChartDeps(PrintWriter outChartDeps, Relations relations, Sentence sentence) {
 		for ( Cell cell : chart.chart ) {
 			for ( SuperCategory superCat : cell.getSuperCategories() ) {
@@ -794,6 +667,7 @@ public class ChartParserBeam extends ChartParser {
 		outChartDeps.println();
 	}
 
+	@Override
 	public void printChartFeatures(PrintWriter outChartFeatures, Sentence sentence) {
 		for ( Cell cell : chart.chart ) {
 			for ( SuperCategory superCat : cell.getSuperCategories() ) {

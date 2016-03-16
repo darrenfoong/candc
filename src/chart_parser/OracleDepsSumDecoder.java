@@ -97,6 +97,8 @@ public class OracleDepsSumDecoder extends OracleDecoder {
 			}
 		}
 
+		this.maxRoot = bestEquivSuperCat;
+
 		if ( bestEquivSuperCat == null ) {
 			logger.info("No best!");
 			return false;
