@@ -115,7 +115,7 @@ public class PrintForests {
 
 				if ( !parser.maxWordsExceeded && !parser.maxSuperCatsExceeded ) {
 					oracleDecoder.decode(parser.chart, parser.sentence);
-					oracleDecoder.markOracleDeps(parser.chart, false, true);
+					oracleDecoder.markOracleDeps(parser.chart, false);
 					// if the chart is empty nothing gets printed (ie no new line)
 					forest.print(out, parser.chart, parser.sentence);
 				}

@@ -244,9 +244,8 @@ public abstract class OracleDecoder extends Decoder {
 	 * for printing deps above, but easiest to mark the superCategories in the
 	 * chart if it's being passed to a PrintForest object for printing
 	 */
-	public boolean markOracleDeps(Chart chart, boolean extractRuleInstances, boolean checkRoot) {
+	public boolean markOracleDeps(Chart chart, boolean extractRuleInstances) {
 		Cell root = chart.root();
-
 		boolean foundMax = false;
 
 		if (checkRoot) {

@@ -152,7 +152,7 @@ public class OracleParser {
 							oracleDecoder.printDeps(out, parser.categories.dependencyRelations, parser.sentence, false);
 							parser.sentence.printC_line(out);
 						} else {
-							if ( oracleDecoder.markOracleDeps(parser.chart, extractRuleInstances, checkRoot) ) {
+							if ( oracleDecoder.markOracleDeps(parser.chart, extractRuleInstances) ) {
 								oracleDecoder.printDepsForTraining(out, parser.categories, parser.sentence);
 								parser.sentence.printSupertags(outPerCell);
 								parser.printCellDepsForTraining(outPerCell, parser.categories, parser.sentence, oracleDecoder);
@@ -160,7 +160,7 @@ public class OracleParser {
 						}
 
 						if ( extractRuleInstances ) {
-							oracleDecoder.markOracleDeps(parser.chart, extractRuleInstances, checkRoot);
+							oracleDecoder.markOracleDeps(parser.chart, extractRuleInstances);
 						}
 					} else {
 						logger.info("No span");

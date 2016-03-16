@@ -21,8 +21,7 @@ import lexicon.Categories;
  * them all
  */
 public class OracleDepsSumDecoder extends OracleDecoder {
-	public static final Logger logger = LogManager
-			.getLogger(OracleDepsSumDecoder.class);
+	public static final Logger logger = LogManager.getLogger(OracleDepsSumDecoder.class);
 
 	public OracleDepsSumDecoder(Categories categories,
 			boolean extractRuleInstances,

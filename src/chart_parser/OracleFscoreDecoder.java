@@ -113,7 +113,7 @@ public class OracleFscoreDecoder extends OracleDecoder {
 	}
 
 	@Override
-	public boolean markOracleDeps(Chart chart, boolean extractRuleInstances, boolean checkRoot) {
+	public boolean markOracleDeps(Chart chart, boolean extractRuleInstances) {
 		Cell root = chart.root();
 		double maxScore = Double.NEGATIVE_INFINITY;
 		boolean foundRoot = false;
@@ -138,8 +138,7 @@ public class OracleFscoreDecoder extends OracleDecoder {
 				for ( SuperCategory superCat : root.getSuperCategories() ) {
 					double currentScore = (2 * superCat.maxEquivScore) / (superCat.outside + numGoldDeps());
 					// p.90 Auli's thesis
-					if ( currentScore == maxScore && superCat.cat
-							.equals(rootCat) ) {
+					if ( currentScore == maxScore && superCat.cat.equals(rootCat) ) {
 						foundMax = true;
 						markEquivOracleDeps(superCat, extractRuleInstances);
 					}
