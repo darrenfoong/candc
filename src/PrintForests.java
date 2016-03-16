@@ -79,7 +79,7 @@ public class PrintForests {
 					eisnerNormalForm, MAX_WORDS, MAX_SUPERCATS,
 					oracleFscore, adaptiveSupertagging, ruleInstancesParams,
 					lexicon, featuresFile, null, false, false);
-			oracleDecoder = new OracleDepsSumDecoder(parser.categories, false);
+			oracleDecoder = new OracleDepsSumDecoder(parser.categories, false, true, true);
 		} catch ( IOException e ) {
 			logger.error(e);
 			return;
@@ -114,9 +114,8 @@ public class PrintForests {
 				oracleDecoder.readRootCat(roots, parser.categories);
 
 				if ( !parser.maxWordsExceeded && !parser.maxSuperCatsExceeded ) {
-					double maxGoldDeps = oracleDecoder.decode(parser.chart, parser.sentence);
-					boolean checkRoot = true;
-					oracleDecoder.markOracleDeps(parser.chart, maxGoldDeps, false, checkRoot);
+					oracleDecoder.decode(parser.chart, parser.sentence);
+					oracleDecoder.markOracleDeps(parser.chart, false, true);
 					// if the chart is empty nothing gets printed (ie no new line)
 					forest.print(out, parser.chart, parser.sentence);
 				}

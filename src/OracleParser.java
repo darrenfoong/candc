@@ -90,6 +90,9 @@ public class OracleParser {
 		ChartParser parser = null;
 		OracleDecoder oracleDecoder = null;
 
+		boolean ignoreDepsFlag = true;
+		boolean checkRoot = true;
+
 		try {
 			parser = new ChartParser(grammarDir, altMarkedup,
 					eisnerNormalForm, MAX_WORDS, MAX_SUPERCATS,
@@ -97,9 +100,9 @@ public class OracleParser {
 					null, null, false, false);
 
 			if ( depsSumDecoder ) {
-				oracleDecoder = new OracleDepsSumDecoder(parser.categories, extractRuleInstances);
+				oracleDecoder = new OracleDepsSumDecoder(parser.categories, extractRuleInstances, ignoreDepsFlag, checkRoot);
 			} else {
-				oracleDecoder = new OracleFscoreDecoder(parser.categories, extractRuleInstances);
+				oracleDecoder = new OracleFscoreDecoder(parser.categories, extractRuleInstances, ignoreDepsFlag, checkRoot);
 			}
 		} catch ( IOException e ) {
 			logger.error(e);
@@ -111,7 +114,7 @@ public class OracleParser {
 				BufferedReader stagsIn = !goldSupertagsFile.equals("null") ? new BufferedReader(new FileReader(goldSupertagsFile)) : null;
 				BufferedReader roots = !rootCatsFile.equals("null") ? new BufferedReader(new FileReader(rootCatsFile)) : null;
 				PrintWriter out = new PrintWriter(new FileWriter(outputFile));
-				PrintWriter out2 = new PrintWriter(new FileWriter(outputFile + ".per_cell"));
+				PrintWriter outPerCell = new PrintWriter(new FileWriter(outputFile + ".per_cell"));
 				PrintWriter log = IoBuilder.forLogger(logger).setLevel(Level.INFO).buildPrintWriter();
 				PrintWriter rules = extractRuleInstances ? new PrintWriter(new FileWriter(oracleRuleInstancesFile)) : null ) {
 
@@ -124,8 +127,6 @@ public class OracleParser {
 				Preface.readPreface(roots);
 			}
 			Preface.printPreface(out);
-
-			boolean ignoreDepsFlag = true;
 
 			Sentences sentences = new Sentences(in, stagsIn, parser.categories, MAX_WORDS);
 			sentences.skip(fromSentence - 1);
@@ -142,16 +143,8 @@ public class OracleParser {
 				}
 
 				if ( !parser.maxWordsExceeded && !parser.maxSuperCatsExceeded ) {
-					double maxScore = oracleDecoder.decode(parser.chart, parser.sentence);
-
-					logger.info("Max score: " + maxScore);
-					logger.info("Num gold deps: " + oracleDecoder.numGoldDeps());
-					if ( maxScore == Double.NEGATIVE_INFINITY ) {
-						logger.info("NO SPAN!");
-					}
-
-					boolean checkRoot = true;
-					if ( oracleDecoder.getParserDeps(parser.chart, maxScore, parser.sentence, ignoreDepsFlag, checkRoot) ) {
+					if ( oracleDecoder.decode(parser.chart, parser.sentence) ) {
+						logger.info("Num gold deps: " + oracleDecoder.numGoldDeps());
 						logger.info("Num parser deps: " + oracleDecoder.numParserDeps());
 						oracleDecoder.printMissingDeps(log, parser.categories.dependencyRelations, parser.sentence);
 
@@ -159,23 +152,23 @@ public class OracleParser {
 							oracleDecoder.printDeps(out, parser.categories.dependencyRelations, parser.sentence, false);
 							parser.sentence.printC_line(out);
 						} else {
-							boolean foundMax = oracleDecoder.markOracleDeps(parser.chart, maxScore, extractRuleInstances, checkRoot);
-							if ( foundMax ) {
+							if ( oracleDecoder.markOracleDeps(parser.chart, extractRuleInstances, checkRoot) ) {
 								oracleDecoder.printDepsForTraining(out, parser.categories, parser.sentence);
-								parser.sentence.printSupertags(out2);
-								parser.printCellDepsForTraining(out2, parser.categories, parser.sentence, oracleDecoder);
-								// decoder is used to provide the IgnoreDepsEval object
+								parser.sentence.printSupertags(outPerCell);
+								parser.printCellDepsForTraining(outPerCell, parser.categories, parser.sentence, oracleDecoder);
 							}
 						}
-					}
 
-					if ( extractRuleInstances ) {
-						oracleDecoder.markOracleDeps(parser.chart, maxScore, extractRuleInstances, checkRoot);
+						if ( extractRuleInstances ) {
+							oracleDecoder.markOracleDeps(parser.chart, extractRuleInstances, checkRoot);
+						}
+					} else {
+						logger.info("No span");
 					}
 				}
 
 				out.println();
-				out2.println();
+				outPerCell.println();
 				log.println();
 			}
 

@@ -21,52 +21,81 @@ public class ViterbiDecoder extends Decoder {
 		Cell root = chart.root();
 
 		for (SuperCategory superCat : root.getSuperCategories()) {
-			bestEquiv(superCat);
+			bestEquiv(superCat, sentence);
 		}
 
 		return getParserDeps(chart, sentence);
 	}
 
 	@Override
-	protected void bestEquiv(SuperCategory superCat) {
-		if (superCat.maxEquivSuperCat != null) {
-			return;
-			// already been to this equivalence class
-		}
-
-		double maxScore = Double.NEGATIVE_INFINITY;
-		SuperCategory maxEquivSuperCat = null;
-
-		for (SuperCategory equivSuperCat = superCat; equivSuperCat != null; equivSuperCat = equivSuperCat.next) {
-			double currentScore = bestScore(equivSuperCat);
-			if (currentScore > maxScore) {
-				maxScore = currentScore;
-				maxEquivSuperCat = equivSuperCat;
-			}
-		}
-
-		if (maxEquivSuperCat == null) {
-			throw new Error("should always have a maxSuperCat!");
-		}
-
-		superCat.maxEquivScore = maxScore;
-		superCat.maxEquivSuperCat = maxEquivSuperCat;
-	}
-
-	@Override
-	protected double bestScore(SuperCategory superCat) {
+	protected double bestScore(SuperCategory superCat, Sentence sentence) {
 		double score = superCat.score;
 
 		if (superCat.leftChild != null) {
-			bestEquiv(superCat.leftChild);
+			bestEquiv(superCat.leftChild, sentence);
 			score += superCat.leftChild.maxEquivScore;
 
 			if (superCat.rightChild != null) {
-				bestEquiv(superCat.rightChild);
+				bestEquiv(superCat.rightChild, sentence);
 				score += superCat.rightChild.maxEquivScore;
 			}
 		}
 
 		return score;
+	}
+
+	/*
+	 * finds the dependencies on a best-scoring parse; assumes we've already run
+	 * decode
+	 */
+	private boolean getParserDeps(Chart chart, Sentence sentence) {
+		parserDeps.clear();
+		Cell root = chart.root();
+
+		double maxScore = Double.NEGATIVE_INFINITY;
+		SuperCategory maxRoot = null;
+
+		for (SuperCategory superCat : root.getSuperCategories()) {
+			double currentScore = superCat.maxEquivScore;
+			if (currentScore > maxScore) {
+				maxScore = currentScore;
+				maxRoot = superCat.maxEquivSuperCat;
+			}
+		}
+
+		if (maxRoot == null) {
+			logger.info("No best!");
+			return false;
+		}
+
+		getDeps(maxRoot, sentence);
+
+		return true;
+	}
+
+	private void getDeps(SuperCategory superCat, Sentence sentence) {
+		if (superCat.leftChild != null) {
+			getEquivDeps(superCat.leftChild, sentence);
+
+			if (superCat.rightChild != null) {
+				getEquivDeps(superCat.rightChild, sentence);
+			}
+		} else {
+			sentence.addOutputSupertag(superCat.cat);
+		}
+
+		for ( FilledDependency filled : superCat.filledDeps ) {
+			parserDeps.add(filled);
+		}
+	}
+
+	private void getEquivDeps(SuperCategory superCat, Sentence sentence) {
+		SuperCategory bestEquivSuperCat = superCat.maxEquivSuperCat;
+
+		if (bestEquivSuperCat == null) {
+			throw new Error("should always have a maxEquivSuperCat!");
+		}
+
+		getDeps(bestEquivSuperCat, sentence);
 	}
 }

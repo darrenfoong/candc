@@ -16,11 +16,9 @@ import lexicon.Categories;
 import lexicon.Category;
 import lexicon.Relations;
 
-public abstract class OracleDecoder {
+public abstract class OracleDecoder extends Decoder {
 	public HashSet<FilledDependency> goldDeps;
 	// these are the dependencies we're trying to find
-	public HashSet<FilledDependency> parserDeps;
-	// storage for the dependencies we do find
 	public Category rootCat;
 	// some oracle decoders assume a root category
 	public Category newRootCat;
@@ -36,7 +34,11 @@ public abstract class OracleDecoder {
 	private String relHeadFile = "grammar/relsHeadsNoEval.txt";
 	private String relHeadFillerFile = "grammar/relsHeadsFillersNoEval.txt";
 
-	public OracleDecoder(Categories categories, boolean extractRuleInstances) throws IOException {
+	protected boolean ignoreDepsFlag;
+	protected boolean checkRoot;
+	protected double maxDeps;
+
+	public OracleDecoder(Categories categories, boolean extractRuleInstances, boolean ignoreDepsFlag, boolean checkRoot) throws IOException {
 		this.goldDeps = new HashSet<FilledDependency>();
 		this.parserDeps = new HashSet<FilledDependency>();
 		this.rootCat = null;
@@ -48,6 +50,9 @@ public abstract class OracleDecoder {
 			allRules = new RuleInstances(null, categories);
 			// null indicates we're not reading rules in from a file
 		}
+
+		this.ignoreDepsFlag = ignoreDepsFlag;
+		this.checkRoot = checkRoot;
 	}
 
 	public int numGoldDeps() {
@@ -74,19 +79,8 @@ public abstract class OracleDecoder {
 		return numGold;
 	}
 
-	public int numParserDeps() {
-		return parserDeps.size();
-	}
-
-	public boolean isEmptyParserDeps() {
-		return parserDeps.isEmpty();
-	}
-
-	/*
-	 * decode goes through the chart counting maximum gold deps; getParserDeps
-	 * then traces a max derivation and stores the dependencies
-	 */
-	public double decode(Chart chart, Sentence sentence) {
+	@Override
+	public boolean decode(Chart chart, Sentence sentence) {
 		Cell root = chart.root();
 		double maxScore = Double.NEGATIVE_INFINITY;
 
@@ -98,41 +92,22 @@ public abstract class OracleDecoder {
 			}
 		}
 
-		return maxScore;
+		maxDeps = maxScore;
+
+		return getParserDeps(chart, sentence);
 	}
 
-	public abstract double bestScore(SuperCategory superCat, Sentence sentence);
+	@Override
+	protected abstract double bestScore(SuperCategory superCat, Sentence sentence);
 
-	public SuperCategory bestEquiv(SuperCategory superCat, Sentence sentence) {
-		if (superCat.maxEquivSuperCat != null) {
-			return superCat.maxEquivSuperCat;
-			// already been to this equivalence class
-		}
+	protected abstract boolean getParserDeps(Chart chart, Sentence sentence);
 
-		double maxScore = Double.NEGATIVE_INFINITY;
-		SuperCategory maxEquivSuperCat = null;
-
-		for (SuperCategory equivSuperCat = superCat; equivSuperCat != null; equivSuperCat = equivSuperCat.next) {
-			double currentScore = bestScore(equivSuperCat, sentence);
-			if (currentScore > maxScore) {
-				maxScore = currentScore;
-				maxEquivSuperCat = equivSuperCat;
-			}
-		}
-
-		superCat.maxEquivScore = maxScore;
-		superCat.maxEquivSuperCat = maxEquivSuperCat;
-		return maxEquivSuperCat;
-	}
-
-	public abstract boolean getParserDeps(Chart chart, double inputScore, Sentence sentence, boolean ignoreDepsFlag, boolean checkRoot);
-
-	public void getDeps(SuperCategory superCat, Sentence sentence, boolean ignoreDepsFlag) {
+	protected void getDeps(SuperCategory superCat, Sentence sentence) {
 		if (superCat.leftChild != null) {
-			getEquivDeps(superCat.leftChild, sentence, ignoreDepsFlag);
+			getEquivDeps(superCat.leftChild, sentence);
 
 			if (superCat.rightChild != null) {
-				getEquivDeps(superCat.rightChild, sentence, ignoreDepsFlag);
+				getEquivDeps(superCat.rightChild, sentence);
 			}
 		} else {
 			sentence.addOutputSupertag(superCat.cat);
@@ -145,14 +120,14 @@ public abstract class OracleDecoder {
 		}
 	}
 
-	private void getEquivDeps(SuperCategory superCat, Sentence sentence, boolean ignoreDeps) {
+	private void getEquivDeps(SuperCategory superCat, Sentence sentence) {
 		SuperCategory bestEquivSuperCat = superCat.maxEquivSuperCat;
 
 		if (bestEquivSuperCat == null) {
 			throw new IllegalArgumentException("Should always have a maxEquivSuperCat.");
 		}
 
-		getDeps(bestEquivSuperCat, sentence, ignoreDeps);
+		getDeps(bestEquivSuperCat, sentence);
 	}
 
 	public void readRootCat(BufferedReader roots, Categories categories) throws IOException {
@@ -269,7 +244,7 @@ public abstract class OracleDecoder {
 	 * for printing deps above, but easiest to mark the superCategories in the
 	 * chart if it's being passed to a PrintForest object for printing
 	 */
-	public boolean markOracleDeps(Chart chart, double maxDeps, boolean extractRuleInstances, boolean checkRoot) {
+	public boolean markOracleDeps(Chart chart, boolean extractRuleInstances, boolean checkRoot) {
 		Cell root = chart.root();
 
 		boolean foundMax = false;
@@ -307,13 +282,6 @@ public abstract class OracleDecoder {
 	public void markEquivOracleDeps(SuperCategory superCat, boolean extractRuleInstances) {
 		// does this work? we effectively only mark the *conj* nodes:
 		if (superCat.goldMarker == -1 || superCat.goldMarker == 1) {
-
-			/*
-			 * System.out.println("been here!"); PrintWriter writer = new
-			 * PrintWriter(System.out); superCat.cat.print(writer);
-			 * writer.flush(); System.out.println();
-			 */
-
 			return;
 			// already been to this equivalence class
 		}
@@ -322,33 +290,11 @@ public abstract class OracleDecoder {
 
 		for (SuperCategory equivSuperCat = superCat; equivSuperCat != null; equivSuperCat = equivSuperCat.next) {
 			if (equivSuperCat.score == maxScore) {
-
-				/*
-				 * System.out.println("max score match: " + maxScore);
-				 * PrintWriter writer = new PrintWriter(System.out);
-				 * equivSuperCat.cat.print(writer); writer.flush();
-				 * System.out.println();
-				 */
-
 				equivSuperCat.goldMarker = 1;
 				markConjOracleDeps(equivSuperCat, extractRuleInstances);
 			} else {
 				equivSuperCat.goldMarker = -1;
 				// don't bother recursing into incorrect derivations
-
-				/*
-				 * System.out.println("NO MATCH: " + equivSuperCat.score);
-				 * PrintWriter writer = new PrintWriter(System.out);
-				 * equivSuperCat.cat.print(writer); writer.flush();
-				 * System.out.println(); System.out.println("Children: "); if
-				 * (equivSuperCat.leftChild != null) {
-				 * System.out.println(" left: ");
-				 * equivSuperCat.leftChild.cat.print(writer); writer.flush(); if
-				 * (equivSuperCat.rightChild != null) {
-				 * System.out.println(" right: ");
-				 * equivSuperCat.rightChild.cat.print(writer); writer.flush(); }
-				 * System.out.println(); }
-				 */
 			}
 		}
 	}

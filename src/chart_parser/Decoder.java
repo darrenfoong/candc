@@ -15,85 +15,49 @@ import lexicon.Relations;
 public abstract class Decoder {
 	HashSet<FilledDependency> parserDeps;
 
+	public static final Logger logger = LogManager.getLogger(Decoder.class);
+
 	public int numParserDeps() {
 		return parserDeps.size();
 	}
 
+	public boolean isEmptyParserDeps() {
+		return parserDeps.isEmpty();
+	}
+
 	public abstract boolean decode(Chart chart, Sentence sentence);
 
-	protected abstract void bestEquiv(SuperCategory superCat);
-
-	protected abstract double bestScore(SuperCategory superCat);
-
-	public static final Logger logger = LogManager.getLogger(Decoder.class);
-
-	/*
-	 * finds the dependencies on a best-scoring parse; assumes we've already run
-	 * decode
-	 */
-	protected boolean getParserDeps(Chart chart, Sentence sentence) {
-		parserDeps.clear();
-		Cell root = chart.root();
+	protected void bestEquiv(SuperCategory superCat, Sentence sentence) {
+		if (superCat.maxEquivSuperCat != null) {
+			return;
+			// already been to this equivalence class
+		}
 
 		double maxScore = Double.NEGATIVE_INFINITY;
-		SuperCategory maxRoot = null;
+		SuperCategory maxEquivSuperCat = null;
 
-		for (SuperCategory superCat : root.getSuperCategories()) {
-			double currentScore = superCat.maxEquivScore;
+		for (SuperCategory equivSuperCat = superCat; equivSuperCat != null; equivSuperCat = equivSuperCat.next) {
+			double currentScore = bestScore(equivSuperCat, sentence);
 			if (currentScore > maxScore) {
 				maxScore = currentScore;
-				maxRoot = superCat.maxEquivSuperCat;
+				maxEquivSuperCat = equivSuperCat;
 			}
 		}
 
-		if (maxRoot == null) {
-			logger.info("No best!\n");
-			return false;
+		if (maxEquivSuperCat == null) {
+			throw new Error("should always have a maxSuperCat!");
 		}
 
-		getDeps(maxRoot, sentence);
-
-		return true;
+		superCat.maxEquivScore = maxScore;
+		superCat.maxEquivSuperCat = maxEquivSuperCat;
 	}
 
-	protected void getDeps(SuperCategory superCat, Sentence sentence) {
-		if (superCat.leftChild != null) {
-			/*
-			 * System.out.println("left: "); superCat.leftChild.cat.print();
-			 * System.out.println();
-			 */
-			getEquivDeps(superCat.leftChild, sentence);
-
-			if (superCat.rightChild != null) {
-				/*
-				 * System.out.println("right: ");
-				 * superCat.rightChild.cat.print(); System.out.println();
-				 */
-				getEquivDeps(superCat.rightChild, sentence);
-			}
-		} else {
-			sentence.addOutputSupertag(superCat.cat);
-		}
-
-		for ( FilledDependency filled : superCat.filledDeps ) {
-			parserDeps.add(filled);
-		}
-	}
-
-	protected void getEquivDeps(SuperCategory superCat, Sentence sentence) {
-		SuperCategory bestEquivSuperCat = superCat.maxEquivSuperCat;
-
-		if (bestEquivSuperCat == null) {
-			throw new Error("should always have a maxEquivSuperCat!");
-		}
-
-		getDeps(bestEquivSuperCat, sentence);
-	}
+	protected abstract double bestScore(SuperCategory equivSuperCat, Sentence sentence);
 
 	public void print(PrintWriter out, Relations relations, Sentence sentence) {
 		Iterator<FilledDependency> iterator = parserDeps.iterator();
 
-		while (iterator.hasNext()) {
+		while ( iterator.hasNext() ) {
 			FilledDependency parserDep = iterator.next();
 			parserDep.printFullJslot(out, relations, sentence);
 		}

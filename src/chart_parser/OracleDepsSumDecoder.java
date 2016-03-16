@@ -21,38 +21,43 @@ import lexicon.Categories;
  * them all
  */
 public class OracleDepsSumDecoder extends OracleDecoder {
-	public static final Logger logger = LogManager.getLogger(OracleDepsSumDecoder.class);
+	public static final Logger logger = LogManager
+			.getLogger(OracleDepsSumDecoder.class);
 
-	public OracleDepsSumDecoder(Categories categories, boolean extractRuleInstances) throws IOException {
-		super(categories, extractRuleInstances);
+	public OracleDepsSumDecoder(Categories categories,
+			boolean extractRuleInstances,
+			boolean ignoreDepsFlag,
+			boolean checkRoot) throws IOException {
+		super(categories, extractRuleInstances, ignoreDepsFlag, checkRoot);
 	}
 
 	@Override
 	public double bestScore(SuperCategory superCat, Sentence sentence) {
 		double score = 0.0;
 
-		if (superCat.leftChild != null) {
+		if ( superCat.leftChild != null ) {
 			bestEquiv(superCat.leftChild, sentence);
 			score += superCat.leftChild.maxEquivScore;
 
-			if (superCat.rightChild != null) {
+			if ( superCat.rightChild != null ) {
 				bestEquiv(superCat.rightChild, sentence);
 				score += superCat.rightChild.maxEquivScore;
 			}
 		}
+
 		/*
 		 * determine how many dependencies are gold (note we're ignoring any
 		 * that match the first 4 elements of the tuple but would get ignored by
 		 * the evaluate script);
 		 */
 		for ( FilledDependency filled : superCat.filledDeps ) {
-			if (goldDeps.contains(filled)
-					&& !ignoreDeps.ignoreDependency(filled, sentence)) {
+			if ( goldDeps.contains(filled) && !ignoreDeps.ignoreDependency(filled, sentence) ) {
 				score++;
-			} else if (!ignoreDeps.ignoreDependency(filled, sentence)) {
+			} else if ( !ignoreDeps.ignoreDependency(filled, sentence) ) {
 				score = score - 100;
 			}
 		}
+
 		superCat.score = score;
 		return score;
 	}
@@ -60,44 +65,46 @@ public class OracleDepsSumDecoder extends OracleDecoder {
 	/*
 	 * finds the dependencies on a best-scoring parse; assumes we've already run
 	 * decode
-	 * 
+	 *
 	 * first looks for a root category matching the oracle root - note the use
 	 * of the Category equals method here, for which S[X] = S, but now NP[nb] !=
 	 * NP and N =! N[num] (update as of 10/6/14)
 	 */
 	@Override
-	public boolean getParserDeps(Chart chart, double maxDeps, Sentence sentence, boolean ignoreDepsFlag, boolean checkRoot) {
+	public boolean getParserDeps(Chart chart, Sentence sentence) {
 		parserDeps.clear();
-		Cell root = chart.root();
 
+		Cell root = chart.root();
 		SuperCategory bestEquivSuperCat = null;
-		for (SuperCategory superCat : root.getSuperCategories()) {
-			if (superCat.maxEquivScore == maxDeps
-					&& superCat.cat.equals(rootCat)) {
+
+		for ( SuperCategory superCat : root.getSuperCategories() ) {
+			if ( superCat.maxEquivScore == maxDeps && superCat.cat.equals(rootCat) ) {
 				bestEquivSuperCat = superCat.maxEquivSuperCat;
 				break;
 			}
 		}
-		if (bestEquivSuperCat == null) {
-			for (SuperCategory superCat : root.getSuperCategories()) {
-				if (superCat.maxEquivScore == maxDeps) {
+
+		if ( bestEquivSuperCat == null ) {
+			for ( SuperCategory superCat : root.getSuperCategories() ) {
+				if ( superCat.maxEquivScore == maxDeps ) {
 					bestEquivSuperCat = superCat.maxEquivSuperCat;
 					break;
 				}
 			}
-			if (bestEquivSuperCat != null)
-			{
+
+			if ( bestEquivSuperCat != null ) {
 				newRootCat = bestEquivSuperCat.cat;
 				// gets printed out with deps
 			}
 		}
-		if (bestEquivSuperCat == null) {
-			logger.info("No best!\n");
+
+		if ( bestEquivSuperCat == null ) {
+			logger.info("No best!");
 			return false;
 		}
-		getDeps(bestEquivSuperCat, sentence, ignoreDepsFlag);
+
+		getDeps(bestEquivSuperCat, sentence);
 
 		return true;
 	}
-
 }
