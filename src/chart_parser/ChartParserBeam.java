@@ -607,22 +607,6 @@ public class ChartParserBeam extends ChartParser {
 		}
 	}
 
-	public void printDeps(PrintWriter out, Relations relations, Sentence sentence, SuperCategory superCat) {
-		for ( FilledDependency filled : superCat.filledDeps ) {
-			filled.printFullJslot(out, relations, sentence);
-		}
-
-		if (superCat.leftChild != null) {
-			printDeps(out, relations, sentence, superCat.leftChild);
-
-			if (superCat.rightChild != null) {
-				printDeps(out, relations, sentence, superCat.rightChild);
-			}
-		} else {
-			sentence.addOutputSupertag(superCat.cat);
-		}
-	}
-
 	public void printFeatures(PrintWriter outFeatures, Sentence sentence) {
 		double maxScore = Double.NEGATIVE_INFINITY;
 		SuperCategory maxRoot = null;
@@ -639,18 +623,6 @@ public class ChartParserBeam extends ChartParser {
 
 		if (maxRoot != null) {
 			printFeatures(outFeatures, sentence, maxRoot);
-		}
-	}
-
-	public void printFeatures(PrintWriter outFeatures, Sentence sentence, SuperCategory superCat) {
-		printFeature(outFeatures, sentence, superCat);
-
-		if (superCat.leftChild != null) {
-			printFeatures(outFeatures, sentence, superCat.leftChild);
-
-			if (superCat.rightChild != null) {
-				printFeatures(outFeatures, sentence, superCat.rightChild);
-			}
 		}
 	}
 

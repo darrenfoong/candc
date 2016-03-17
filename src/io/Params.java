@@ -75,6 +75,8 @@ public class Params {
 		optionParser.accepts("extractRuleInstances").withRequiredArg().ofType(Boolean.class).defaultsTo(false);
 		optionParser.accepts("oracleRuleInstancesFile").withRequiredArg().ofType(String.class).defaultsTo("");
 		optionParser.accepts("training").withRequiredArg().ofType(Boolean.class).defaultsTo(true);
+		optionParser.accepts("printChartDeps").withRequiredArg().ofType(Boolean.class).defaultsTo(false);
+		optionParser.accepts("printChartFeatures").withRequiredArg().ofType(Boolean.class).defaultsTo(false);
 		optionParser.accepts("betas").withRequiredArg().ofType(String.class).defaultsTo("0.01,0.01,0.01,0.03,0.075");
 
 		optionParser.accepts("input").withRequiredArg().ofType(String.class).required();
@@ -186,6 +188,7 @@ public class Params {
 		optionParser.accepts("modelDir").requiredIf("depnn").withRequiredArg().ofType(String.class);
 		optionParser.accepts("skimmer").withRequiredArg().ofType(Boolean.class).defaultsTo(false);
 		optionParser.accepts("printChartDeps").withRequiredArg().ofType(Boolean.class).defaultsTo(false);
+		optionParser.accepts("printChartFeatures").withRequiredArg().ofType(Boolean.class).defaultsTo(false);
 		optionParser.accepts("betas").withRequiredArg().ofType(String.class).defaultsTo("0.0001");
 		addBeamBeta(optionParser);
 

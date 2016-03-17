@@ -1,4 +1,5 @@
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -70,6 +71,8 @@ public class OracleParser {
 		boolean extractRuleInstances = (Boolean) options.valueOf("extractRuleInstances");
 		String oracleRuleInstancesFile = (String) options.valueOf("oracleRuleInstancesFile");
 		boolean training = (Boolean) options.valueOf("training");
+		boolean printChartDeps = (Boolean) options.valueOf("printChartDeps");
+		boolean printChartFeatures = (Boolean) options.valueOf("printChartFeatures");
 		double[] betas = Params.betasArray((String) options.valueOf("betas"));
 
 		String inputFile = (String) options.valueOf("input");
@@ -116,7 +119,10 @@ public class OracleParser {
 				PrintWriter out = new PrintWriter(new FileWriter(outputFile));
 				PrintWriter outPerCell = new PrintWriter(new FileWriter(outputFile + ".per_cell"));
 				PrintWriter log = IoBuilder.forLogger(logger).setLevel(Level.INFO).buildPrintWriter();
-				PrintWriter rules = extractRuleInstances ? new PrintWriter(new FileWriter(oracleRuleInstancesFile)) : null ) {
+				PrintWriter rules = extractRuleInstances ? new PrintWriter(new FileWriter(oracleRuleInstancesFile)) : null;
+				PrintWriter outChartDeps = printChartDeps ? new PrintWriter(new BufferedWriter(new FileWriter(outputFile + ".chartdeps"))) : null;
+				PrintWriter outFeatures = printChartFeatures ? new PrintWriter(new BufferedWriter(new FileWriter(outputFile + ".feats"))) : null;
+				PrintWriter outChartFeatures = printChartFeatures ? new PrintWriter(new BufferedWriter(new FileWriter(outputFile + ".chartfeats"))) : null ) {
 
 			Preface.readPreface(in);
 			Preface.readPreface(gold);
@@ -170,6 +176,20 @@ public class OracleParser {
 				out.println();
 				outPerCell.println();
 				log.println();
+
+				if ( printChartDeps ) {
+					parser.printChartDeps(outChartDeps, parser.categories.dependencyRelations, parser.sentence);
+				}
+
+				if ( printChartFeatures ) {
+					if ( oracleDecoder.maxRoot != null ) {
+						parser.printFeatures(outFeatures, parser.sentence, oracleDecoder.maxRoot);
+					}
+
+					outFeatures.println();
+
+					parser.printChartFeatures(outChartFeatures, parser.sentence);
+				}
 			}
 
 			if ( extractRuleInstances ) {

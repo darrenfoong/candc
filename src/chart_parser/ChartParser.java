@@ -405,6 +405,22 @@ public class ChartParser {
 		}
 	}
 
+	public void printDeps(PrintWriter out, Relations relations, Sentence sentence, SuperCategory superCat) {
+		for ( FilledDependency filled : superCat.filledDeps ) {
+			filled.printFullJslot(out, relations, sentence);
+		}
+
+		if (superCat.leftChild != null) {
+			printDeps(out, relations, sentence, superCat.leftChild);
+
+			if (superCat.rightChild != null) {
+				printDeps(out, relations, sentence, superCat.rightChild);
+			}
+		} else {
+			sentence.addOutputSupertag(superCat.cat);
+		}
+	}
+
 	public void printFeature(PrintWriter outFeatures, Sentence sentence, SuperCategory superCat) {
 		for ( ArrayList<String> feature : getFeature(sentence, superCat) ) {
 			StringBuilder featureBuilder = new StringBuilder();
@@ -416,6 +432,18 @@ public class ChartParser {
 
 			featureBuilder.append(feature.get(feature.size()-1));
 			outFeatures.println(featureBuilder.toString());
+		}
+	}
+
+	public void printFeatures(PrintWriter outFeatures, Sentence sentence, SuperCategory superCat) {
+		printFeature(outFeatures, sentence, superCat);
+
+		if (superCat.leftChild != null) {
+			printFeatures(outFeatures, sentence, superCat.leftChild);
+
+			if (superCat.rightChild != null) {
+				printFeatures(outFeatures, sentence, superCat.rightChild);
+			}
 		}
 	}
 
