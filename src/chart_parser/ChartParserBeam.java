@@ -2,7 +2,6 @@ package chart_parser;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -11,13 +10,11 @@ import java.util.PriorityQueue;
 import cat_combination.FilledDependency;
 import cat_combination.RuleInstancesParams;
 import cat_combination.SuperCategory;
-import cat_combination.Variable;
 import io.Sentence;
 import lexicon.Relations;
 import model.Lexicon;
 import uk.ac.cam.cl.depnn.NeuralNetwork;
 import uk.ac.cam.cl.depnn.io.Dependency;
-import uk.ac.cam.cl.depnn.io.Feature;
 import utils.Pair;
 
 public class ChartParserBeam extends ChartParser {
