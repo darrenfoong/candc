@@ -458,21 +458,21 @@ public class ChartParser {
 		String rightLeftCat = "";
 		String rightRightCat = "";
 
-		ArrayList<Integer> topCatWords = new ArrayList<Integer>();
-		ArrayList<Integer> leftCatWords = new ArrayList<Integer>();
-		ArrayList<Integer> rightCatWords = new ArrayList<Integer>();
-		ArrayList<Integer> leftLeftCatWords = new ArrayList<Integer>();
-		ArrayList<Integer> leftRightCatWords = new ArrayList<Integer>();
-		ArrayList<Integer> rightLeftCatWords = new ArrayList<Integer>();
-		ArrayList<Integer> rightRightCatWords = new ArrayList<Integer>();
+		ArrayList<String> topCatWords = new ArrayList<String>();
+		ArrayList<String> leftCatWords = new ArrayList<String>();
+		ArrayList<String> rightCatWords = new ArrayList<String>();
+		ArrayList<String> leftLeftCatWords = new ArrayList<String>();
+		ArrayList<String> leftRightCatWords = new ArrayList<String>();
+		ArrayList<String> rightLeftCatWords = new ArrayList<String>();
+		ArrayList<String> rightRightCatWords = new ArrayList<String>();
 
-		ArrayList<Integer> topCatPoss = new ArrayList<Integer>();
-		ArrayList<Integer> leftCatPoss = new ArrayList<Integer>();
-		ArrayList<Integer> rightCatPoss = new ArrayList<Integer>();
-		ArrayList<Integer> leftLeftCatPoss = new ArrayList<Integer>();
-		ArrayList<Integer> leftRightCatPoss = new ArrayList<Integer>();
-		ArrayList<Integer> rightLeftCatPoss = new ArrayList<Integer>();
-		ArrayList<Integer> rightRightCatPoss = new ArrayList<Integer>();
+		ArrayList<String> topCatPoss = new ArrayList<String>();
+		ArrayList<String> leftCatPoss = new ArrayList<String>();
+		ArrayList<String> rightCatPoss = new ArrayList<String>();
+		ArrayList<String> leftLeftCatPoss = new ArrayList<String>();
+		ArrayList<String> leftRightCatPoss = new ArrayList<String>();
+		ArrayList<String> rightLeftCatPoss = new ArrayList<String>();
+		ArrayList<String> rightRightCatPoss = new ArrayList<String>();
 
 		getWordPos(sentence, superCat, topCatWords, topCatPoss);
 
@@ -506,20 +506,20 @@ public class ChartParser {
 			}
 		}
 
-		for ( Integer topCatWord : topCatWords ) {
-		for ( Integer leftCatWord : leftCatWords ) {
-		for ( Integer rightCatWord : rightCatWords ) {
-		for ( Integer leftLeftCatWord : leftLeftCatWords ) {
-		for ( Integer leftRightCatWord : leftRightCatWords ) {
-		for ( Integer rightLeftCatWord : rightLeftCatWords ) {
-		for ( Integer rightRightCatWord : rightRightCatWords ) {
-		for ( Integer topCatPos : topCatPoss ) {
-		for ( Integer leftCatPos : leftCatPoss ) {
-		for ( Integer rightCatPos : rightCatPoss ) {
-		for ( Integer leftLeftCatPos : leftLeftCatPoss ) {
-		for ( Integer leftRightCatPos : leftRightCatPoss ) {
-		for ( Integer rightLeftCatPos : rightLeftCatPoss ) {
-		for ( Integer rightRightCatPos : rightRightCatPoss ) {
+		for ( String topCatWord : topCatWords ) {
+		for ( String leftCatWord : leftCatWords ) {
+		for ( String rightCatWord : rightCatWords ) {
+		for ( String leftLeftCatWord : leftLeftCatWords ) {
+		for ( String leftRightCatWord : leftRightCatWords ) {
+		for ( String rightLeftCatWord : rightLeftCatWords ) {
+		for ( String rightRightCatWord : rightRightCatWords ) {
+		for ( String topCatPos : topCatPoss ) {
+		for ( String leftCatPos : leftCatPoss ) {
+		for ( String rightCatPos : rightCatPoss ) {
+		for ( String leftLeftCatPos : leftLeftCatPoss ) {
+		for ( String leftRightCatPos : leftRightCatPoss ) {
+		for ( String rightLeftCatPos : rightLeftCatPoss ) {
+		for ( String rightRightCatPos : rightRightCatPoss ) {
 			Feature feature = new Feature();
 			feature.add(topCat);
 			feature.add(leftCat);
@@ -528,27 +528,27 @@ public class ChartParser {
 			feature.add(leftRightCat);
 			feature.add(rightLeftCat);
 			feature.add(rightRightCat);
-			feature.add(topCatWord.toString());
-			feature.add(leftCatWord.toString());
-			feature.add(rightCatWord.toString());
-			feature.add(leftLeftCatWord.toString());
-			feature.add(leftRightCatWord.toString());
-			feature.add(rightLeftCatWord.toString());
-			feature.add(rightRightCatWord.toString());
-			feature.add(topCatPos.toString());
-			feature.add(leftCatPos.toString());
-			feature.add(rightCatPos.toString());
-			feature.add(leftLeftCatPos.toString());
-			feature.add(leftRightCatPos.toString());
-			feature.add(rightLeftCatPos.toString());
-			feature.add(rightRightCatPos.toString());
+			feature.add(topCatWord);
+			feature.add(leftCatWord);
+			feature.add(rightCatWord);
+			feature.add(leftLeftCatWord);
+			feature.add(leftRightCatWord);
+			feature.add(rightLeftCatWord);
+			feature.add(rightRightCatWord);
+			feature.add(topCatPos);
+			feature.add(leftCatPos);
+			feature.add(rightCatPos);
+			feature.add(leftLeftCatPos);
+			feature.add(leftRightCatPos);
+			feature.add(rightLeftCatPos);
+			feature.add(rightRightCatPos);
 			features.add(feature);
 		}}}}}}}}}}}}}}
 
 		return features;
 	}
 
-	private void getWordPos(Sentence sentence, SuperCategory superCat, ArrayList<Integer> words, ArrayList<Integer> poss) {
+	private void getWordPos(Sentence sentence, SuperCategory superCat, ArrayList<String> words, ArrayList<String> poss) {
 		Variable var = superCat.vars[superCat.cat.var];
 
 		for ( int i = 0; i < var.fillers.length && var.fillers[i] != Variable.SENTINEL; i++ ) {
@@ -556,8 +556,8 @@ public class ChartParser {
 				continue;
 			}
 
-			words.add(sentence.wordIDs.get(var.fillers[i] - 1));
-			poss.add(sentence.postagIDs.get(var.fillers[i] - 1));
+			words.add(sentence.words.get(var.fillers[i] - 1));
+			poss.add(sentence.postags.get(var.fillers[i] - 1));
 		}
 	}
 
