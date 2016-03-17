@@ -121,8 +121,7 @@ public class OracleParser {
 				PrintWriter log = IoBuilder.forLogger(logger).setLevel(Level.INFO).buildPrintWriter();
 				PrintWriter rules = extractRuleInstances ? new PrintWriter(new FileWriter(oracleRuleInstancesFile)) : null;
 				PrintWriter outChartDeps = printChartDeps ? new PrintWriter(new BufferedWriter(new FileWriter(outputFile + ".chartdeps"))) : null;
-				PrintWriter outFeatures = printChartFeatures ? new PrintWriter(new BufferedWriter(new FileWriter(outputFile + ".feats"))) : null;
-				PrintWriter outChartFeatures = printChartFeatures ? new PrintWriter(new BufferedWriter(new FileWriter(outputFile + ".chartfeats"))) : null ) {
+				PrintWriter outFeatures = printChartFeatures ? new PrintWriter(new BufferedWriter(new FileWriter(outputFile + ".feats"))) : null ) {
 
 			Preface.readPreface(in);
 			Preface.readPreface(gold);
@@ -187,8 +186,6 @@ public class OracleParser {
 					}
 
 					outFeatures.println();
-
-					parser.printChartFeatures(outChartFeatures, parser.sentence);
 				}
 			}
 
