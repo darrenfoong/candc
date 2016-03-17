@@ -448,7 +448,7 @@ public class ChartParser {
 	}
 
 	public ArrayList<Feature> getFeature(Sentence sentence, SuperCategory superCat) {
-		String nullString = "_NULL_";
+		String nullString = "_";
 		ArrayList<Feature> features = new ArrayList<Feature>();
 
 		String topCat = superCat.cat.toString();
