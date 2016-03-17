@@ -448,15 +448,16 @@ public class ChartParser {
 	}
 
 	public ArrayList<Feature> getFeature(Sentence sentence, SuperCategory superCat) {
+		String nullString = "_NULL_";
 		ArrayList<Feature> features = new ArrayList<Feature>();
 
 		String topCat = superCat.cat.toString();
-		String leftCat = "";
-		String rightCat = "";
-		String leftLeftCat = "";
-		String leftRightCat = "";
-		String rightLeftCat = "";
-		String rightRightCat = "";
+		String leftCat = nullString;
+		String rightCat = nullString;
+		String leftLeftCat = nullString;
+		String leftRightCat = nullString;
+		String rightLeftCat = nullString;
+		String rightRightCat = nullString;
 
 		ArrayList<String> topCatWords = new ArrayList<String>();
 		ArrayList<String> leftCatWords = new ArrayList<String>();
@@ -505,6 +506,21 @@ public class ChartParser {
 				}
 			}
 		}
+
+		if ( topCatWords.isEmpty() ) { topCatWords.add(nullString); }
+		if ( leftCatWords.isEmpty() ) { leftCatWords.add(nullString); }
+		if ( rightCatWords.isEmpty() ) { rightCatWords.add(nullString); }
+		if ( leftLeftCatWords.isEmpty() ) { leftLeftCatWords.add(nullString); }
+		if ( leftRightCatWords.isEmpty() ) { leftRightCatWords.add(nullString); }
+		if ( rightLeftCatWords.isEmpty() ) { rightLeftCatWords.add(nullString); }
+		if ( rightRightCatWords.isEmpty() ) { rightRightCatWords.add(nullString); }
+		if ( topCatPoss.isEmpty() ) { topCatPoss.add(nullString); }
+		if ( leftCatPoss.isEmpty() ) { leftCatPoss.add(nullString); }
+		if ( rightCatPoss.isEmpty() ) { rightCatPoss.add(nullString); }
+		if ( leftLeftCatPoss.isEmpty() ) { leftLeftCatPoss.add(nullString); }
+		if ( leftRightCatPoss.isEmpty() ) { leftRightCatPoss.add(nullString); }
+		if ( rightLeftCatPoss.isEmpty() ) { rightLeftCatPoss.add(nullString); }
+		if ( rightRightCatPoss.isEmpty() ) { rightRightCatPoss.add(nullString); }
 
 		for ( String topCatWord : topCatWords ) {
 		for ( String leftCatWord : leftCatWords ) {
