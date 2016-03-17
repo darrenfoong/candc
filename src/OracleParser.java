@@ -133,6 +133,14 @@ public class OracleParser {
 			}
 			Preface.printPreface(out);
 
+			if ( printChartDeps ) {
+				Preface.printPreface(outChartDeps);
+			}
+
+			if ( printChartFeatures ) {
+				Preface.printPreface(outFeatures);
+			}
+
 			Sentences sentences = new Sentences(in, stagsIn, parser.categories, MAX_WORDS);
 			sentences.skip(fromSentence - 1);
 

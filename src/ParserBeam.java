@@ -110,6 +110,11 @@ public class ParserBeam {
 				Preface.printPreface(outChartDeps);
 			}
 
+			if ( printChartFeatures ) {
+				Preface.printPreface(outFeatures);
+				Preface.printPreface(outChartFeatures);
+			}
+
 			Sentences sentences = new Sentences(in, null, parser.categories, MAX_WORDS);
 			sentences.skip(fromSentence - 1);
 
