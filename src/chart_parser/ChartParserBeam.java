@@ -13,8 +13,8 @@ import cat_combination.SuperCategory;
 import io.Sentence;
 import lexicon.Relations;
 import model.Lexicon;
-import uk.ac.cam.cl.depnn.NeuralNetwork;
 import uk.ac.cam.cl.depnn.io.Dependency;
+import uk.ac.cam.cl.depnn.nn.NeuralNetwork;
 import utils.Pair;
 
 public class ChartParserBeam extends ChartParser {

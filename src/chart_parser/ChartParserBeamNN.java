@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import cat_combination.RuleInstancesParams;
 import cat_combination.SuperCategory;
 import model.Lexicon;
-import uk.ac.cam.cl.depnn.NeuralNetwork;
 import uk.ac.cam.cl.depnn.io.Feature;
+import uk.ac.cam.cl.depnn.nn.NeuralNetwork;
 
 public class ChartParserBeamNN extends ChartParserBeam {
 	private NeuralNetwork<Feature> nn;
