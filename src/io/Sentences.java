@@ -101,10 +101,10 @@ public class Sentences implements Iterator<Sentence> {
 					Category goldLexicalCategory = categories.getCategory(goldSupertagString);
 
 					if ( goldLexicalCategory == null ) {
-						throw new IllegalArgumentException("No such gold supertag: " + goldSupertagString);
+						logger.error("No such gold supertag: " + goldSupertagString);
+					} else {
+						supertags.add(0, new Supertag(goldSupertagString, goldLexicalCategory, 1.0));
 					}
-
-					supertags.add(0, new Supertag(goldSupertagString, goldLexicalCategory, 1.0));
 				}
 
 				sentence.addSupertags(supertags);
