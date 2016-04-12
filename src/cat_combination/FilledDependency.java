@@ -72,6 +72,16 @@ public class FilledDependency implements Comparable<FilledDependency> {
 		return headIndex + " " + relID + " " + fillerIndex + " " + unaryRuleID;
 	}
 
+	private String getPosTag(int index, Sentence sentence) {
+		if ( index < 0 ) {
+			return "START";
+		} else if ( index >= sentence.words.size() ) {
+			return "END";
+		} else {
+			return sentence.postags.get(index);
+		}
+	}
+
 	public String[] getAttributes(Relations relations, Sentence sentence) {
 		String[] output = new String[7];
 		Relation relation = relations.getRelation(relID);
@@ -80,8 +90,12 @@ public class FilledDependency implements Comparable<FilledDependency> {
 		output[2] = sentence.words.get(fillerIndex - 1);
 		output[3] = String.valueOf(relation.jslot);
 		output[4] = String.valueOf(Math.abs(fillerIndex - headIndex));
-		output[5] = sentence.postags.get(headIndex);
-		output[6] = sentence.postags.get(fillerIndex);
+		output[5] = sentence.postags.get(headIndex - 1);
+		output[6] = sentence.postags.get(fillerIndex - 1);
+		output[7] = getPosTag(headIndex - 2, sentence);
+		output[8] = getPosTag(headIndex, sentence);
+		output[9] = getPosTag(fillerIndex - 2, sentence);
+		output[10] = getPosTag(fillerIndex, sentence);
 
 		return output;
 	}
