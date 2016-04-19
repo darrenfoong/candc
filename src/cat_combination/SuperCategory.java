@@ -59,7 +59,7 @@ public class SuperCategory {
 	public double disjInside = 0.0;
 
 	public double logPScore = 0.0;
-	public double logDepNNScore = 0.0;
+	public double depnnScore = 0.0;
 
 	// used to mark active nodes
 	public int marker = 0;

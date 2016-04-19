@@ -23,6 +23,8 @@ public class ChartParserBeam extends ChartParser {
 	private double beta;
 
 	private NeuralNetwork<Dependency> depnn;
+	private double nnPosThres;
+	private double nnNegThres;
 
 	public ChartParserBeam(
 					String grammarDir,
@@ -373,8 +375,8 @@ public class ChartParserBeam extends ChartParser {
 		}
 
 		if ( depnn != null ) {
-			superCat.logDepNNScore = calcDepNNScore(superCat);
-			superCat.score += weights.getDepNN() * superCat.logDepNNScore;
+			superCat.depnnScore = calcDepNNScore(superCat);
+			superCat.score += weights.getDepNN() * superCat.depnnScore;
 		}
 	}
 
@@ -411,7 +413,7 @@ public class ChartParserBeam extends ChartParser {
 		SuperCategory leftChild = superCat.leftChild;
 		SuperCategory rightChild = superCat.rightChild;
 
-		double sum = superCat.logDepNNScore;
+		double sum = superCat.depnnScore;
 		numCats++;
 
 		if (leftChild != null) {
@@ -518,17 +520,20 @@ public class ChartParserBeam extends ChartParser {
 				dependency.add(attributes[4]);
 				dependency.add(attributes[5]);
 				dependency.add(attributes[6]);
-				score += Math.log(depnn.predictSoft(dependency));
+				score += depnn.predict(dependency, nnPosThres, nnNegThres);
 			}
 		}
 
 		return score;
 	}
 
-	public void initDepNN(String modelDir) throws IOException {
+	public void initDepNN(String modelDir, double posThres, double negThres) throws IOException {
 		if ( depnn != null ) {
 			depnn = new NeuralNetwork<Dependency>(modelDir, new Dependency());
 		}
+
+		this.nnPosThres = posThres;
+		this.nnNegThres = negThres;
 	}
 
 	public void skimmer(PrintWriter out, Relations relations, Sentence sentence) {

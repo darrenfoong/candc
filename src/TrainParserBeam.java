@@ -59,9 +59,13 @@ public class TrainParserBeam {
 		boolean depnn = options.has("depnn");
 
 		String modelDir = null;
+		double nnPosThres = 0;
+		double nnNegThres = 0;
 
 		if ( depnn ) {
 			modelDir = (String) options.valueOf("modelDir");
+			nnPosThres = (Double) options.valueOf("nnPosThres");
+			nnNegThres = (Double) options.valueOf("nnNegThres");
 		}
 
 		boolean parallelUpdate = (Boolean) options.valueOf("parallelUpdate");
@@ -100,7 +104,7 @@ public class TrainParserBeam {
 					updateLogP, updateDepNN);
 			oracleDecoder = new OracleDepsSumDecoder(parser.categories, false, true ,true);
 			if ( depnn ) {
-				parser.initDepNN(modelDir);
+				parser.initDepNN(modelDir, nnPosThres, nnNegThres);
 			}
 		} catch ( IOException e ) {
 			logger.error(e);

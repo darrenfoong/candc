@@ -55,9 +55,13 @@ public class ParserBeam {
 		boolean depnn = options.has("depnn");
 
 		String modelDir = null;
+		double nnPosThres = 0;
+		double nnNegThres = 0;
 
 		if ( depnn ) {
 			modelDir = (String) options.valueOf("modelDir");
+			nnPosThres = (Double) options.valueOf("nnPosThres");
+			nnNegThres = (Double) options.valueOf("nnNegThres");
 		}
 
 		boolean skimmer = (Boolean) options.valueOf("skimmer");
@@ -90,7 +94,7 @@ public class ParserBeam {
 					ruleInstancesParams, lexicon, featuresFile, weightsFile,
 					newFeatures, compactWeights, cubePruning, beamSize, beta);
 			if ( depnn ) {
-				parser.initDepNN(modelDir);
+				parser.initDepNN(modelDir, nnPosThres, nnNegThres);
 			}
 		} catch ( IOException e ) {
 			logger.error(e);
