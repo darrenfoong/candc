@@ -518,7 +518,7 @@ public class ChartParserBeam extends ChartParser {
 	public double calcDepNNScore(SuperCategory superCat) {
 		double score = 0.0;
 
-		if ( superCat.filledDeps == null ) {
+		if ( superCat.filledDeps == null || superCat.filledDeps.isEmpty() ) {
 			return score;
 		}
 
