@@ -19,6 +19,7 @@ countfeatures
 evaluate
 evaluatebeam
 hashcodedist
+import
 incorrectdeps
 Makefile
 oracle
