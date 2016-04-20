@@ -522,6 +522,8 @@ public class ChartParserBeam extends ChartParser {
 			return score;
 		}
 
+		ArrayList<Dependency> deps = new ArrayList<Dependency>();
+
 		for ( FilledDependency dep : superCat.filledDeps ) {
 			String[] attributes = dep.getAttributes(categories.dependencyRelations, sentence);
 			Dependency dependency= new Dependency();
@@ -532,8 +534,10 @@ public class ChartParserBeam extends ChartParser {
 			dependency.add(attributes[4]);
 			dependency.add(posEmbeddingsList.get(Integer.parseInt(attributes[5])));
 			dependency.add(posEmbeddingsList.get(Integer.parseInt(attributes[6])));
-			score += depnn.predict(dependency, nnPosThres, nnNegThres);
+			deps.add(dependency);
 		}
+
+		score += depnn.predict(deps, nnPosThres, nnNegThres);
 
 		return score;
 	}
