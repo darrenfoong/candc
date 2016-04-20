@@ -87,8 +87,8 @@ public class FilledDependency implements Comparable<FilledDependency> {
 		Relation relation = relations.getRelation(relID);
 		output[0] = sentence.words.get(headIndex - 1);
 		output[1] = relation.category;
-		output[2] = sentence.words.get(fillerIndex - 1);
-		output[3] = String.valueOf(relation.jslot);
+		output[2] = String.valueOf(relation.jslot);
+		output[3] = sentence.words.get(fillerIndex - 1);
 		output[4] = String.valueOf(Math.abs(fillerIndex - headIndex));
 		output[5] = sentence.postags.get(headIndex - 1);
 		output[6] = sentence.postags.get(fillerIndex - 1);
