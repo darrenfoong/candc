@@ -2,10 +2,13 @@ package chart_parser;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
+
+import org.nd4j.linalg.api.ndarray.INDArray;
 
 import cat_combination.FilledDependency;
 import cat_combination.RuleInstancesParams;
@@ -13,6 +16,7 @@ import cat_combination.SuperCategory;
 import io.Sentence;
 import lexicon.Relations;
 import model.Lexicon;
+import uk.ac.cam.cl.depnn.embeddings.Embeddings;
 import uk.ac.cam.cl.depnn.io.Dependency;
 import uk.ac.cam.cl.depnn.nn.NeuralNetwork;
 import utils.Pair;
@@ -25,6 +29,9 @@ public class ChartParserBeam extends ChartParser {
 	private NeuralNetwork<Dependency> depnn;
 	private double nnPosThres;
 	private double nnNegThres;
+
+	private ArrayList<INDArray> wordEmbeddingsList;
+	private ArrayList<INDArray> posEmbeddingsList;
 
 	public ChartParserBeam(
 					String grammarDir,
@@ -96,6 +103,8 @@ public class ChartParserBeam extends ChartParser {
 		maxSuperCatsExceeded = false;
 		chart.clear();
 		chart.load(sentence, betas[0], false, true);
+
+		loadEmbeddings();
 
 		if (!preParse()) {
 			return true;
@@ -516,13 +525,13 @@ public class ChartParserBeam extends ChartParser {
 		for ( FilledDependency dep : superCat.filledDeps ) {
 			String[] attributes = dep.getAttributes(categories.dependencyRelations, sentence);
 			Dependency dependency= new Dependency();
-			dependency.add(attributes[0]);
+			dependency.add(wordEmbeddingsList.get(Integer.parseInt(attributes[0])));
 			dependency.add(attributes[1]);
 			dependency.add(attributes[2]);
-			dependency.add(attributes[3]);
+			dependency.add(wordEmbeddingsList.get(Integer.parseInt(attributes[3])));
 			dependency.add(attributes[4]);
-			dependency.add(attributes[5]);
-			dependency.add(attributes[6]);
+			dependency.add(posEmbeddingsList.get(Integer.parseInt(attributes[5])));
+			dependency.add(posEmbeddingsList.get(Integer.parseInt(attributes[6])));
 			score += depnn.predict(dependency, nnPosThres, nnNegThres);
 		}
 
@@ -536,6 +545,16 @@ public class ChartParserBeam extends ChartParser {
 
 		this.nnPosThres = posThres;
 		this.nnNegThres = negThres;
+	}
+
+	private void loadEmbeddings() {
+		wordEmbeddingsList = new ArrayList<INDArray>();
+		posEmbeddingsList = new ArrayList<INDArray>();
+
+		for ( int i = 0; i < sentence.words.size(); i++ ) {
+			wordEmbeddingsList.add(depnn.getWordVector(sentence.words.get(i)));
+			posEmbeddingsList.add(depnn.posEmbeddings.getINDArray(sentence.words.get(i)));
+		}
 	}
 
 	public void skimmer(PrintWriter out, Relations relations, Sentence sentence) {
