@@ -513,19 +513,17 @@ public class ChartParserBeam extends ChartParser {
 			return score;
 		}
 
-		for ( FilledDependency dep :superCat.filledDeps ) {
-			if ( !SuperCategory.ignoreDeps.ignoreDependency(dep, sentence) ) {
-				String[] attributes = dep.getAttributes(categories.dependencyRelations, sentence);
-				Dependency dependency= new Dependency();
-				dependency.add(attributes[0]);
-				dependency.add(attributes[1]);
-				dependency.add(attributes[2]);
-				dependency.add(attributes[3]);
-				dependency.add(attributes[4]);
-				dependency.add(attributes[5]);
-				dependency.add(attributes[6]);
-				score += depnn.predict(dependency, nnPosThres, nnNegThres);
-			}
+		for ( FilledDependency dep : superCat.filledDeps ) {
+			String[] attributes = dep.getAttributes(categories.dependencyRelations, sentence);
+			Dependency dependency= new Dependency();
+			dependency.add(attributes[0]);
+			dependency.add(attributes[1]);
+			dependency.add(attributes[2]);
+			dependency.add(attributes[3]);
+			dependency.add(attributes[4]);
+			dependency.add(attributes[5]);
+			dependency.add(attributes[6]);
+			score += depnn.predict(dependency, nnPosThres, nnNegThres);
 		}
 
 		return score;

@@ -83,7 +83,7 @@ public class FilledDependency implements Comparable<FilledDependency> {
 	}
 
 	public String[] getAttributes(Relations relations, Sentence sentence) {
-		String[] output = new String[7];
+		String[] output = new String[11];
 		Relation relation = relations.getRelation(relID);
 		output[0] = sentence.words.get(headIndex - 1);
 		output[1] = relation.category;
