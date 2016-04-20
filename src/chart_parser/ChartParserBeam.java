@@ -509,6 +509,10 @@ public class ChartParserBeam extends ChartParser {
 	public double calcDepNNScore(SuperCategory superCat) {
 		double score = 0.0;
 
+		if ( superCat.filledDeps == null ) {
+			return score;
+		}
+
 		for ( FilledDependency dep :superCat.filledDeps ) {
 			if ( !SuperCategory.ignoreDeps.ignoreDependency(dep, sentence) ) {
 				String[] attributes = dep.getAttributes(categories.dependencyRelations, sentence);
@@ -528,7 +532,7 @@ public class ChartParserBeam extends ChartParser {
 	}
 
 	public void initDepNN(String modelDir, double posThres, double negThres) throws IOException {
-		if ( depnn != null ) {
+		if ( depnn == null ) {
 			depnn = new NeuralNetwork<Dependency>(modelDir, new Dependency());
 		}
 
