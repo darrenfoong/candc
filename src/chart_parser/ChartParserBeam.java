@@ -122,7 +122,13 @@ public class ChartParserBeam extends ChartParser {
 
 			typeChange(chart.cell(i, 1), i, 1);
 			typeRaise(chart.cell(i, 1), i, 1);
+		}
 
+		if ( depnn != null ) {
+			calcSpanNNScore(1);
+		}
+
+		for (int i = 0; i < numWords; i++) {
 			/*
 			 * 260215: it was discovered that sorting the leaves (just sorting,
 			 * no beam) can cause slight variations in the results; this has
@@ -135,10 +141,6 @@ public class ChartParserBeam extends ChartParser {
 			 * order. This is because there is no further tiebreaker after
 			 * comparing scores.
 			 */
-			if ( depnn != null ) {
-				calcCellNNScore(i, 1);
-			}
-
 			chart.cell(i, 1).applyBeam(0, beta);
 
 			postParse(i, 1, numWords);
@@ -173,11 +175,13 @@ public class ChartParserBeam extends ChartParser {
 					typeChange(chart.cell(i, j), i, j);
 					typeRaise(chart.cell(i, j), i, j);
 				}
+			}
 
-				if ( depnn != null ) {
-					calcCellNNScore(i ,j);
-				}
+			if ( depnn != null ) {
+				calcSpanNNScore(j);
+			}
 
+			for (int i = 0; i <= numWords - j; i++) {
 				chart.cell(i, j).applyBeam(beamSize, beta);
 
 				postParse(i, j, numWords);
@@ -589,6 +593,61 @@ public class ChartParserBeam extends ChartParser {
 			}
 
 			superCat.score += weights.getDepNN() * superCat.depnnScore;
+		}
+	}
+
+	private void calcSpanNNScore(int span) {
+		int numWords = sentence.words.size();
+
+		ArrayList<Integer> indices = new ArrayList<Integer>();
+		ArrayList<Dependency> deps = new ArrayList<Dependency>();
+
+		indices.add(0);
+
+		for ( int pos = 0; pos <= numWords - pos; pos++ ) {
+			Cell cell = chart.cell(pos, span);
+
+			for ( SuperCategory superCat : cell.getSuperCategories() ) {
+				if ( superCat.filledDeps == null || superCat.filledDeps.isEmpty() ) {
+					indices.add(deps.size());
+					continue;
+				}
+
+				for ( FilledDependency dep : superCat.filledDeps ) {
+					String[] attributes = dep.getAttributes(categories.dependencyRelations, sentence);
+					Dependency dependency= new Dependency();
+					dependency.add(wordEmbeddingsList.get(Integer.parseInt(attributes[0])));
+					dependency.add(attributes[1]);
+					dependency.add(attributes[2]);
+					dependency.add(wordEmbeddingsList.get(Integer.parseInt(attributes[3])));
+					dependency.add(attributes[4]);
+					dependency.add(posEmbeddingsList.get(Integer.parseInt(attributes[5])));
+					dependency.add(posEmbeddingsList.get(Integer.parseInt(attributes[6])));
+					deps.add(dependency);
+				}
+
+				indices.add(deps.size());
+			}
+		}
+
+		if ( deps.isEmpty() ) {
+			return;
+		}
+
+		int[] predictions = depnn.predict(deps, nnPosThres, nnNegThres);
+
+		for ( int pos = 0; pos <= numWords - pos; pos++ ) {
+			Cell cell = chart.cell(pos, span);
+
+			for ( int i = 0; i < cell.getSuperCategories().size(); i++ ) {
+				SuperCategory superCat = cell.getSuperCategories().get(i);
+
+				for ( int j = indices.get(i); j < indices.get(i+1); j++ ) {
+					superCat.depnnScore += predictions[j];
+				}
+
+				superCat.score += weights.getDepNN() * superCat.depnnScore;
+			}
 		}
 	}
 
