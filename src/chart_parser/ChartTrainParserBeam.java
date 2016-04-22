@@ -503,7 +503,7 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 
 		if ( updateDepNN ) {
 			depNNFeature.perceptronUpdateFast(numTrainInstances);
-			weights.setLogP(depNNFeature.getLambda());
+			weights.setDepNN(depNNFeature.getLambda());
 			logger.info("Feature depnn is now " + weights.getDepNN());
 		}
 	}
