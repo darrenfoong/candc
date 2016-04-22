@@ -17,7 +17,7 @@ public class CellTrainBeam extends Cell {
 	private int sentIndex;
 	private double maxScore = Double.NEGATIVE_INFINITY;
 
-	private HashSet<FilledDependency> goldDeps;
+	protected HashSet<FilledDependency> goldDeps;
 
 	public CellTrainBeam() {
 		super();

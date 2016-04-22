@@ -26,7 +26,7 @@ public class ChartParserBeam extends ChartParser {
 	private int beamSize;
 	private double beta;
 
-	private NeuralNetwork<Dependency> depnn;
+	protected NeuralNetwork<Dependency> depnn;
 	private double nnPosThres;
 	private double nnNegThres;
 
@@ -524,81 +524,21 @@ public class ChartParserBeam extends ChartParser {
 		}
 	}
 
-	private double calcDepNNScore(SuperCategory superCat) {
-		double score = 0.0;
+	protected Dependency makeDependency(FilledDependency dep) {
+		String[] attributes = dep.getAttributes(categories.dependencyRelations, sentence);
+		Dependency dependency= new Dependency();
+		dependency.add(wordEmbeddingsList.get(Integer.parseInt(attributes[0])));
+		dependency.add(attributes[1]);
+		dependency.add(attributes[2]);
+		dependency.add(wordEmbeddingsList.get(Integer.parseInt(attributes[3])));
+		dependency.add(attributes[4]);
+		dependency.add(posEmbeddingsList.get(Integer.parseInt(attributes[5])));
+		dependency.add(posEmbeddingsList.get(Integer.parseInt(attributes[6])));
 
-		if ( superCat.filledDeps == null || superCat.filledDeps.isEmpty() ) {
-			return score;
-		}
-
-		ArrayList<Dependency> deps = new ArrayList<Dependency>();
-
-		for ( FilledDependency dep : superCat.filledDeps ) {
-			String[] attributes = dep.getAttributes(categories.dependencyRelations, sentence);
-			Dependency dependency= new Dependency();
-			dependency.add(wordEmbeddingsList.get(Integer.parseInt(attributes[0])));
-			dependency.add(attributes[1]);
-			dependency.add(attributes[2]);
-			dependency.add(wordEmbeddingsList.get(Integer.parseInt(attributes[3])));
-			dependency.add(attributes[4]);
-			dependency.add(posEmbeddingsList.get(Integer.parseInt(attributes[5])));
-			dependency.add(posEmbeddingsList.get(Integer.parseInt(attributes[6])));
-			deps.add(dependency);
-		}
-
-		score += depnn.predictSum(deps, nnPosThres, nnNegThres);
-
-		return score;
+		return dependency;
 	}
 
-	private void calcCellNNScore(int pos, int span) {
-		Cell cell = chart.cell(pos, span);
-
-		ArrayList<Integer> indices = new ArrayList<Integer>();
-		ArrayList<Dependency> deps = new ArrayList<Dependency>();
-
-		indices.add(0);
-
-		for ( SuperCategory superCat : cell.getSuperCategories() ) {
-			if ( superCat.filledDeps == null || superCat.filledDeps.isEmpty() ) {
-				indices.add(deps.size());
-				continue;
-			}
-
-			for ( FilledDependency dep : superCat.filledDeps ) {
-				String[] attributes = dep.getAttributes(categories.dependencyRelations, sentence);
-				Dependency dependency= new Dependency();
-				dependency.add(wordEmbeddingsList.get(Integer.parseInt(attributes[0])));
-				dependency.add(attributes[1]);
-				dependency.add(attributes[2]);
-				dependency.add(wordEmbeddingsList.get(Integer.parseInt(attributes[3])));
-				dependency.add(attributes[4]);
-				dependency.add(posEmbeddingsList.get(Integer.parseInt(attributes[5])));
-				dependency.add(posEmbeddingsList.get(Integer.parseInt(attributes[6])));
-				deps.add(dependency);
-			}
-
-			indices.add(deps.size());
-		}
-
-		if ( deps.isEmpty() ) {
-			return;
-		}
-
-		int[] predictions = depnn.predict(deps, nnPosThres, nnNegThres);
-
-		for ( int i = 0; i < cell.getSuperCategories().size(); i++ ) {
-			SuperCategory superCat = cell.getSuperCategories().get(i);
-
-			for ( int j = indices.get(i); j < indices.get(i+1); j++ ) {
-				superCat.depnnScore += predictions[j];
-			}
-
-			superCat.score += weights.getDepNN() * superCat.depnnScore;
-		}
-	}
-
-	private void calcSpanNNScore(int span) {
+	protected void calcSpanNNScore(int span) {
 		int numWords = sentence.words.size();
 
 		ArrayList<Integer> indices = new ArrayList<Integer>();
@@ -616,16 +556,7 @@ public class ChartParserBeam extends ChartParser {
 				}
 
 				for ( FilledDependency dep : superCat.filledDeps ) {
-					String[] attributes = dep.getAttributes(categories.dependencyRelations, sentence);
-					Dependency dependency= new Dependency();
-					dependency.add(wordEmbeddingsList.get(Integer.parseInt(attributes[0])));
-					dependency.add(attributes[1]);
-					dependency.add(attributes[2]);
-					dependency.add(wordEmbeddingsList.get(Integer.parseInt(attributes[3])));
-					dependency.add(attributes[4]);
-					dependency.add(posEmbeddingsList.get(Integer.parseInt(attributes[5])));
-					dependency.add(posEmbeddingsList.get(Integer.parseInt(attributes[6])));
-					deps.add(dependency);
+					deps.add(makeDependency(dep));
 				}
 
 				indices.add(deps.size());
@@ -662,7 +593,7 @@ public class ChartParserBeam extends ChartParser {
 		this.nnNegThres = negThres;
 	}
 
-	private void loadEmbeddings() {
+	protected void loadEmbeddings() {
 		wordEmbeddingsList = new ArrayList<INDArray>();
 		posEmbeddingsList = new ArrayList<INDArray>();
 

@@ -37,9 +37,9 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 	protected ArrayList<CellCoords> maxViolationCells = new ArrayList<CellCoords>();
 
 	private Feature[] trainingFeatures;
-	private BufferedReader goldDepsPerCell;
-	private ArrayList<Category> oracleSupertags;
-	private OracleDecoder oracleDecoder;
+	protected BufferedReader goldDepsPerCell;
+	protected ArrayList<Category> oracleSupertags;
+	protected OracleDecoder oracleDecoder;
 
 	public ChartTrainParserBeam(
 			String grammarDir,
@@ -535,7 +535,7 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 	 * @return true if success, false if failure or there are no gold 
 	 * dependencies left.
 	 */
-	private boolean readDepsPerCell(BufferedReader goldDepsPerCell) throws IOException {
+	protected boolean readDepsPerCell(BufferedReader goldDepsPerCell) throws IOException {
 		String line = goldDepsPerCell.readLine();
 		boolean readStags = false;
 

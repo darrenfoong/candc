@@ -205,6 +205,31 @@ public class Params {
 		return optionParser;
 	}
 
+	public static OptionParser getParserBeamOracleOptionParser() {
+		OptionParser optionParser = getBaseOptionParser();
+
+		optionParser.accepts("maxWords").withRequiredArg().ofType(Integer.class).defaultsTo(150);
+		optionParser.accepts("maxSupercats").withRequiredArg().ofType(Integer.class).defaultsTo(500000);
+
+		addDirs(optionParser);
+
+		optionParser.accepts("altMarkedup").withRequiredArg().ofType(Boolean.class).defaultsTo(false);
+		optionParser.accepts("eisnerNormalForm").withRequiredArg().ofType(Boolean.class).defaultsTo(true);
+		optionParser.accepts("newFeatures").withRequiredArg().ofType(Boolean.class).defaultsTo(false);
+		optionParser.accepts("cubePruning").withRequiredArg().ofType(Boolean.class).defaultsTo(false);
+		optionParser.accepts("betas").withRequiredArg().ofType(String.class).defaultsTo("0.0001");
+		addBeamBeta(optionParser);
+
+		optionParser.accepts("input").withRequiredArg().ofType(String.class).required();
+		optionParser.accepts("output").withRequiredArg().ofType(String.class).required();
+		optionParser.accepts("log").withRequiredArg().ofType(String.class).required();
+		optionParser.accepts("weights").withRequiredArg().ofType(String.class).required();
+		optionParser.accepts("goldDeps").withRequiredArg().ofType(String.class).required();
+		addFromTo(optionParser);
+
+		return optionParser;
+	}
+
 	public static OptionParser getPrintForestsOptionParser() {
 		OptionParser optionParser = getBaseOptionParser();
 

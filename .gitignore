@@ -23,6 +23,7 @@ import
 incorrectdeps
 Makefile
 oracle
+oraclebeam
 parse
 parsebeam
 printforests
