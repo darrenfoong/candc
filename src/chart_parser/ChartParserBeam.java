@@ -104,7 +104,9 @@ public class ChartParserBeam extends ChartParser {
 		chart.clear();
 		chart.load(sentence, betas[0], false, true);
 
-		loadEmbeddings();
+		if ( depnn != null ) {
+			loadEmbeddings();
+		}
 
 		if (!preParse()) {
 			return true;
