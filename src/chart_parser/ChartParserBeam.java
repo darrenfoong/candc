@@ -11,12 +11,12 @@ import java.util.PriorityQueue;
 import org.nd4j.linalg.api.ndarray.INDArray;
 
 import cat_combination.FilledDependency;
+import cat_combination.IgnoreDepsEval;
 import cat_combination.RuleInstancesParams;
 import cat_combination.SuperCategory;
 import io.Sentence;
 import lexicon.Relations;
 import model.Lexicon;
-import uk.ac.cam.cl.depnn.embeddings.Embeddings;
 import uk.ac.cam.cl.depnn.io.Dependency;
 import uk.ac.cam.cl.depnn.nn.NeuralNetwork;
 import utils.Pair;
@@ -32,6 +32,13 @@ public class ChartParserBeam extends ChartParser {
 
 	private ArrayList<INDArray> wordEmbeddingsList;
 	private ArrayList<INDArray> posEmbeddingsList;
+
+	private String ruleIDsFile = "grammar/ruleIDsNoEval.txt";
+	private String relRuleIDsFile = "grammar/relsNoEval.txt";
+	private String relHeadFile = "grammar/relsHeadsNoEval.txt";
+	private String relHeadFillerFile = "grammar/relsHeadsFillersNoEval.txt";
+
+	protected IgnoreDepsEval ignoreDeps = new IgnoreDepsEval(ruleIDsFile, relRuleIDsFile, relHeadFile, relHeadFillerFile, categories.dependencyRelations);
 
 	public ChartParserBeam(
 					String grammarDir,
@@ -560,7 +567,9 @@ public class ChartParserBeam extends ChartParser {
 				}
 
 				for ( FilledDependency dep : superCat.filledDeps ) {
-					deps.add(makeDependency(dep));
+					if ( !ignoreDeps.ignoreDependency(dep, sentence) ) {
+						deps.add(makeDependency(dep));
+					}
 				}
 
 				indices.add(deps.size());
