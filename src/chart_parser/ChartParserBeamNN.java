@@ -21,9 +21,10 @@ public class ChartParserBeamNN extends ChartParserBeam {
 			Lexicon lexicon,
 			String modelDir,
 			boolean cubePruning,
+			double[] betas,
 			int beamSize,
 			double beta) throws IOException {
-		super(grammarDir, altMarkedup, eisnerNormalForm, MAX_WORDS, MAX_SUPERCATS, ruleInstancesParams, lexicon, null, null, false, false, cubePruning, beamSize, beta);
+		super(grammarDir, altMarkedup, eisnerNormalForm, MAX_WORDS, MAX_SUPERCATS, ruleInstancesParams, lexicon, null, null, false, false, cubePruning, betas, beamSize, beta);
 
 		nn = new NeuralNetwork<Feature>(modelDir, new Feature());
 	}
