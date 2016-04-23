@@ -81,8 +81,9 @@ public class ParserBeamOracle {
 			parser = new ChartParserBeamOracle(grammarDir, altMarkedup,
 					eisnerNormalForm, MAX_WORDS, MAX_SUPERCATS,
 					ruleInstancesParams, lexicon, featuresFile, weightsFile,
-					newFeatures, cubePruning, betas, beamSize, beta, oracleDecoder);
+					newFeatures, cubePruning, betas, beamSize, beta);
 			oracleDecoder = new OracleDepsSumDecoder(parser.categories, false, true ,true);
+			parser.setOracleDecoder(oracleDecoder);
 		} catch ( IOException e ) {
 			logger.error(e);
 			return;

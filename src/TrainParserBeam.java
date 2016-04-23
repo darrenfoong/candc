@@ -101,8 +101,9 @@ public class TrainParserBeam {
 					eisnerNormalForm, MAX_WORDS, MAX_SUPERCATS,
 					ruleInstancesParams, lexicon, featuresFile, weightsFile,
 					newFeatures, cubePruning, betas, beamSize, beta, parallelUpdate,
-					updateLogP, updateDepNN, oracleDecoder);
+					updateLogP, updateDepNN);
 			oracleDecoder = new OracleDepsSumDecoder(parser.categories, false, true ,true);
+			parser.setOracleDecoder(oracleDecoder);
 			if ( depnn ) {
 				parser.initDepNN(modelDir, nnPosThres, nnNegThres);
 			}

@@ -52,8 +52,7 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 			double beta,
 			boolean parallelUpdate,
 			boolean updateLogP,
-			boolean updateDepNN,
-			OracleDecoder oracleDecoder) throws IOException {
+			boolean updateDepNN) throws IOException {
 		super(grammarDir, altMarkedup, eisnerNormalForm, MAX_WORDS,
 				MAX_SUPERCATS, ruleInstancesParams,
 				lexicon, featuresFile, weightsFile, newFeatures, false, cubePruning,
@@ -77,6 +76,9 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 		depNNFeature = new Feature(-2, weights.getDepNN());
 
 		this.oracleSupertags = new ArrayList<Category>();
+	}
+
+	public void setOracleDecoder(OracleDecoder oracleDecoder) {
 		this.oracleDecoder = oracleDecoder;
 	}
 
