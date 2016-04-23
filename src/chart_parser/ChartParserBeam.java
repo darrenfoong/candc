@@ -88,13 +88,6 @@ public class ChartParserBeam extends ChartParser {
 
 		maxWordsExceeded = false;
 		int numWords = sentence.words.size();
-		if ( numWords > chart.MAX_WORDS ) {
-			logger.info(" Sentence has " + numWords + " words; MAX_WORDS exceeded.");
-			maxWordsExceeded = true;
-			return true;
-		} else {
-			logger.info(" Sentence has " + numWords + " words; chart capacity: " + (beamSize*numWords*(numWords+1)/2));
-		}
 
 		if (lexicon != null) {
 			sentence.addIDs(lexicon);
@@ -110,6 +103,16 @@ public class ChartParserBeam extends ChartParser {
 
 		if (!preParse()) {
 			return true;
+		}
+
+		// MAX_WORDS check moved to *after* preParse()
+		// this is necessary for ChartTrainParserBeam
+		if ( numWords > chart.MAX_WORDS ) {
+			logger.info(" Sentence has " + numWords + " words; MAX_WORDS exceeded.");
+			maxWordsExceeded = true;
+			return true;
+		} else {
+			logger.info(" Sentence has " + numWords + " words; chart capacity: " + (beamSize*numWords*(numWords+1)/2));
 		}
 
 		/*
