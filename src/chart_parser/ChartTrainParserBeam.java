@@ -13,17 +13,11 @@ import java.util.LinkedList;
 import cat_combination.FilledDependency;
 import cat_combination.RuleInstancesParams;
 import cat_combination.SuperCategory;
-import io.Sentence;
 import lexicon.Category;
 import model.Lexicon;
-import statistics.HasUpdateStatistics;
-import statistics.HypothesisSizeStatistics;
 import training.Feature;
 
 public class ChartTrainParserBeam extends ChartParserBeam {
-	public HasUpdateStatistics hasUpdateStatistics = new HasUpdateStatistics();
-	public HypothesisSizeStatistics hypothesisSizeStatistics = new HypothesisSizeStatistics();
-
 	protected boolean parallelUpdate;
 	protected boolean updateLogP;
 	protected boolean updateDepNN;
@@ -53,15 +47,17 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 			String weightsFile,
 			boolean newFeatures,
 			boolean cubePruning,
+			double[] betas,
 			int beamSize,
 			double beta,
 			boolean parallelUpdate,
 			boolean updateLogP,
-			boolean updateDepNN) throws IOException {
+			boolean updateDepNN,
+			OracleDecoder oracleDecoder) throws IOException {
 		super(grammarDir, altMarkedup, eisnerNormalForm, MAX_WORDS,
 				MAX_SUPERCATS, ruleInstancesParams,
 				lexicon, featuresFile, weightsFile, newFeatures, false, cubePruning,
-				beamSize, beta);
+				betas, beamSize, beta);
 
 		this.chart = new Chart(MAX_WORDS, categories.dependencyRelations, false, true);
 		this.chart.setWeights(this.weights);
@@ -81,25 +77,11 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 		depNNFeature = new Feature(-2, weights.getDepNN());
 
 		this.oracleSupertags = new ArrayList<Category>();
+		this.oracleDecoder = oracleDecoder;
 	}
 
-	/**
-	 * Parses one supertagged sentence using chart parser with beam search,
-	 * while training using gold dependencies.
-	 * 
-	 * @param in file containing supertagged sentences to parse
-	 * @param goldDepsPerCell file containing gold dependencies per cell
-	 * @param stagsIn file containing additional supertags
-	 * @param log log file
-	 * @param betas array of values of beta
-	 * @param oracleDecoder oracle decoder
-	 * @return true if sentence is parsed or skipped, false if there are no
-	 * sentences left
-	 */
-	public boolean parseSentence(Sentence sentence, double[] betas, BufferedReader goldDepsPerCell, OracleDecoder oracleDecoder) throws IOException {
+	public void setGoldDepsPerCell(BufferedReader goldDepsPerCell) {
 		this.goldDepsPerCell = goldDepsPerCell;
-		this.oracleDecoder = oracleDecoder;
-		return parseSentence(sentence, betas);
 	}
 
 	/**
@@ -343,9 +325,6 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 		if ( !parallelUpdate ) {
 			if (maxViolationCell == null) {
 				logger.info("No non-zero violation in the chart.");
-
-				hasUpdateStatistics.addData(false);
-
 				return null;
 			} else {
 				CellTrainBeam cell = (CellTrainBeam) chart.cell(maxViolationCell.pos, maxViolationCell.span);
@@ -374,9 +353,6 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 
 				updateAllWeights(featuresToUpdate, numTrainInstances);
 
-				hasUpdateStatistics.addData(true);
-				hypothesisSizeStatistics.addData(maxViolationCell.span, sentence.words.size());
-
 				return cell.maxSuper;
 			}
 		} else {
@@ -384,9 +360,6 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 
 			if (maxViolationCells.isEmpty()) {
 				logger.info("No non-zero violation in the chart.");
-
-				hasUpdateStatistics.addData(false);
-
 				return null;
 			} else {
 				CellTrainBeam cell = null;
@@ -415,15 +388,11 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 
 				updateAllWeights(featuresToUpdate, numTrainInstances);
 
-				hasUpdateStatistics.addData(true);
-
 				int totalSpan = 0;
 
 				for ( CellCoords pair : maxViolationCells ) {
 					totalSpan += pair.span;
 				}
-
-				hypothesisSizeStatistics.addData(totalSpan, sentence.words.size());
 
 				return cell.maxSuper;
 			}

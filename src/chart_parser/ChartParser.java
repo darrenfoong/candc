@@ -39,6 +39,8 @@ public class ChartParser {
 	public ArrayList<SuperCategory> results;
 	public ArrayList<Integer> featureIDs;
 
+	public double[] betas;
+
 	public static final Logger logger = LogManager.getLogger(ChartParser.class);
 
 	public ChartParser(
@@ -54,7 +56,8 @@ public class ChartParser {
 					String featuresFile,
 					String weightsFile,
 					boolean newFeatures,
-					boolean compactWeights) throws IOException {
+					boolean compactWeights,
+					double[] betas) throws IOException {
 		this.MAX_SUPERCATS = MAX_SUPERCATS;
 		this.oracleFscore = oracleFscore;
 		this.adaptiveSupertagging = adaptiveSupertagging;
@@ -76,9 +79,11 @@ public class ChartParser {
 
 		this.chart = new Chart(MAX_WORDS, categories.dependencyRelations, oracleFscore, false);
 		this.chart.setWeights(this.weights);
+
+		this.betas = betas;
 	}
 
-	public boolean parseSentence(Sentence sentence, double[] betas) throws IOException {
+	public boolean parseSentence(Sentence sentence) throws IOException {
 		int betaLevel;
 
 		if (adaptiveSupertagging) {

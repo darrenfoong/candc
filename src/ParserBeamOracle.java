@@ -54,9 +54,9 @@ public class ParserBeamOracle {
 		boolean newFeatures = (Boolean) options.valueOf("newFeatures");
 		boolean cubePruning = (Boolean) options.valueOf("cubePruning");
 
+		double[] betas = Params.betasArray((String) options.valueOf("betas"));
 		int beamSize = (Integer) options.valueOf("beamSize");
 		double beta = (Double) options.valueOf("beta");
-		double[] betas = Params.betasArray((String) options.valueOf("betas"));
 
 		String inputFile = (String) options.valueOf("input");
 		String outputFile = (String) options.valueOf("output");
@@ -81,7 +81,7 @@ public class ParserBeamOracle {
 			parser = new ChartParserBeamOracle(grammarDir, altMarkedup,
 					eisnerNormalForm, MAX_WORDS, MAX_SUPERCATS,
 					ruleInstancesParams, lexicon, featuresFile, weightsFile,
-					newFeatures, cubePruning, beamSize, beta);
+					newFeatures, cubePruning, betas, beamSize, beta, oracleDecoder);
 			oracleDecoder = new OracleDepsSumDecoder(parser.categories, false, true ,true);
 		} catch ( IOException e ) {
 			logger.error(e);
@@ -95,13 +95,15 @@ public class ParserBeamOracle {
 			Preface.readPreface(in);
 			Preface.printPreface(out);
 
+			parser.setGoldDepsPerCell(goldDepsPerCell);
+
 			Sentences sentences = new Sentences(in, null, parser.categories, MAX_WORDS);
 			sentences.skip(fromSentence - 1);
 
 			for ( int numSentence = fromSentence; numSentence <= toSentence && sentences.hasNext(); numSentence++ ) {
 				logger.info("Parsing sentence " + numSentence);
 
-				parser.parseSentence(sentences.next(), betas, goldDepsPerCell, oracleDecoder);
+				parser.parseSentence(sentences.next());
 
 				if ( !parser.maxWordsExceeded && !parser.maxSuperCatsExceeded ) {
 					boolean success = parser.root();

@@ -76,7 +76,7 @@ public class Parser {
 			parser = new ChartParser(grammarDir, altMarkedup,
 					eisnerNormalForm, MAX_WORDS, MAX_SUPERCATS,
 					oracleFscore, adaptiveSupertagging, ruleInstancesParams,
-					lexicon, featuresFile, weightsFile, false, compactWeights);
+					lexicon, featuresFile, weightsFile, false, compactWeights, betas);
 		} catch ( IOException e ) {
 			logger.error(e);
 			return;
@@ -96,7 +96,7 @@ public class Parser {
 			for ( int numSentence = fromSentence; numSentence <= toSentence && sentences.hasNext(); numSentence++ ) {
 				logger.info("Parsing sentence " + numSentence);
 
-				parser.parseSentence(sentences.next(),  betas);
+				parser.parseSentence(sentences.next());
 
 				if ( !parser.maxWordsExceeded && !parser.maxSuperCatsExceeded ) {
 					boolean success = parser.calcScores();

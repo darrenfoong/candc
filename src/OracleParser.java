@@ -100,7 +100,7 @@ public class OracleParser {
 			parser = new ChartParser(grammarDir, altMarkedup,
 					eisnerNormalForm, MAX_WORDS, MAX_SUPERCATS,
 					oracleFscore, adaptiveSupertagging, ruleInstancesParams, null,
-					null, null, false, false);
+					null, null, false, false, betas);
 
 			if ( depsSumDecoder ) {
 				oracleDecoder = new OracleDepsSumDecoder(parser.categories, extractRuleInstances, ignoreDepsFlag, checkRoot);
@@ -147,7 +147,7 @@ public class OracleParser {
 			for ( int numSentence = fromSentence; numSentence <= toSentence && sentences.hasNext(); numSentence++ ) {
 				logger.info("Parsing sentence " + numSentence);
 
-				parser.parseSentence(sentences.next(), betas);
+				parser.parseSentence(sentences.next());
 
 				oracleDecoder.readDeps(gold, parser.categories);
 

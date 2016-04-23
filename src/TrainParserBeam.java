@@ -71,9 +71,9 @@ public class TrainParserBeam {
 		boolean parallelUpdate = (Boolean) options.valueOf("parallelUpdate");
 		boolean updateLogP = (Boolean) options.valueOf("updateLogP");
 		boolean updateDepNN = (Boolean) options.valueOf("updateDepNN");
+		double[] betas = Params.betasArray((String) options.valueOf("betas"));
 		int beamSize = (Integer) options.valueOf("beamSize");
 		double beta = (Double) options.valueOf("beta");
-		double[] betas = Params.betasArray((String) options.valueOf("betas"));
 
 		String inputFile = (String) options.valueOf("input");
 		String outputWeightsFile = (String) options.valueOf("outputWeights");
@@ -100,8 +100,8 @@ public class TrainParserBeam {
 			parser = new ChartTrainParserBeam(grammarDir, altMarkedup,
 					eisnerNormalForm, MAX_WORDS, MAX_SUPERCATS,
 					ruleInstancesParams, lexicon, featuresFile, weightsFile,
-					newFeatures, cubePruning, beamSize, beta, parallelUpdate,
-					updateLogP, updateDepNN);
+					newFeatures, cubePruning, betas, beamSize, beta, parallelUpdate,
+					updateLogP, updateDepNN, oracleDecoder);
 			oracleDecoder = new OracleDepsSumDecoder(parser.categories, false, true ,true);
 			if ( depnn ) {
 				parser.initDepNN(modelDir, nnPosThres, nnNegThres);
@@ -130,8 +130,7 @@ public class TrainParserBeam {
 					Preface.readPreface(goldDepsPerCell);
 					Preface.readPreface(roots);
 
-					parser.hasUpdateStatistics.clear();
-					parser.hypothesisSizeStatistics.clear();
+					parser.setGoldDepsPerCell(goldDepsPerCell);
 
 					Sentences sentences = new Sentences(in, null, parser.categories, MAX_WORDS);
 					sentences.skip(fromSentence - 1);
@@ -139,7 +138,7 @@ public class TrainParserBeam {
 					for ( int numSentence = fromSentence; numSentence <= toSentence && sentences.hasNext(); numSentence++ ) {
 						logger.info("Parsing sentence " + iteration + "/" + numSentence);
 
-						parser.parseSentence(sentences.next(), betas, goldDepsPerCell, oracleDecoder);
+						parser.parseSentence(sentences.next());
 
 						oracleDecoder.readDeps(goldDeps, parser.categories);
 
@@ -168,9 +167,6 @@ public class TrainParserBeam {
 							}
 						}
 					}
-
-					logger.info("# Statistics for iteration " + iteration + ": hasUpdate: " + parser.hasUpdateStatistics.calcHasUpdates() + "/" + parser.hasUpdateStatistics.getSize() + " (" + ((double) parser.hasUpdateStatistics.calcHasUpdates() / (double) parser.hasUpdateStatistics.getSize()) + ")");
-					logger.info("# Statistics for iteration " + iteration + ": hypothesisSize: " + parser.hypothesisSizeStatistics.calcAverageProportion() + " (" + parser.hypothesisSizeStatistics.getSize() + ")");
 
 					Preface.printPreface(outIter);
 					parser.printWeights(outIter, numTrainInstances);

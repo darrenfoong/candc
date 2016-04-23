@@ -22,12 +22,14 @@ public class ChartParserBeamOracle extends ChartTrainParserBeam {
 			String weightsFile,
 			boolean newFeatures,
 			boolean cubePruning,
+			double[] betas,
 			int beamSize,
-			double beta) throws IOException {
+			double beta,
+			OracleDecoder oracleDecoder) throws IOException {
 		super(grammarDir, altMarkedup, eisnerNormalForm, MAX_WORDS,
 				MAX_SUPERCATS, ruleInstancesParams,
 				lexicon, featuresFile, weightsFile, newFeatures, cubePruning,
-				beamSize, beta, false, false, false);
+				betas, beamSize, beta, false, false, false, oracleDecoder);
 
 		this.depnn = new NeuralNetwork<Dependency>();
 	}

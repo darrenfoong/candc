@@ -67,9 +67,9 @@ public class ParserBeam {
 		boolean skimmer = (Boolean) options.valueOf("skimmer");
 		boolean printChartDeps = (Boolean) options.valueOf("printChartDeps");
 		boolean printChartFeatures = (Boolean) options.valueOf("printChartFeatures");
+		double[] betas = Params.betasArray((String) options.valueOf("betas"));
 		int beamSize = (Integer) options.valueOf("beamSize");
 		double beta = (Double) options.valueOf("beta");
-		double[] betas = Params.betasArray((String) options.valueOf("betas"));
 
 		String inputFile = (String) options.valueOf("input");
 		String outputFile = (String) options.valueOf("output");
@@ -92,7 +92,7 @@ public class ParserBeam {
 			parser = new ChartParserBeam(grammarDir, altMarkedup,
 					eisnerNormalForm, MAX_WORDS, MAX_SUPERCATS,
 					ruleInstancesParams, lexicon, featuresFile, weightsFile,
-					newFeatures, compactWeights, cubePruning, beamSize, beta);
+					newFeatures, compactWeights, cubePruning, betas, beamSize, beta);
 			if ( depnn ) {
 				parser.initDepNN(modelDir, nnPosThres, nnNegThres);
 			}
@@ -125,7 +125,7 @@ public class ParserBeam {
 			for ( int numSentence = fromSentence; numSentence <= toSentence && sentences.hasNext(); numSentence++ ) {
 				logger.info("Parsing sentence " + numSentence);
 
-				parser.parseSentence(sentences.next(), betas);
+				parser.parseSentence(sentences.next());
 
 				if ( !parser.maxWordsExceeded && !parser.maxSuperCatsExceeded ) {
 					boolean success = parser.root();

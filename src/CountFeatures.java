@@ -52,9 +52,9 @@ public class CountFeatures {
 		boolean eisnerNormalForm = (Boolean) options.valueOf("eisnerNormalForm");
 		boolean newFeatures = (Boolean) options.valueOf("newFeatures");
 		boolean cubePruning = (Boolean) options.valueOf("cubePruning");
+		double[] betas = Params.betasArray((String) options.valueOf("betas"));
 		int beamSize = (Integer) options.valueOf("beamSize");
 		double beta = (Double) options.valueOf("beta");
-		double[] betas = Params.betasArray((String) options.valueOf("betas"));
 
 		String inputFile = (String) options.valueOf("input");
 		String outputFile = (String) options.valueOf("output");
@@ -78,7 +78,7 @@ public class CountFeatures {
 			parser = new ChartParserBeam(grammarDir, altMarkedup,
 					eisnerNormalForm, MAX_WORDS, MAX_SUPERCATS,
 					ruleInstancesParams, lexicon, featuresFile, weightsFile,
-					newFeatures, false, cubePruning, beamSize, beta);
+					newFeatures, false, cubePruning, betas, beamSize, beta);
 		} catch ( IOException e ) {
 			logger.error(e);
 			return;
@@ -100,7 +100,7 @@ public class CountFeatures {
 			for ( int numSentence = fromSentence; numSentence <= toSentence && sentences.hasNext(); numSentence++ ) {
 				logger.info("Parsing sentence " + numSentence);
 
-				parser.parseSentence(sentences.next(), betas);
+				parser.parseSentence(sentences.next());
 
 				if ( !parser.maxWordsExceeded && !parser.maxSuperCatsExceeded ) {
 					boolean success = countFeaturesDecoder.countFeatures(parser.chart, parser.sentence);

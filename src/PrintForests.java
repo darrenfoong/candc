@@ -78,7 +78,7 @@ public class PrintForests {
 			parser = new ChartParser(grammarDir, altMarkedup,
 					eisnerNormalForm, MAX_WORDS, MAX_SUPERCATS,
 					oracleFscore, adaptiveSupertagging, ruleInstancesParams,
-					lexicon, featuresFile, null, false, false);
+					lexicon, featuresFile, null, false, false, betas);
 			oracleDecoder = new OracleDepsSumDecoder(parser.categories, false, true, true);
 		} catch ( IOException e ) {
 			logger.error(e);
@@ -107,7 +107,7 @@ public class PrintForests {
 			for ( int numSentence = fromSentence; numSentence <= toSentence && sentences.hasNext(); numSentence++ ) {
 				logger.info("Parsing sentence " + numSentence);
 
-				parser.parseSentence(sentences.next(), betas);
+				parser.parseSentence(sentences.next());
 
 				oracleDecoder.readDeps(gold, parser.categories);
 				// ugly - passing parser.categories?

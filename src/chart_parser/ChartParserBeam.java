@@ -46,11 +46,12 @@ public class ChartParserBeam extends ChartParser {
 					boolean newFeatures,
 					boolean compactWeights,
 					boolean cubePruning,
+					double[] betas,
 					int beamSize,
 					double beta) throws IOException {
 		super(grammarDir, altMarkedup, eisnerNormalForm, MAX_WORDS,
 					MAX_SUPERCATS, false, false, ruleInstancesParams,
-					lexicon, featuresFile, weightsFile, newFeatures, compactWeights);
+					lexicon, featuresFile, weightsFile, newFeatures, compactWeights, betas);
 
 		this.chart = new Chart(MAX_WORDS, categories.dependencyRelations, false, false);
 		this.chart.setWeights(this.weights);
@@ -79,7 +80,7 @@ public class ChartParserBeam extends ChartParser {
 	 * sentences left
 	 */
 	@Override
-	public boolean parseSentence(Sentence sentence,  double[] betas) throws IOException {
+	public boolean parseSentence(Sentence sentence) throws IOException {
 		if (betas.length != 1) {
 			throw new IllegalArgumentException("Only need 1 beta value.");
 		}
