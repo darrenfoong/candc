@@ -536,49 +536,39 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 	 * dependencies left.
 	 */
 	protected boolean readDepsPerCell(BufferedReader goldDepsPerCell) throws IOException {
+		// read oracle supertags
 		String line = goldDepsPerCell.readLine();
-		boolean readStags = false;
 
-		if (line == null) {
+		if ( line == null ) {
 			return false;
 		}
 
-		if (line.isEmpty()) {
-			return false;
+		if ( line.isEmpty() ) {
+			return true;
 		}
 
+		String[] tokens;
+
+		oracleSupertags.clear();
+		tokens = line.split("\\s");
+		for ( String token : tokens ) {
+			Category lexicalCategory = categories.getCategory(token);
+			if ( lexicalCategory == null ) {
+				throw new Error("can't find oracle supertag! " + token);
+			}
+			oracleSupertags.add(lexicalCategory);
+		}
+
+		if ( oracleSupertags.size() != sentence.words.size() ) {
+			throw new Error("Incorrect number of oracle supertags: " + oracleSupertags.size() + "; expected: " + sentence.words.size());
+		}
+
+		// read each cell
 		while (true) {
-			if (line == null) {
-				return false;
-			}
+			line = goldDepsPerCell.readLine();
 
-			if (line.isEmpty()) {
+			if ( line.isEmpty() ) {
 				return true;
-			}
-
-			String[] tokens;
-
-			if (!readStags) {
-				oracleSupertags.clear();
-				tokens = line.split("\\s");
-				for ( String token : tokens ) {
-					Category lexicalCategory = categories.getCategory(token);
-					if ( lexicalCategory == null ) {
-						throw new Error("can't find oracle supertag! " + token);
-					}
-					oracleSupertags.add(lexicalCategory);
-				}
-
-				readStags = true;
-				line = goldDepsPerCell.readLine();
-
-				if ( line == null ) {
-					throw new IllegalArgumentException("Unexpected end of stream");
-				}
-
-				if (line.isEmpty()) {
-					return false;
-				}
 			}
 
 			tokens = line.split("\\s");
@@ -586,7 +576,7 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 				throw new Error("expecting 3 fields");
 			}
 
-			int start = Integer.parseInt(tokens[0]);
+			int pos = Integer.parseInt(tokens[0]);
 			int span = Integer.parseInt(tokens[1]);
 			int numDeps = Integer.parseInt(tokens[2]);
 
@@ -615,11 +605,9 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 				}
 
 				FilledDependency dep = new FilledDependency(relID, headIndex, fillerIndex, unaryRuleID, lrange);
-				CellTrainBeam cell = (CellTrainBeam) (chart.cell(start, span));
+				CellTrainBeam cell = (CellTrainBeam) (chart.cell(pos, span));
 				cell.addDep(dep);
 			}
-
-			line = goldDepsPerCell.readLine();
 		}
 	}
 }
