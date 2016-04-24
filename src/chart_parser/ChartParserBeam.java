@@ -539,7 +539,7 @@ public class ChartParserBeam extends ChartParser {
 		String[] attributes = dep.getAttributes(categories.dependencyRelations, sentence);
 		Dependency dependency= new Dependency();
 		dependency.add(wordEmbeddingsList.get(Integer.parseInt(attributes[0])));
-		dependency.add(dependency.stripCategory(attributes[1]));
+		dependency.add(dependency.stripCategory(dependency.stripMarkup(attributes[1])));
 		dependency.add(attributes[2]);
 		dependency.add(wordEmbeddingsList.get(Integer.parseInt(attributes[3])));
 		dependency.add(attributes[4]);
