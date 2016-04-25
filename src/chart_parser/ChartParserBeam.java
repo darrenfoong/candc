@@ -30,8 +30,8 @@ public class ChartParserBeam extends ChartParser {
 	private double nnPosThres;
 	private double nnNegThres;
 
-	private ArrayList<INDArray> wordEmbeddingsList;
-	private ArrayList<INDArray> posEmbeddingsList;
+	protected ArrayList<INDArray> wordEmbeddingsList;
+	protected ArrayList<INDArray> posEmbeddingsList;
 
 	private String ruleIDsFile = "grammar/ruleIDsNoEval.txt";
 	private String relRuleIDsFile = "grammar/relsNoEval.txt";
