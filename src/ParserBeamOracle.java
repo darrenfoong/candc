@@ -53,6 +53,7 @@ public class ParserBeamOracle {
 		boolean eisnerNormalForm = (Boolean) options.valueOf("eisnerNormalForm");
 		boolean newFeatures = (Boolean) options.valueOf("newFeatures");
 		boolean cubePruning = (Boolean) options.valueOf("cubePruning");
+		boolean nnHardLabels = (Boolean) options.valueOf("nnHardLabels");
 
 		double[] betas = Params.betasArray((String) options.valueOf("betas"));
 		int beamSize = (Integer) options.valueOf("beamSize");
@@ -81,7 +82,7 @@ public class ParserBeamOracle {
 			parser = new ChartParserBeamOracle(grammarDir, altMarkedup,
 					eisnerNormalForm, MAX_WORDS, MAX_SUPERCATS,
 					ruleInstancesParams, lexicon, featuresFile, weightsFile,
-					newFeatures, cubePruning, betas, beamSize, beta);
+					newFeatures, cubePruning, nnHardLabels, betas, beamSize, beta);
 			oracleDecoder = new OracleDepsSumDecoder(parser.categories, false, true ,true);
 			parser.setOracleDecoder(oracleDecoder);
 		} catch ( IOException e ) {

@@ -27,6 +27,7 @@ public class ChartParserBeam extends ChartParser {
 	private double beta;
 
 	protected NeuralNetwork<Dependency> depnn;
+	protected boolean nnHardLabels;
 	private double nnPosThres;
 	private double nnNegThres;
 
@@ -580,7 +581,13 @@ public class ChartParserBeam extends ChartParser {
 			return;
 		}
 
-		int[] predictions = depnn.predict(deps, nnPosThres, nnNegThres);
+		double[] predictions = null;
+
+		if ( nnHardLabels ) {
+			predictions = depnn.predict(deps, nnPosThres, nnNegThres);
+		} else {
+			predictions = depnn.predictSoft(deps);
+		}
 
 		for ( int pos = 0; pos <= numWords - pos; pos++ ) {
 			Cell cell = chart.cell(pos, span);
@@ -597,11 +604,12 @@ public class ChartParserBeam extends ChartParser {
 		}
 	}
 
-	public void initDepNN(String modelDir, double posThres, double negThres) throws IOException {
+	public void initDepNN(String modelDir, boolean hardLabels, double posThres, double negThres) throws IOException {
 		if ( depnn == null ) {
 			depnn = new NeuralNetwork<Dependency>(modelDir, new Dependency());
 		}
 
+		this.nnHardLabels = hardLabels;
 		this.nnPosThres = posThres;
 		this.nnNegThres = negThres;
 	}

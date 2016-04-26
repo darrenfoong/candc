@@ -10,6 +10,9 @@ import uk.ac.cam.cl.depnn.io.Dependency;
 import uk.ac.cam.cl.depnn.nn.NeuralNetwork;
 
 public class ChartParserBeamOracle extends ChartTrainParserBeam {
+	private double correctScore;
+	private double incorrectScore;
+
 	public ChartParserBeamOracle(
 			String grammarDir,
 			boolean altMarkedup,
@@ -22,6 +25,7 @@ public class ChartParserBeamOracle extends ChartTrainParserBeam {
 			String weightsFile,
 			boolean newFeatures,
 			boolean cubePruning,
+			boolean nnHardLabels,
 			double[] betas,
 			int beamSize,
 			double beta) throws IOException {
@@ -31,6 +35,15 @@ public class ChartParserBeamOracle extends ChartTrainParserBeam {
 				betas, beamSize, beta, false, false, false);
 
 		this.depnn = new NeuralNetwork<Dependency>();
+		this.nnHardLabels = nnHardLabels;
+
+		if ( nnHardLabels ) {
+			correctScore = 1;
+			incorrectScore = -1;
+		} else {
+			correctScore = 1;
+			incorrectScore = 0;
+		}
 	}
 
 	@Override
@@ -64,9 +77,9 @@ public class ChartParserBeamOracle extends ChartTrainParserBeam {
 				for ( FilledDependency dep : superCat.filledDeps ) {
 					if ( !oracleDecoder.ignoreDeps.ignoreDependency(dep, sentence) ) {
 						if ( cell.goldDeps.contains(dep) ) {
-							superCat.depnnScore += 1;
+							superCat.depnnScore += correctScore;
 						} else {
-							superCat.depnnScore -= 1;
+							superCat.depnnScore += incorrectScore;
 						}
 					}
 				}

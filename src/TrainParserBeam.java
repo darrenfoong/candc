@@ -59,11 +59,13 @@ public class TrainParserBeam {
 		boolean depnn = options.has("depnn");
 
 		String modelDir = null;
+		boolean nnHardLabels = true;
 		double nnPosThres = 0;
 		double nnNegThres = 0;
 
 		if ( depnn ) {
 			modelDir = (String) options.valueOf("modelDir");
+			nnHardLabels = (Boolean) options.valueOf("nnHardLabels");
 			nnPosThres = (Double) options.valueOf("nnPosThres");
 			nnNegThres = (Double) options.valueOf("nnNegThres");
 		}
@@ -105,7 +107,7 @@ public class TrainParserBeam {
 			oracleDecoder = new OracleDepsSumDecoder(parser.categories, false, true ,true);
 			parser.setOracleDecoder(oracleDecoder);
 			if ( depnn ) {
-				parser.initDepNN(modelDir, nnPosThres, nnNegThres);
+				parser.initDepNN(modelDir, nnHardLabels, nnPosThres, nnNegThres);
 			}
 		} catch ( IOException e ) {
 			logger.error(e);
