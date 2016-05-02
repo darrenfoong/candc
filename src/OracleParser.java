@@ -175,6 +175,12 @@ public class OracleParser {
 						if ( extractRuleInstances ) {
 							oracleDecoder.markOracleDeps(parser.chart, extractRuleInstances);
 						}
+
+						if ( printChartFeatures ) {
+							if ( oracleDecoder.maxRoot != null ) {
+								parser.printFeatures(outFeatures, parser.sentence, oracleDecoder.maxRoot);
+							}
+						}
 					} else {
 						logger.info("No span");
 					}
@@ -189,10 +195,6 @@ public class OracleParser {
 				}
 
 				if ( printChartFeatures ) {
-					if ( oracleDecoder.maxRoot != null ) {
-						parser.printFeatures(outFeatures, parser.sentence, oracleDecoder.maxRoot);
-					}
-
 					outFeatures.println();
 				}
 			}
