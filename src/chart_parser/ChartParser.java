@@ -459,26 +459,14 @@ public class ChartParser {
 		String topCat = superCat.cat.toString();
 		String leftCat = nullString;
 		String rightCat = nullString;
-		String leftLeftCat = nullString;
-		String leftRightCat = nullString;
-		String rightLeftCat = nullString;
-		String rightRightCat = nullString;
 
 		ArrayList<String> topCatWords = new ArrayList<String>();
 		ArrayList<String> leftCatWords = new ArrayList<String>();
 		ArrayList<String> rightCatWords = new ArrayList<String>();
-		ArrayList<String> leftLeftCatWords = new ArrayList<String>();
-		ArrayList<String> leftRightCatWords = new ArrayList<String>();
-		ArrayList<String> rightLeftCatWords = new ArrayList<String>();
-		ArrayList<String> rightRightCatWords = new ArrayList<String>();
 
 		ArrayList<String> topCatPoss = new ArrayList<String>();
 		ArrayList<String> leftCatPoss = new ArrayList<String>();
 		ArrayList<String> rightCatPoss = new ArrayList<String>();
-		ArrayList<String> leftLeftCatPoss = new ArrayList<String>();
-		ArrayList<String> leftRightCatPoss = new ArrayList<String>();
-		ArrayList<String> rightLeftCatPoss = new ArrayList<String>();
-		ArrayList<String> rightRightCatPoss = new ArrayList<String>();
 
 		getWordPos(sentence, superCat, topCatWords, topCatPoss);
 
@@ -486,85 +474,37 @@ public class ChartParser {
 			leftCat = superCat.leftChild.cat.toString();
 			getWordPos(sentence, superCat.leftChild, leftCatWords, leftCatPoss);
 
-			if ( superCat.leftChild.leftChild != null ) {
-				leftLeftCat = superCat.leftChild.leftChild.cat.toString();
-				getWordPos(sentence, superCat.leftChild.leftChild, leftLeftCatWords, leftLeftCatPoss);
-			}
-
-			if ( superCat.leftChild.rightChild != null ) {
-				leftRightCat = superCat.leftChild.rightChild.cat.toString();
-				getWordPos(sentence, superCat.leftChild.rightChild, leftRightCatWords, leftRightCatPoss);
-			}
-
 			if ( superCat.rightChild != null ) {
 				rightCat = superCat.rightChild.cat.toString();
 				getWordPos(sentence, superCat.rightChild, rightCatWords, rightCatPoss);
-
-				if ( superCat.rightChild.leftChild != null ) {
-					rightLeftCat = superCat.rightChild.leftChild.cat.toString();
-					getWordPos(sentence, superCat.rightChild.leftChild, rightLeftCatWords, rightLeftCatPoss);
-				}
-
-				if ( superCat.rightChild.rightChild != null ) {
-					rightRightCat = superCat.rightChild.rightChild.cat.toString();
-					getWordPos(sentence, superCat.rightChild.rightChild, rightRightCatWords, rightRightCatPoss);
-				}
 			}
 		}
 
 		if ( topCatWords.isEmpty() ) { topCatWords.add(nullString); }
 		if ( leftCatWords.isEmpty() ) { leftCatWords.add(nullString); }
 		if ( rightCatWords.isEmpty() ) { rightCatWords.add(nullString); }
-		if ( leftLeftCatWords.isEmpty() ) { leftLeftCatWords.add(nullString); }
-		if ( leftRightCatWords.isEmpty() ) { leftRightCatWords.add(nullString); }
-		if ( rightLeftCatWords.isEmpty() ) { rightLeftCatWords.add(nullString); }
-		if ( rightRightCatWords.isEmpty() ) { rightRightCatWords.add(nullString); }
 		if ( topCatPoss.isEmpty() ) { topCatPoss.add(nullString); }
 		if ( leftCatPoss.isEmpty() ) { leftCatPoss.add(nullString); }
 		if ( rightCatPoss.isEmpty() ) { rightCatPoss.add(nullString); }
-		if ( leftLeftCatPoss.isEmpty() ) { leftLeftCatPoss.add(nullString); }
-		if ( leftRightCatPoss.isEmpty() ) { leftRightCatPoss.add(nullString); }
-		if ( rightLeftCatPoss.isEmpty() ) { rightLeftCatPoss.add(nullString); }
-		if ( rightRightCatPoss.isEmpty() ) { rightRightCatPoss.add(nullString); }
 
 		for ( String topCatWord : topCatWords ) {
 		for ( String leftCatWord : leftCatWords ) {
 		for ( String rightCatWord : rightCatWords ) {
-		for ( String leftLeftCatWord : leftLeftCatWords ) {
-		for ( String leftRightCatWord : leftRightCatWords ) {
-		for ( String rightLeftCatWord : rightLeftCatWords ) {
-		for ( String rightRightCatWord : rightRightCatWords ) {
 		for ( String topCatPos : topCatPoss ) {
 		for ( String leftCatPos : leftCatPoss ) {
 		for ( String rightCatPos : rightCatPoss ) {
-		for ( String leftLeftCatPos : leftLeftCatPoss ) {
-		for ( String leftRightCatPos : leftRightCatPoss ) {
-		for ( String rightLeftCatPos : rightLeftCatPoss ) {
-		for ( String rightRightCatPos : rightRightCatPoss ) {
 			Feature feature = new Feature();
 			feature.add(topCat);
 			feature.add(leftCat);
 			feature.add(rightCat);
-			feature.add(leftLeftCat);
-			feature.add(leftRightCat);
-			feature.add(rightLeftCat);
-			feature.add(rightRightCat);
 			feature.add(topCatWord);
 			feature.add(leftCatWord);
 			feature.add(rightCatWord);
-			feature.add(leftLeftCatWord);
-			feature.add(leftRightCatWord);
-			feature.add(rightLeftCatWord);
-			feature.add(rightRightCatWord);
 			feature.add(topCatPos);
 			feature.add(leftCatPos);
 			feature.add(rightCatPos);
-			feature.add(leftLeftCatPos);
-			feature.add(leftRightCatPos);
-			feature.add(rightLeftCatPos);
-			feature.add(rightRightCatPos);
 			features.add(feature);
-		}}}}}}}}}}}}}}
+		}}}}}}
 
 		return features;
 	}
