@@ -443,9 +443,9 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 			logger.info(" Finally updating feature depnn");
 
 			if (positiveUpdate) {
-				depNNFeature.setLambdaUpdate(depNNFeature.getLambdaUpdate() + calcAverageSumDepNNScore(superCat));
+				depNNFeature.setLambdaUpdate(depNNFeature.getLambdaUpdate() + calcSumDepNNScore(superCat));
 			} else {
-				depNNFeature.setLambdaUpdate(depNNFeature.getLambdaUpdate() - calcAverageSumDepNNScore(superCat));
+				depNNFeature.setLambdaUpdate(depNNFeature.getLambdaUpdate() - calcSumDepNNScore(superCat));
 			}
 		}
 	}

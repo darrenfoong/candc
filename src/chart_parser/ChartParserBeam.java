@@ -434,30 +434,20 @@ public class ChartParserBeam extends ChartParser {
 		return sum;
 	}
 
-	public double calcAverageSumDepNNScore(SuperCategory superCat) {
-		Pair<Double, Integer> result = calcSumDepNNScore(superCat, 0);
-		return result.x / result.y;
-	}
-
-	public Pair<Double, Integer> calcSumDepNNScore(SuperCategory superCat, int numCats) {
+	public double calcSumDepNNScore(SuperCategory superCat) {
 		SuperCategory leftChild = superCat.leftChild;
 		SuperCategory rightChild = superCat.rightChild;
 
 		double sum = superCat.depnnScore;
-		numCats++;
 
 		if (leftChild != null) {
 			if (rightChild != null) {
-				Pair<Double, Integer> resultRight = calcSumDepNNScore(superCat.rightChild, numCats);
-				sum += resultRight.x;
-				numCats += resultRight.y;
+				sum += calcSumDepNNScore(superCat.rightChild);
 			}
-			Pair<Double, Integer> resultLeft = calcSumDepNNScore(superCat.leftChild, numCats);
-			sum += resultLeft.x;
-			numCats += resultLeft.y;
+			sum += calcSumDepNNScore(superCat.leftChild);
 		}
 
-		return new Pair<Double, Integer>(sum, numCats);
+		return sum;
 	}
 
 	/**
