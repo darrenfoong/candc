@@ -144,6 +144,10 @@ public class ParserBeam {
 							parser.sentence.printC_line(out);
 						}
 					}
+
+					if ( printChartFeatures ) {
+						parser.printFeatures(outFeatures, parser.sentence);
+					}
 				}
 
 				out.println();
@@ -153,7 +157,7 @@ public class ParserBeam {
 				}
 
 				if ( printChartFeatures ) {
-					parser.printFeatures(outFeatures, parser.sentence);
+					outFeatures.println();
 					parser.printChartFeatures(outChartFeatures, parser.sentence);
 				}
 			}
