@@ -30,7 +30,7 @@ public class ChartParserBeamNN extends ChartParserBeam {
 				ruleInstancesParams, lexicon, null, null, false, false, cubePruning,
 				betas, beamSize, beta);
 
-		// nn = new NeuralNetwork<Feature>(modelDir, new Feature());
+		nn = new NeuralNetwork<Feature>(modelDir, new Feature());
 	}
 
 	@Override
@@ -70,7 +70,7 @@ public class ChartParserBeamNN extends ChartParserBeam {
 			return;
 		}
 
-		// double[] predictions = nn.predictSoft(features);
+		double[] predictions = nn.predictSoft(features);
 
 		for ( int pos = 0; pos <= numWords - pos; pos++ ) {
 			Cell cell = chart.cell(pos, span);
@@ -80,7 +80,7 @@ public class ChartParserBeamNN extends ChartParserBeam {
 				double nnScore = 0.0;
 
 				for ( int j = indices.get(i); j < indices.get(i+1); j++ ) {
-					// nnScore += predictions[j];
+					nnScore += predictions[j];
 					nnScore += Math.random();
 				}
 
@@ -95,8 +95,8 @@ public class ChartParserBeamNN extends ChartParserBeam {
 		posEmbeddingsList = new ArrayList<INDArray>();
 
 		for ( int i = 0; i < sentence.words.size(); i++ ) {
-			// wordEmbeddingsList.add(nn.getWordVector(sentence.words.get(i)));
-			// posEmbeddingsList.add(nn.posEmbeddings.getINDArray(sentence.words.get(i)));
+			wordEmbeddingsList.add(nn.getWordVector(sentence.words.get(i)));
+			posEmbeddingsList.add(nn.posEmbeddings.getINDArray(sentence.words.get(i)));
 		}
 	}
 }
