@@ -31,6 +31,7 @@ public class ChartParserBeamNN extends ChartParserBeam {
 				betas, beamSize, beta);
 
 		nn = new NeuralNetwork<Feature>(modelDir, new Feature());
+		chart.weights.setLogP(1.0);
 	}
 
 	@Override
