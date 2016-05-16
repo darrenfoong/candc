@@ -39,7 +39,6 @@ public class ParserBeam {
 		}
 
 		int MAX_WORDS = (Integer) options.valueOf("maxWords");
-		int MAX_SUPERCATS = (Integer) options.valueOf("maxSupercats");
 
 		String grammarDir = (String) options.valueOf("grammarDir");
 		String lexiconFile = (String) options.valueOf("lexiconFile");
@@ -92,7 +91,7 @@ public class ParserBeam {
 		try {
 			lexicon = new Lexicon(lexiconFile);
 			parser = new ChartParserBeam(grammarDir, altMarkedup,
-					eisnerNormalForm, MAX_WORDS, MAX_SUPERCATS,
+					eisnerNormalForm, MAX_WORDS,
 					ruleInstancesParams, lexicon, featuresFile, weightsFile,
 					newFeatures, compactWeights, cubePruning, betas, beamSize, beta);
 			if ( depnn ) {
@@ -129,7 +128,7 @@ public class ParserBeam {
 
 				parser.parseSentence(sentences.next());
 
-				if ( !parser.maxWordsExceeded && !parser.maxSuperCatsExceeded ) {
+				if ( !parser.maxWordsExceeded ) {
 					boolean success = parser.root();
 
 					if ( success ) {

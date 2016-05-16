@@ -41,7 +41,6 @@ public class ParserBeamOracle {
 		}
 
 		int MAX_WORDS = (Integer) options.valueOf("maxWords");
-		int MAX_SUPERCATS = (Integer) options.valueOf("maxSupercats");
 
 		String grammarDir = (String) options.valueOf("grammarDir");
 		String lexiconFile = (String) options.valueOf("lexiconFile");
@@ -80,7 +79,7 @@ public class ParserBeamOracle {
 		try {
 			lexicon = new Lexicon(lexiconFile);
 			parser = new ChartParserBeamOracle(grammarDir, altMarkedup,
-					eisnerNormalForm, MAX_WORDS, MAX_SUPERCATS,
+					eisnerNormalForm, MAX_WORDS,
 					ruleInstancesParams, lexicon, featuresFile, weightsFile,
 					newFeatures, cubePruning, nnHardLabels, betas, beamSize, beta);
 			oracleDecoder = new OracleDepsSumDecoder(parser.categories, false, true ,true);
@@ -107,7 +106,7 @@ public class ParserBeamOracle {
 
 				parser.parseSentence(sentences.next());
 
-				if ( !parser.maxWordsExceeded && !parser.maxSuperCatsExceeded ) {
+				if ( !parser.maxWordsExceeded ) {
 					boolean success = parser.root();
 
 					if ( success ) {

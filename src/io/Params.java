@@ -94,7 +94,6 @@ public class Params {
 		OptionParser optionParser = getBaseOptionParser();
 
 		optionParser.accepts("maxWords").withRequiredArg().ofType(Integer.class).defaultsTo(150);
-		optionParser.accepts("maxSupercats").withRequiredArg().ofType(Integer.class).defaultsTo(500000);
 
 		addDirs(optionParser);
 
@@ -119,7 +118,6 @@ public class Params {
 		OptionParser optionParser = getBaseOptionParser();
 
 		optionParser.accepts("maxWords").withRequiredArg().ofType(Integer.class).defaultsTo(150);
-		optionParser.accepts("maxSupercats").withRequiredArg().ofType(Integer.class).defaultsTo(500000);
 
 		addDirs(optionParser);
 
@@ -178,7 +176,6 @@ public class Params {
 		OptionParser optionParser = getBaseOptionParser();
 
 		optionParser.accepts("maxWords").withRequiredArg().ofType(Integer.class).defaultsTo(150);
-		optionParser.accepts("maxSupercats").withRequiredArg().ofType(Integer.class).defaultsTo(500000);
 
 		addDirs(optionParser);
 
@@ -211,7 +208,6 @@ public class Params {
 		OptionParser optionParser = getBaseOptionParser();
 
 		optionParser.accepts("maxWords").withRequiredArg().ofType(Integer.class).defaultsTo(150);
-		optionParser.accepts("maxSupercats").withRequiredArg().ofType(Integer.class).defaultsTo(500000);
 
 		addDirs(optionParser);
 
@@ -237,7 +233,6 @@ public class Params {
 		OptionParser optionParser = getBaseOptionParser();
 
 		optionParser.accepts("maxWords").withRequiredArg().ofType(Integer.class).defaultsTo(150);
-		optionParser.accepts("maxSupercats").withRequiredArg().ofType(Integer.class).defaultsTo(500000);
 
 		addDirs(optionParser);
 

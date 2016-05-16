@@ -40,7 +40,6 @@ public class CountFeatures {
 		}
 
 		int MAX_WORDS = (Integer) options.valueOf("maxWords");
-		int MAX_SUPERCATS = (Integer) options.valueOf("maxSupercats");
 
 		String grammarDir = (String) options.valueOf("grammarDir");
 		String lexiconFile = (String) options.valueOf("lexiconFile");
@@ -76,7 +75,7 @@ public class CountFeatures {
 		try {
 			lexicon = new Lexicon(lexiconFile);
 			parser = new ChartParserBeam(grammarDir, altMarkedup,
-					eisnerNormalForm, MAX_WORDS, MAX_SUPERCATS,
+					eisnerNormalForm, MAX_WORDS,
 					ruleInstancesParams, lexicon, featuresFile, weightsFile,
 					newFeatures, false, cubePruning, betas, beamSize, beta);
 		} catch ( IOException e ) {
@@ -102,7 +101,7 @@ public class CountFeatures {
 
 				parser.parseSentence(sentences.next());
 
-				if ( !parser.maxWordsExceeded && !parser.maxSuperCatsExceeded ) {
+				if ( !parser.maxWordsExceeded ) {
 					boolean success = countFeaturesDecoder.countFeatures(parser.chart, parser.sentence);
 
 					if ( success ) {

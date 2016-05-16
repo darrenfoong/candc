@@ -40,7 +40,6 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 			boolean altMarkedup,
 			boolean eisnerNormalForm,
 			int MAX_WORDS,
-			int MAX_SUPERCATS,
 			RuleInstancesParams ruleInstancesParams,
 			Lexicon lexicon,
 			String featuresFile,
@@ -53,8 +52,7 @@ public class ChartTrainParserBeam extends ChartParserBeam {
 			boolean parallelUpdate,
 			boolean updateLogP,
 			boolean updateDepNN) throws IOException {
-		super(grammarDir, altMarkedup, eisnerNormalForm, MAX_WORDS,
-				MAX_SUPERCATS, ruleInstancesParams,
+		super(grammarDir, altMarkedup, eisnerNormalForm, MAX_WORDS, ruleInstancesParams,
 				lexicon, featuresFile, weightsFile, newFeatures, false, cubePruning,
 				betas, beamSize, beta);
 

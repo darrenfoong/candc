@@ -46,7 +46,6 @@ public class ChartParserBeam extends ChartParser {
 					boolean altMarkedup,
 					boolean eisnerNormalForm,
 					int MAX_WORDS,
-					int MAX_SUPERCATS,
 					RuleInstancesParams ruleInstancesParams,
 					Lexicon lexicon,
 					String featuresFile,
@@ -58,7 +57,7 @@ public class ChartParserBeam extends ChartParser {
 					int beamSize,
 					double beta) throws IOException {
 		super(grammarDir, altMarkedup, eisnerNormalForm, MAX_WORDS,
-					MAX_SUPERCATS, false, false, ruleInstancesParams,
+					Integer.MAX_VALUE, false, false, ruleInstancesParams,
 					lexicon, featuresFile, weightsFile, newFeatures, compactWeights, betas);
 
 		this.chart = new Chart(MAX_WORDS, categories.dependencyRelations, false, false);
@@ -166,12 +165,6 @@ public class ChartParserBeam extends ChartParser {
 				setCellSize(chart, i, j);
 
 				for (int k = 1; k < j; k++) {
-					if (Chart.getNumSuperCategories() > MAX_SUPERCATS) {
-						maxSuperCatsExceeded = true;
-						logger.info("MAX_SUPERCATS exceeded. (" + Chart.getNumSuperCategories() + " > " + MAX_SUPERCATS + ")");
-						break jloop;
-					}
-
 					logger.trace("Combining cells: (" + i + "," + k + ") (" + (i+k) + "," + (j-k) + ")");
 
 					if (cubePruning) {

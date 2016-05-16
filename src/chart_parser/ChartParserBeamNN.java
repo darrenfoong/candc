@@ -18,7 +18,6 @@ public class ChartParserBeamNN extends ChartParserBeam {
 			boolean altMarkedup,
 			boolean eisnerNormalForm,
 			int MAX_WORDS,
-			int MAX_SUPERCATS,
 			RuleInstancesParams ruleInstancesParams,
 			Lexicon lexicon,
 			String modelDir,
@@ -26,7 +25,7 @@ public class ChartParserBeamNN extends ChartParserBeam {
 			double[] betas,
 			int beamSize,
 			double beta) throws IOException {
-		super(grammarDir, altMarkedup, eisnerNormalForm, MAX_WORDS, MAX_SUPERCATS,
+		super(grammarDir, altMarkedup, eisnerNormalForm, MAX_WORDS,
 				ruleInstancesParams, lexicon, null, null, false, false, cubePruning,
 				betas, beamSize, beta);
 

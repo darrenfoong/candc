@@ -18,7 +18,6 @@ public class ChartParserBeamOracle extends ChartTrainParserBeam {
 			boolean altMarkedup,
 			boolean eisnerNormalForm,
 			int MAX_WORDS,
-			int MAX_SUPERCATS,
 			RuleInstancesParams ruleInstancesParams,
 			Lexicon lexicon,
 			String featuresFile,
@@ -29,8 +28,7 @@ public class ChartParserBeamOracle extends ChartTrainParserBeam {
 			double[] betas,
 			int beamSize,
 			double beta) throws IOException {
-		super(grammarDir, altMarkedup, eisnerNormalForm, MAX_WORDS,
-				MAX_SUPERCATS, ruleInstancesParams,
+		super(grammarDir, altMarkedup, eisnerNormalForm, MAX_WORDS, ruleInstancesParams,
 				lexicon, featuresFile, weightsFile, newFeatures, cubePruning,
 				betas, beamSize, beta, false, false, false);
 

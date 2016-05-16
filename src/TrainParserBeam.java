@@ -44,7 +44,6 @@ public class TrainParserBeam {
 		}
 
 		int MAX_WORDS = (Integer) options.valueOf("maxWords");
-		int MAX_SUPERCATS = (Integer) options.valueOf("maxSupercats");
 
 		String grammarDir = (String) options.valueOf("grammarDir");
 		String lexiconFile = (String) options.valueOf("lexiconFile");
@@ -100,7 +99,7 @@ public class TrainParserBeam {
 		try {
 			lexicon = new Lexicon(lexiconFile);
 			parser = new ChartTrainParserBeam(grammarDir, altMarkedup,
-					eisnerNormalForm, MAX_WORDS, MAX_SUPERCATS,
+					eisnerNormalForm, MAX_WORDS,
 					ruleInstancesParams, lexicon, featuresFile, weightsFile,
 					newFeatures, cubePruning, betas, beamSize, beta, parallelUpdate,
 					updateLogP, updateDepNN);
