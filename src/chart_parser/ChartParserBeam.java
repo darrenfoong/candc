@@ -561,7 +561,7 @@ public class ChartParserBeam extends ChartParser {
 			}
 		}
 
-		logger.info("Size of deps in span " + span + ": " + deps.size());
+		logger.trace("Size of deps in span " + span + ": " + deps.size());
 
 		if ( deps.isEmpty() ) {
 			return;
