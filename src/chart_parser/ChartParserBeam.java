@@ -552,14 +552,16 @@ public class ChartParserBeam extends ChartParser {
 				}
 
 				for ( FilledDependency dep : superCat.filledDeps ) {
-					if ( !ignoreDeps.ignoreDependency(dep, sentence) ) {
+					//if ( !ignoreDeps.ignoreDependency(dep, sentence) ) {
 						deps.add(makeDependency(dep));
-					}
+					//}
 				}
 
 				indices.add(deps.size());
 			}
 		}
+
+		logger.info("Size of deps in span " + span + ": " + deps.size());
 
 		if ( deps.isEmpty() ) {
 			return;
@@ -573,17 +575,18 @@ public class ChartParserBeam extends ChartParser {
 			predictions = depnn.predictSoft(deps);
 		}
 
+		int superCatCount = 0;
+
 		for ( int pos = 0; pos <= numWords - pos; pos++ ) {
 			Cell cell = chart.cell(pos, span);
 
-			for ( int i = 0; i < cell.getSuperCategories().size(); i++ ) {
-				SuperCategory superCat = cell.getSuperCategories().get(i);
-
-				for ( int j = indices.get(i); j < indices.get(i+1); j++ ) {
+			for ( SuperCategory superCat : cell.getSuperCategories() ) {
+				for ( int j = indices.get(superCatCount); j < indices.get(superCatCount+1); j++ ) {
 					superCat.depnnScore += predictions[j];
 				}
 
 				superCat.score += weights.getDepNN() * superCat.depnnScore;
+				superCatCount++;
 			}
 		}
 	}

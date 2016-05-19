@@ -73,13 +73,13 @@ public class ChartParserBeamOracle extends ChartTrainParserBeam {
 				}
 
 				for ( FilledDependency dep : superCat.filledDeps ) {
-					if ( !oracleDecoder.ignoreDeps.ignoreDependency(dep, sentence) ) {
+					//if ( !oracleDecoder.ignoreDeps.ignoreDependency(dep, sentence) ) {
 						if ( cell.goldDeps.contains(dep) ) {
 							superCat.depnnScore += correctScore;
 						} else {
 							superCat.depnnScore += incorrectScore;
 						}
-					}
+					//}
 				}
 
 				superCat.score += weights.getDepNN() * superCat.depnnScore;
