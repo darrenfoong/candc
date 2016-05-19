@@ -19,6 +19,7 @@ import lexicon.Relations;
 import model.Lexicon;
 import uk.ac.cam.cl.depnn.io.Dependency;
 import uk.ac.cam.cl.depnn.nn.NeuralNetwork;
+import uk.ac.cam.cl.depnn.nn.SimpleNeuralNetwork;
 import utils.Pair;
 
 public class ChartParserBeam extends ChartParser {
@@ -589,7 +590,7 @@ public class ChartParserBeam extends ChartParser {
 
 	public void initDepNN(String modelDir, boolean hardLabels, double posThres, double negThres) throws IOException {
 		if ( depnn == null ) {
-			depnn = new NeuralNetwork<Dependency>(modelDir, new Dependency());
+			depnn = new SimpleNeuralNetwork<Dependency>(modelDir, false, new Dependency());
 		}
 
 		this.nnHardLabels = hardLabels;
