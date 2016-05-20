@@ -552,9 +552,9 @@ public class ChartParserBeam extends ChartParser {
 				}
 
 				for ( FilledDependency dep : superCat.filledDeps ) {
-					//if ( !ignoreDeps.ignoreDependency(dep, sentence) ) {
+					if ( !ignoreDeps.ignoreDependency(dep, sentence) ) {
 						deps.add(makeDependency(dep));
-					//}
+					}
 				}
 
 				indices.add(deps.size());
