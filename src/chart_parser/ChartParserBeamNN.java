@@ -10,6 +10,7 @@ import cat_combination.SuperCategory;
 import model.Lexicon;
 import uk.ac.cam.cl.depnn.io.Feature;
 import uk.ac.cam.cl.depnn.nn.NeuralNetwork;
+import uk.ac.cam.cl.depnn.nn.SimpleNeuralNetwork;
 
 public class ChartParserBeamNN extends ChartParserBeam {
 	private NeuralNetwork<Feature> nn;
@@ -29,7 +30,7 @@ public class ChartParserBeamNN extends ChartParserBeam {
 				ruleInstancesParams, lexicon, null, null, false, false, cubePruning,
 				betas, beamSize, beta);
 
-		nn = new NeuralNetwork<Feature>(modelDir, new Feature());
+		nn = new SimpleNeuralNetwork<Feature>(modelDir, false, new Feature());
 		chart.weights.setLogP(1.0);
 	}
 
